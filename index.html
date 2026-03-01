@@ -1591,7 +1591,13 @@
         </div>
       </div>
       <div class="form-group" id="addressGroup" style="display:none;"><label>Alamat Lengkap *</label><textarea id="customerAddress" rows="2" placeholder="Masukkan alamat lengkap"></textarea></div>
-      <div class="form-group"><label>Metode Pembayaran</label><div class="pembayaran-icons"><i class="fas fa-qrcode" title="QRIS"></i><i class="fas fa-money-bill-wave" title="Cash"></i></div><p style="font-size:0.9rem;">* QRIS / Cash (COD)</p></div>
+      <div class="form-group">
+        <label>Metode Pembayaran</label>
+        <div class="radio-group">
+          <div class="radio-option"><input type="radio" id="qris" name="payment" value="qris" checked><label for="qris"><i class="fas fa-qrcode"></i> QRIS</label></div>
+          <div class="radio-option"><input type="radio" id="cash" name="payment" value="cash"><label for="cash"><i class="fas fa-money-bill-wave"></i> Cash (COD)</label></div>
+        </div>
+      </div>
       <div class="form-group"><label>Catatan (Opsional)</label><textarea id="customerNotes" rows="2" placeholder="Contoh: Tolong dikemas rapi"></textarea></div>
       <div class="modal-buttons"><button class="modal-btn btn-cancel" onclick="closeModal()">Batal</button><button class="modal-btn btn-submit" onclick="submitOrder()"><i class="fab fa-whatsapp"></i> Kirim Pesanan</button></div>
     </div>
@@ -1911,6 +1917,7 @@
       const name = document.getElementById('customerName').value.trim();
       const phone = document.getElementById('customerPhone').value.trim();
       const delivery = document.querySelector('input[name="delivery"]:checked').value;
+      const payment = document.querySelector('input[name="payment"]:checked').value;
       const address = document.getElementById('customerAddress').value.trim();
       const notes = document.getElementById('customerNotes').value.trim();
       if (!name||!phone) return showToast('Nama dan telepon harus diisi','error');
@@ -1919,11 +1926,13 @@
       let subtotal = 0;
       cart.forEach(item => { subtotal += item.harga * item.quantity; });
 
+      const paymentLabel = payment === 'qris' ? 'QRIS' : 'Cash (COD)';
       const order = {
         waktu: new Date().toLocaleString('id-ID'),
         nama: name,
         telepon: phone,
         metode: delivery === 'pickup' ? 'Ambil di Toko' : 'Antar ke Rumah',
+        pembayaran: paymentLabel,
         total: subtotal,
         status: 'Selesai'
       };
@@ -1933,7 +1942,7 @@
 
       let message = `*TOSERBA YOLA - PESANAN BARU*\n\n👤 *Nama:* ${name}\n📱 *HP:* ${phone}\n📍 *Metode:* ${delivery==='pickup'?'Ambil di Toko':'Antar ke Rumah'}\n`;
       if (delivery==='delivery') message += `🏠 *Alamat:* ${address}\n`;
-      message += `💳 *Pembayaran:* QRIS/Cash\n${notes ? '📝 *Catatan:* '+notes+'\n' : ''}\n*🛒 DETAIL PRODUK*\n═══════\n`;
+      message += `💳 *Pembayaran:* ${paymentLabel}\n${notes ? '📝 *Catatan:* '+notes+'\n' : ''}\n*🛒 DETAIL PRODUK*\n═══════\n`;
 
       cart.forEach(item => { const sub = item.harga * item.quantity; message += `• ${item.nama} ${item.quantity}x Rp ${item.harga.toLocaleString()} = Rp ${sub.toLocaleString()}\n`; });
       message += `═══════\n*💰 TOTAL: Rp ${subtotal.toLocaleString()}*\n\nTerima kasih.`;
