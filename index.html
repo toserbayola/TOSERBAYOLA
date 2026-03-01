@@ -215,6 +215,16 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
+    /* Logo image in header (rounded) */
+    .logo-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      background: white;
+    }
+
     .logo h1 {
       font-size: 1.4rem;
       font-weight: 700;
@@ -1377,7 +1387,7 @@
   <header>
     <div class="nav-container">
       <div class="logo">
-        <img src="logoyola.jpeg" alt="toserba yola" style="height: 48px; width: auto;">
+        <img src="logoyola.jpeg" alt="toserba yola" class="logo-img">
         
         <h1>TOSERBA YOLA <span>PROMO</span></h1>
       </div>
@@ -1425,10 +1435,10 @@
       <!-- CAROUSEL -->
       <div class="carousel-container" id="carousel">
         <div class="carousel-slides" id="carouselSlides">
-          <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1586201375761-2886500162bf?w=400" alt="Sensabu"><div class="slide-caption"><h3>Promo Sensabu</h3><p>Senin-Rabu diskon 30%</p></div></div>
-          <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1612929633738-8fe44f7ec841?w=400" alt="Jusami"><div class="slide-caption"><h3>Promo Jusami</h3><p>Jumat-Minggu diskon 25%</p></div></div>
-          <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1622480916112-6000a7a8c9f3?w=400" alt="Gajian"><div class="slide-caption"><h3>Promo Gajian</h3><p>25 Feb - 5 Mar diskon 40%</p></div></div>
-          <div class="carousel-slide"><img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400" alt="Hemat"><div class="slide-caption"><h3>Promo Hemat</h3><p>Setiap hari diskon 20%</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Sensabu"><div class="slide-caption"><h3>Promo Sensabu</h3><p>Senin-Rabu diskon 30%</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Jusami"><div class="slide-caption"><h3>Promo Jusami</h3><p>Jumat-Minggu diskon 25%</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Gajian"><div class="slide-caption"><h3>Promo Gajian</h3><p>25 Feb - 5 Mar diskon 40%</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Hemat"><div class="slide-caption"><h3>Promo Hemat</h3><p>Setiap hari diskon 20%</p></div></div>
         </div>
         <button class="carousel-btn carousel-prev" onclick="prevSlide()">❮</button>
         <button class="carousel-btn carousel-next" onclick="nextSlide()">❯</button>
