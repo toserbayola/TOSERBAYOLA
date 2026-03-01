@@ -1671,6 +1671,7 @@
     // HITUNG PENGUNJUNG
     visitorCount++;
     localStorage.setItem('visitorCount', visitorCount);
+    if (document.getElementById('adminPanel') && document.getElementById('adminPanel').style.display === 'block') updateAdminStats();
 
     // SPLASH SCREEN - TOMBOL MASUK
     document.getElementById('enterButton').addEventListener('click', function() {
@@ -1928,6 +1929,7 @@
       };
       orders.push(order);
       localStorage.setItem('orders', JSON.stringify(orders));
+      if (document.getElementById('adminPanel') && document.getElementById('adminPanel').style.display === 'block') updateAdminStats();
 
       let message = `*TOSERBA YOLA - PESANAN BARU*\n\n👤 *Nama:* ${name}\n📱 *HP:* ${phone}\n📍 *Metode:* ${delivery==='pickup'?'Ambil di Toko':'Antar ke Rumah'}\n`;
       if (delivery==='delivery') message += `🏠 *Alamat:* ${address}\n`;
@@ -1968,7 +1970,7 @@
       if (orders.length === 0) {
         ordersList.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada order</td></tr>';
       } else {
-        ordersList.innerHTML = orders.reverse().map(o => `
+        ordersList.innerHTML = orders.slice().reverse().map(o => `
           <tr>
             <td>${o.waktu}</td>
             <td>${o.nama}</td>
@@ -1980,6 +1982,31 @@
         `).join('');
       }
     }
+
+    // Sinkronisasi real-time sederhana:
+    // - Terima event `storage` (dari tab lain) dan update variabel serta UI
+    // - Polling tiap beberapa detik untuk menangani perubahan dari proses eksternal
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'visitorCount') {
+        visitorCount = parseInt(localStorage.getItem('visitorCount') || '0');
+        if (document.getElementById('adminPanel') && document.getElementById('adminPanel').style.display === 'block') updateAdminStats();
+      }
+      if (e.key === 'orders') {
+        orders = JSON.parse(localStorage.getItem('orders') || '[]');
+        if (document.getElementById('adminPanel') && document.getElementById('adminPanel').style.display === 'block') updateAdminStats();
+      }
+    });
+
+    // Polling fallback: per 3 detik periksa perubahan
+    setInterval(function() {
+      const v = parseInt(localStorage.getItem('visitorCount') || '0');
+      const o = JSON.parse(localStorage.getItem('orders') || '[]');
+      if (v !== visitorCount || JSON.stringify(o) !== JSON.stringify(orders)) {
+        visitorCount = v;
+        orders = o;
+        if (document.getElementById('adminPanel') && document.getElementById('adminPanel').style.display === 'block') updateAdminStats();
+      }
+    }, 3000);
 
     function showToast(msg, type='success') { 
       const t = document.getElementById('toastContainer'); 
