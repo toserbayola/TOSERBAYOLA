@@ -9,36 +9,36 @@ function escapeHTML(str) {
 
 
 const produkRetail = [
-  { id:1, nama:"Beras Ramos 5kg", kategori:"sembako", harga:68500, hargaAsli:85000, gambar:"", berat:"5kg", promo:"sensabu" },
-  { id:2, nama:"Minyak Goreng Fortune 2L", kategori:"dapur", harga:35900, hargaAsli:45000, gambar:"", berat:"2L", promo:"sensabu" },
-  { id:3, nama:"Gula Pasir Gulavit 1kg", kategori:"sembako", harga:14500, hargaAsli:17500, gambar:"", berat:"1kg", promo:"sensabu" },
-  { id:4, nama:"Tepung Terigu Segitiga 1kg", kategori:"sembako", harga:12500, hargaAsli:15000, gambar:"", berat:"1kg", promo:"sensabu" },
-  { id:5, nama:"Mie Instan Soto 5 pcs", kategori:"makanan", harga:12500, hargaAsli:15000, gambar:"", berat:"5 bungkus", promo:"sensabu" },
-  { id:6, nama:"Kecap Manis Bango 550ml", kategori:"dapur", harga:28000, hargaAsli:32000, gambar:"", berat:"550ml", promo:"sensabu" },
-  { id:7, nama:"Sabun Mandi Lifebuoy 2in1", kategori:"perawatan", harga:14500, hargaAsli:17000, gambar:"", berat:"450ml", promo:"sensabu" },
-  { id:8, nama:"Pasta Gigi Pepsodent 160g", kategori:"perawatan", harga:12500, hargaAsli:15000, gambar:"", berat:"160g", promo:"sensabu" },
-  { id:9, nama:"Indomie Goreng (40 pcs)", kategori:"makanan", harga:42000, hargaAsli:52000, gambar:"", berat:"40 pcs", promo:"jusami" },
-  { id:10, nama:"Ultra Milk Coklat 1L", kategori:"minuman", harga:16500, hargaAsli:19000, gambar:"", berat:"1L", promo:"jusami" },
-  { id:11, nama:"Teh Botol Sosro 500ml (6 pcs)", kategori:"minuman", harga:38000, hargaAsli:48000, gambar:"", berat:"6 x 500ml", promo:"jusami" },
-  { id:12, nama:"Susu Kental Manis Frisian Flag", kategori:"minuman", harga:11500, hargaAsli:14000, gambar:"", berat:"370g", promo:"jusami" },
-  { id:13, nama:"Roti Tawar Sariroti", kategori:"makanan", harga:21000, hargaAsli:25000, gambar:"", berat:"480g", promo:"jusami" },
-  { id:14, nama:"Selai Stroberi Morin", kategori:"makanan", harga:23500, hargaAsli:28000, gambar:"", berat:"300g", promo:"jusami" },
-  { id:15, nama:"Kopi Kapal Api 50g", kategori:"minuman", harga:8500, hargaAsli:11000, gambar:"", berat:"50g", promo:"jusami" },
-  { id:16, nama:"Nabati Keju 145g", kategori:"cemilan", harga:9900, hargaAsli:15000, gambar:"", berat:"145g", promo:"gajian" },
-  { id:17, nama:"Chitato Sapi Panggang 68g", kategori:"cemilan", harga:8500, hargaAsli:12000, gambar:"", berat:"68g", promo:"gajian" },
-  { id:18, nama:"Kapal Api Special Mix 20 sachet", kategori:"minuman", harga:26000, hargaAsli:32000, gambar:"", berat:"20 sachet", promo:"gajian" },
-  { id:19, nama:"Oreo Coklat 133g", kategori:"cemilan", harga:9800, hargaAsli:13000, gambar:"", berat:"133g", promo:"gajian" },
-  { id:20, nama:"SilverQueen Almond 100g", kategori:"cemilan", harga:14500, hargaAsli:19000, gambar:"", berat:"100g", promo:"gajian" },
-  { id:21, nama:"Pocky Chocolate 47g", kategori:"cemilan", harga:7500, hargaAsli:10000, gambar:"", berat:"47g", promo:"gajian" },
-  { id:22, nama:"Lays Keripik Kentang 68g", kategori:"cemilan", harga:11500, hargaAsli:15000, gambar:"", berat:"68g", promo:"gajian" },
-  { id:23, nama:"Telur Ayam Negeri 1kg", kategori:"makanan", harga:28000, hargaAsli:32000, gambar:"", berat:"1kg", promo:"bulanan" },
-  { id:24, nama:"Apel Fuji 500g", kategori:"buah", harga:16500, hargaAsli:22000, gambar:"", berat:"500g", promo:"bulanan" },
-  { id:25, nama:"Popok Bayi MamyPoko XXL 30", kategori:"bayi", harga:62000, hargaAsli:72000, gambar:"", berat:"30 pcs", promo:"bulanan" },
-  { id:26, nama:"Sabun Cuci Piring Sunlight 450ml", kategori:"rumah", harga:21000, hargaAsli:25000, gambar:"", berat:"450ml", promo:"bulanan" },
-  { id:27, nama:"Shampo Clear 340ml", kategori:"perawatan", harga:33000, hargaAsli:39000, gambar:"", berat:"340ml", promo:"bulanan" },
-  { id:28, nama:"Sabun Colek Daia 900g", kategori:"rumah", harga:16000, hargaAsli:20000, gambar:"", berat:"900g", promo:"bulanan" },
-  { id:29, nama:"Pisang Ambon 1kg", kategori:"buah", harga:18500, hargaAsli:23000, gambar:"", berat:"1kg", promo:"bulanan" },
-  { id:30, nama:"Jeruk Medan 500g", kategori:"buah", harga:17500, hargaAsli:21000, gambar:"", berat:"500g", promo:"bulanan" }
+  { id:1, nama:"Beras Ramos 5kg", kategori:"sembako", harga:68500, hargaAsli:85000, gambar:"", berat:"5kg", promo:"sensabu", icon:"fas fa-bag-shopping" },
+  { id:2, nama:"Minyak Goreng Fortune 2L", kategori:"dapur", harga:35900, hargaAsli:45000, gambar:"", berat:"2L", promo:"sensabu", icon:"fas fa-bottle-water" },
+  { id:3, nama:"Gula Pasir Gulavit 1kg", kategori:"sembako", harga:14500, hargaAsli:17500, gambar:"", berat:"1kg", promo:"sensabu", icon:"fas fa-mortar-pestle" },
+  { id:4, nama:"Tepung Terigu Segitiga 1kg", kategori:"sembako", harga:12500, hargaAsli:15000, gambar:"", berat:"1kg", promo:"sensabu", icon:"fas fa-bag-shopping" },
+  { id:5, nama:"Mie Instan Soto 5 pcs", kategori:"makanan", harga:12500, hargaAsli:15000, gambar:"", berat:"5 bungkus", promo:"sensabu", icon:"fas fa-bowl-food" },
+  { id:6, nama:"Kecap Manis Bango 550ml", kategori:"dapur", harga:28000, hargaAsli:32000, gambar:"", berat:"550ml", promo:"sensabu", icon:"fas fa-bottle-water" },
+  { id:7, nama:"Sabun Mandi Lifebuoy 2in1", kategori:"perawatan", harga:14500, hargaAsli:17000, gambar:"", berat:"450ml", promo:"sensabu", icon:"fas fa-soap" },
+  { id:8, nama:"Pasta Gigi Pepsodent 160g", kategori:"perawatan", harga:12500, hargaAsli:15000, gambar:"", berat:"160g", promo:"sensabu", icon:"fas fa-tooth" },
+  { id:9, nama:"Indomie Goreng (40 pcs)", kategori:"makanan", harga:42000, hargaAsli:52000, gambar:"", berat:"40 pcs", promo:"jusami", icon:"fas fa-bowl-food" },
+  { id:10, nama:"Ultra Milk Coklat 1L", kategori:"minuman", harga:16500, hargaAsli:19000, gambar:"", berat:"1L", promo:"jusami", icon:"fas fa-mug-hot" },
+  { id:11, nama:"Teh Botol Sosro 500ml (6 pcs)", kategori:"minuman", harga:38000, hargaAsli:48000, gambar:"", berat:"6 x 500ml", promo:"jusami", icon:"fas fa-mug-hot" },
+  { id:12, nama:"Susu Kental Manis Frisian Flag", kategori:"minuman", harga:11500, hargaAsli:14000, gambar:"", berat:"370g", promo:"jusami", icon:"fas fa-glass-water" },
+  { id:13, nama:"Roti Tawar Sariroti", kategori:"makanan", harga:21000, hargaAsli:25000, gambar:"", berat:"480g", promo:"jusami", icon:"fas fa-bread-slice" },
+  { id:14, nama:"Selai Stroberi Morin", kategori:"makanan", harga:23500, hargaAsli:28000, gambar:"", berat:"300g", promo:"jusami", icon:"fas fa-jar" },
+  { id:15, nama:"Kopi Kapal Api 50g", kategori:"minuman", harga:8500, hargaAsli:11000, gambar:"", berat:"50g", promo:"jusami", icon:"fas fa-mug-hot" },
+  { id:16, nama:"Nabati Keju 145g", kategori:"cemilan", harga:9900, hargaAsli:15000, gambar:"", berat:"145g", promo:"gajian", icon:"fas fa-cookie" },
+  { id:17, nama:"Chitato Sapi Panggang 68g", kategori:"cemilan", harga:8500, hargaAsli:12000, gambar:"", berat:"68g", promo:"gajian", icon:"fas fa-square" },
+  { id:18, nama:"Kapal Api Special Mix 20 sachet", kategori:"minuman", harga:26000, hargaAsli:32000, gambar:"", berat:"20 sachet", promo:"gajian", icon:"fas fa-mug-hot" },
+  { id:19, nama:"Oreo Coklat 133g", kategori:"cemilan", harga:9800, hargaAsli:13000, gambar:"", berat:"133g", promo:"gajian", icon:"fas fa-cookie" },
+  { id:20, nama:"SilverQueen Almond 100g", kategori:"cemilan", harga:14500, hargaAsli:19000, gambar:"", berat:"100g", promo:"gajian", icon:"fas fa-candy-cane" },
+  { id:21, nama:"Pocky Chocolate 47g", kategori:"cemilan", harga:7500, hargaAsli:10000, gambar:"", berat:"47g", promo:"gajian", icon:"fas fa-candy-cane" },
+  { id:22, nama:"Lays Keripik Kentang 68g", kategori:"cemilan", harga:11500, hargaAsli:15000, gambar:"", berat:"68g", promo:"gajian", icon:"fas fa-square" },
+  { id:23, nama:"Telur Ayam Negeri 1kg", kategori:"makanan", harga:28000, hargaAsli:32000, gambar:"", berat:"1kg", promo:"bulanan", icon:"fas fa-egg" },
+  { id:24, nama:"Apel Fuji 500g", kategori:"buah", harga:16500, hargaAsli:22000, gambar:"", berat:"500g", promo:"bulanan", icon:"fas fa-apple-alt" },
+  { id:25, nama:"Popok Bayi MamyPoko XXL 30", kategori:"bayi", harga:62000, hargaAsli:72000, gambar:"", berat:"30 pcs", promo:"bulanan", icon:"fas fa-baby" },
+  { id:26, nama:"Sabun Cuci Piring Sunlight 450ml", kategori:"rumah", harga:21000, hargaAsli:25000, gambar:"", berat:"450ml", promo:"bulanan", icon:"fas fa-soap" },
+  { id:27, nama:"Shampo Clear 340ml", kategori:"perawatan", harga:33000, hargaAsli:39000, gambar:"", berat:"340ml", promo:"bulanan", icon:"fas fa-bottle-water" },
+  { id:28, nama:"Sabun Colek Daia 900g", kategori:"rumah", harga:16000, hargaAsli:20000, gambar:"", berat:"900g", promo:"bulanan", icon:"fas fa-soap" },
+  { id:29, nama:"Pisang Ambon 1kg", kategori:"buah", harga:18500, hargaAsli:23000, gambar:"", berat:"1kg", promo:"bulanan", icon:"fas fa-leaf" },
+  { id:30, nama:"Jeruk Medan 500g", kategori:"buah", harga:17500, hargaAsli:21000, gambar:"", berat:"500g", promo:"bulanan", icon:"fas fa-orange" }
 ];
 
 let cart = JSON.parse(localStorage.getItem('cartRetail')) || [];
@@ -125,7 +125,7 @@ function renderProdukHome() {
   let filtered = produkRetail.filter(p => p.promo === currentPromo);
   if (currentKategori !== 'all') filtered = filtered.filter(p => p.kategori === currentKategori);
   if (currentSearch) filtered = filtered.filter(p => p.nama.toLowerCase().includes(currentSearch.toLowerCase()));
-  container.innerHTML = filtered.map(p => `<div class="produk-card"><div class="produk-gambar"><img src="${p.gambar}" alt="${p.nama}"></div><div class="produk-info"><div class="produk-nama">${p.nama}</div><div class="produk-berat"><i class="fas fa-weight-hanging"></i> ${p.berat}</div><div class="produk-harga"><span class="harga-asli">Rp ${p.hargaAsli.toLocaleString()}</span><span class="harga-promo">Rp ${p.harga.toLocaleString()}</span></div><button class="btn-tambah" onclick="tambahKeKeranjang(${p.id})"><i class="fas fa-cart-plus"></i> Tambah</button></div></div>`).join('');
+  container.innerHTML = filtered.map(p => `<div class="produk-card"><div class="produk-gambar" style="display:flex;align-items:center;justify-content:center;font-size:2rem;color:#C62828;"><i class="${p.icon}"></i></div><div class="produk-info"><div class="produk-nama">${p.nama}</div><div class="produk-berat"><i class="fas fa-weight-hanging"></i> ${p.berat}</div><div class="produk-harga"><span class="harga-asli">Rp ${p.hargaAsli.toLocaleString()}</span><span class="harga-promo">Rp ${p.harga.toLocaleString()}</span></div><button class="btn-tambah" onclick="tambahKeKeranjang(${p.id})"><i class="fas fa-cart-plus"></i> Tambah</button></div></div>`).join('');
 }
 
 function renderSemuaProduk() {
@@ -133,7 +133,7 @@ function renderSemuaProduk() {
   let filtered = produkRetail;
   if (currentKategori !== 'all') filtered = filtered.filter(p => p.kategori === currentKategori);
   if (currentSearch) filtered = filtered.filter(p => p.nama.toLowerCase().includes(currentSearch.toLowerCase()));
-  container.innerHTML = filtered.map(p => `<div class="produk-card"><div class="produk-gambar"><img src="${p.gambar}" alt="${p.nama}"></div><div class="produk-info"><div class="produk-nama">${p.nama}</div><div class="produk-berat"><i class="fas fa-weight-hanging"></i> ${p.berat}</div><div class="produk-harga"><span class="harga-asli">Rp ${p.hargaAsli.toLocaleString()}</span><span class="harga-promo">Rp ${p.harga.toLocaleString()}</span></div><button class="btn-tambah" onclick="tambahKeKeranjang(${p.id})"><i class="fas fa-cart-plus"></i> Tambah</button></div></div>`).join('');
+  container.innerHTML = filtered.map(p => `<div class="produk-card"><div class="produk-gambar" style="display:flex;align-items:center;justify-content:center;font-size:2rem;color:#C62828;"><i class="${p.icon}"></i></div><div class="produk-info"><div class="produk-nama">${p.nama}</div><div class="produk-berat"><i class="fas fa-weight-hanging"></i> ${p.berat}</div><div class="produk-harga"><span class="harga-asli">Rp ${p.hargaAsli.toLocaleString()}</span><span class="harga-promo">Rp ${p.harga.toLocaleString()}</span></div><button class="btn-tambah" onclick="tambahKeKeranjang(${p.id})"><i class="fas fa-cart-plus"></i> Tambah</button></div></div>`).join('');
 }
 
 window.searchProduk = function() {
@@ -167,7 +167,7 @@ function updateCartUI() {
   else { cartCount.classList.remove('hidden'); cartCount.textContent = totalItems; document.getElementById('checkoutBtn').disabled = false; }
   const cartItemsDiv = document.getElementById('cartItems');
   if (cart.length===0) cartItemsDiv.innerHTML = '<p style="text-align:center;color:var(--abu);">Keranjang kosong</p>';
-  else cartItemsDiv.innerHTML = cart.map(item => `<div class="cart-item"><img src="${item.gambar}" alt="${item.nama}"><div class="cart-item-info"><div class="cart-item-name">${item.nama}</div><div class="cart-item-price">Rp ${item.harga.toLocaleString()}</div><div class="cart-item-qty"><button class="qty-btn" onclick="updateQuantity(${item.id}, -1)"><i class="fas fa-minus"></i></button><span>${item.quantity}</span><button class="qty-btn" onclick="updateQuantity(${item.id}, 1)"><i class="fas fa-plus"></i></button><button class="remove-item" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button></div></div></div>`).join('');
+  else cartItemsDiv.innerHTML = cart.map(item => `<div class="cart-item"><div style="width:50px;height:50px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#C62828;background:#F5F5F5;border-radius:4px;"><i class="${item.icon}"></i></div><div class="cart-item-info"><div class="cart-item-name">${item.nama}</div><div class="cart-item-price">Rp ${item.harga.toLocaleString()}</div><div class="cart-item-qty"><button class="qty-btn" onclick="updateQuantity(${item.id}, -1)"><i class="fas fa-minus"></i></button><span>${item.quantity}</span><button class="qty-btn" onclick="updateQuantity(${item.id}, 1)"><i class="fas fa-plus"></i></button><button class="remove-item" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button></div></div></div>`).join('');
   document.getElementById('cartTotal').textContent = `Rp ${cart.reduce((s,i)=> s + i.harga * i.quantity,0).toLocaleString()}`;
 }
 
