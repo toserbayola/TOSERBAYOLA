@@ -41,22 +41,17 @@
       --radius-lg: 24px;
       --radius-circle: 50%;
 
-      /* warna tambahan */
       --emas: #FFC107;
       --emas-gelap: #FFA000;
-      --biru-muda: #E3F2FD;
-      --ungu-muda: #F3E5F5;
-      --glass: rgba(255,255,255,0.2);
-      --glass-border: rgba(255,255,255,0.1);
     }
 
-    /* Dark mode */
+    /* Dark mode - perbaikan warna teks */
     body.dark-mode {
       --putih-gading: #121212;
       --hitam: #FFFFFF;
       --abu-muda: #333333;
-      --abu: #555555;
-      --abu-gelap: #AAAAAA;
+      --abu: #AAAAAA;
+      --abu-gelap: #CCCCCC;
       background: #1e1e1e;
       color: #f0f0f0;
     }
@@ -68,12 +63,106 @@
     body.dark-mode .admin-panel,
     body.dark-mode .admin-login-container,
     body.dark-mode .cart-sidebar,
-    body.dark-mode .wishlist-sidebar,
     body.dark-mode .modal-content,
     body.dark-mode .quickview-content {
       background: #2d2d2d;
       color: #f0f0f0;
       border-color: #444;
+    }
+
+    body.dark-mode input,
+    body.dark-mode textarea,
+    body.dark-mode select {
+      background: #3d3d3d;
+      color: #f0f0f0;
+      border-color: #555;
+    }
+
+    body.dark-mode input::placeholder,
+    body.dark-mode textarea::placeholder {
+      color: #aaa;
+    }
+
+    body.dark-mode .btn-quickview {
+      background: rgba(255,255,255,0.2);
+      color: white;
+    }
+
+    body.dark-mode .qty-btn {
+      background: #3d3d3d;
+      color: #f0f0f0;
+      border-color: #555;
+    }
+
+    body.dark-mode .cart-footer {
+      background: #2d2d2d;
+      border-color: #444;
+    }
+
+    body.dark-mode .cart-total span {
+      color: #f0f0f0;
+    }
+
+    body.dark-mode .total-price {
+      color: var(--merah-terang);
+    }
+
+    body.dark-mode .footer-section p,
+    body.dark-mode .footer-bottom p {
+      color: #ddd;
+    }
+
+    body.dark-mode .promo-card h4,
+    body.dark-mode .promo-card p {
+      color: #f0f0f0;
+    }
+
+    body.dark-mode .kategori-item span {
+      color: #f0f0f0;
+    }
+
+    body.dark-mode .kategori-item.active span {
+      color: white;
+    }
+
+    body.dark-mode .produk-nama {
+      color: #f0f0f0;
+    }
+
+    body.dark-mode .produk-berat {
+      color: #aaa;
+    }
+
+    body.dark-mode .harga-asli {
+      color: #aaa;
+    }
+
+    body.dark-mode .harga-promo {
+      color: var(--merah-terang);
+    }
+
+    /* Perbaikan menu off-canvas di mode dark */
+    body.dark-mode .offcanvas-menu {
+      background: #2d2d2d;
+      color: #f0f0f0;
+      border-color: #444;
+    }
+
+    body.dark-mode .offcanvas-menu a {
+      color: #ffffff; /* putih terang */
+    }
+
+    body.dark-mode .offcanvas-menu a:hover {
+      background: #444;
+      color: #ffffff;
+    }
+
+    body.dark-mode .offcanvas-header h3 {
+      color: #ffffff;
+    }
+
+    body.dark-mode .offcanvas-menu i {
+      color: var(--merah-terang); /* ikon merah tetap terang */
     }
 
     body {
@@ -291,12 +380,12 @@
     }
 
     /* ripple */
-    .btn-tambah, .splash-button, .btn-checkout, .modal-btn, .btn-wishlist, .dark-mode-toggle {
+    .btn-tambah, .splash-button, .btn-checkout, .modal-btn, .dark-mode-toggle {
       position: relative;
       overflow: hidden;
     }
 
-    .btn-tambah::after, .splash-button::after, .btn-checkout::after, .modal-btn::after, .btn-wishlist::after, .dark-mode-toggle::after {
+    .btn-tambah::after, .splash-button::after, .btn-checkout::after, .modal-btn::after, .dark-mode-toggle::after {
       content: '';
       position: absolute;
       top: 50%;
@@ -309,7 +398,7 @@
       transition: width 0.4s, height 0.4s;
     }
 
-    .btn-tambah:active::after, .splash-button:active::after, .btn-checkout:active::after, .modal-btn:active::after, .btn-wishlist:active::after, .dark-mode-toggle:active::after {
+    .btn-tambah:active::after, .splash-button:active::after, .btn-checkout:active::after, .modal-btn:active::after, .dark-mode-toggle:active::after {
       width: 300px;
       height: 300px;
     }
@@ -327,8 +416,8 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* badge berkedip */
-    .cart-badge, .wishlist-badge {
+    /* badge keranjang berkedip */
+    .cart-badge {
       animation: pulseBadge 1.5s infinite;
     }
 
@@ -338,7 +427,7 @@
       100% { transform: scale(1); }
     }
 
-    /* animasi masuk */
+    /* animasi masuk produk */
     .produk-card {
       animation: fadeInUp 0.6s ease forwards;
       opacity: 0;
@@ -451,7 +540,7 @@
       transform: scale(1.1);
     }
 
-    /* efek kilau */
+    /* efek kilau (untuk elemen tertentu) */
     .promo-tag {
       position: relative;
       overflow: hidden;
@@ -591,7 +680,7 @@
       color: white;
     }
 
-    .cart-badge, .wishlist-badge {
+    .cart-badge {
       position: absolute;
       top: -5px;
       right: -5px;
@@ -608,7 +697,7 @@
       border: 2px solid white;
     }
 
-    .cart-badge.hidden, .wishlist-badge.hidden {
+    .cart-badge.hidden {
       display: none;
     }
 
@@ -993,6 +1082,7 @@
     .kategori-item span {
       font-size: 0.7rem;
       font-weight: 500;
+      color: var(--hitam);
     }
 
     /* PRODUK GRID */
@@ -1043,37 +1133,7 @@
       transform: scale(1.1);
     }
 
-    .btn-wishlist {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 32px;
-      height: 32px;
-      background: white;
-      border: none;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--merah);
-      font-size: 1rem;
-      cursor: pointer;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s;
-      z-index: 5;
-    }
-
-    .btn-wishlist:hover {
-      transform: scale(1.1);
-      background: var(--merah);
-      color: white;
-    }
-
-    .btn-wishlist.active {
-      background: var(--merah);
-      color: white;
-    }
-
+    /* Tombol quick view */
     .btn-quickview {
       position: absolute;
       bottom: 8px;
@@ -1093,25 +1153,6 @@
 
     .produk-card:hover .btn-quickview {
       opacity: 1;
-    }
-
-    /* stiker promo */
-    .stiker-promo {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: var(--merah);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 20px;
-      font-size: 0.6rem;
-      font-weight: 600;
-      z-index: 5;
-      animation: pulse 1.5s infinite;
-    }
-
-    .stiker-hot {
-      background: #ff5722;
     }
 
     .produk-info {
@@ -1187,24 +1228,32 @@
       height: 200px;
     }
 
-    /* countdown timer */
+    /* countdown timer - diperkecil untuk mobile */
     .countdown-timer {
       background: rgba(0,0,0,0.7);
       color: white;
-      padding: 8px 16px;
-      border-radius: 50px;
+      padding: 6px 12px;
+      border-radius: 30px;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 16px;
-      font-weight: 600;
+      font-weight: 500;
+      font-size: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .countdown-timer i {
+      font-size: 1rem;
     }
 
     .countdown-timer span {
       background: var(--merah);
-      padding: 4px 8px;
-      border-radius: 20px;
+      padding: 3px 6px;
+      border-radius: 16px;
       margin: 0 2px;
+      font-size: 0.75rem;
+      font-weight: 600;
     }
 
     /* floating emoji */
@@ -1520,113 +1569,6 @@
       cursor: not-allowed;
     }
 
-    /* WISHLIST SIDEBAR */
-    .wishlist-sidebar {
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 100%;
-      max-width: 400px;
-      height: 100vh;
-      background: white;
-      z-index: 2000;
-      transition: right 0.3s ease;
-      display: flex;
-      flex-direction: column;
-      box-shadow: var(--shadow-md);
-    }
-
-    .wishlist-sidebar.open {
-      right: 0;
-    }
-
-    .wishlist-header {
-      background: var(--gradien-hijau);
-      color: white;
-      padding: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .wishlist-header h3 {
-      font-size: 1.3rem;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .close-wishlist {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.2);
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-
-    .wishlist-items {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-    }
-
-    .wishlist-item {
-      display: flex;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid var(--abu-muda);
-    }
-
-    .wishlist-item img {
-      width: 70px;
-      height: 70px;
-      border-radius: var(--radius-sm);
-      object-fit: cover;
-    }
-
-    .wishlist-item-info {
-      flex: 1;
-    }
-
-    .wishlist-item-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
-    }
-
-    .wishlist-item-price {
-      color: var(--merah);
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .wishlist-item-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .wishlist-add-cart {
-      background: var(--gradien-hijau);
-      color: white;
-      border: none;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-
-    .wishlist-remove {
-      background: var(--merah);
-      color: white;
-      border: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
     /* MODAL QUICK VIEW */
     .quickview-modal {
       display: none;
@@ -1721,8 +1663,7 @@
     }
 
     .quickview-btn-wishlist {
-      background: var(--abu-muda);
-      color: var(--hitam);
+      display: none; /* wishlist dihapus */
     }
 
     .quickview-close {
@@ -2126,10 +2067,7 @@
         <div class="menu-icon" id="menuToggle">
           <i class="fas fa-bars"></i>
         </div>
-        <div class="nav-icon" onclick="toggleWishlist()" data-tooltip="Wishlist">
-          <i class="fas fa-heart"></i>
-          <span class="wishlist-badge hidden" id="wishlistCount">0</span>
-        </div>
+        <!-- Wishlist dihapus -->
         <div class="nav-icon" onclick="toggleCart()" data-tooltip="Keranjang">
           <i class="fas fa-shopping-cart"></i>
           <span class="cart-badge hidden" id="cartCount">0</span>
@@ -2160,9 +2098,9 @@
   </div>
   <div class="menu-overlay" id="menuOverlay"></div>
 
-  <!-- COUNTDOWN TIMER -->
+  <!-- COUNTDOWN TIMER (diperkecil) -->
   <div class="countdown-timer" id="countdownTimer">
-    <i class="fas fa-hourglass-half"></i> Promo Gajian berakhir dalam: <span id="days">00</span>h <span id="hours">00</span>j <span id="minutes">00</span>m <span id="seconds">00</span>d
+    <i class="fas fa-hourglass-half"></i> Promo Gajian berakhir: <span id="days">00</span>h <span id="hours">00</span>j <span id="minutes">00</span>m <span id="seconds">00</span>d
   </div>
 
   <main>
@@ -2272,12 +2210,6 @@
     </div>
   </div>
 
-  <!-- WISHLIST SIDEBAR -->
-  <div class="wishlist-sidebar" id="wishlistSidebar">
-    <div class="wishlist-header"><h3><i class="fas fa-heart"></i> Wishlist</h3><button class="close-wishlist" onclick="toggleWishlist()"><i class="fas fa-times"></i></button></div>
-    <div class="wishlist-items" id="wishlistItems"></div>
-  </div>
-
   <!-- CHECKOUT MODAL -->
   <div class="modal" id="checkoutModal">
     <div class="modal-content">
@@ -2310,7 +2242,7 @@
         <div class="quickview-desc" id="quickviewDesc"></div>
         <div class="quickview-actions">
           <button class="quickview-btn quickview-btn-cart" id="quickviewAddCart"><i class="fas fa-cart-plus"></i> Tambah ke Keranjang</button>
-          <button class="quickview-btn quickview-btn-wishlist" id="quickviewAddWishlist"><i class="fas fa-heart"></i> Wishlist</button>
+          <!-- Tombol wishlist dihapus -->
         </div>
       </div>
     </div>
@@ -2387,7 +2319,7 @@
 
     // ========== STATE ==========
     let cart = JSON.parse(localStorage.getItem('cartRetail')) || [];
-    let wishlist = JSON.parse(localStorage.getItem('wishlistRetail')) || [];
+    // wishlist dihapus
     let currentKategori = 'all';
     let currentPromo = 'sensabu';
     let currentSearch = '';
@@ -2546,9 +2478,8 @@
           <div class="produk-card">
             <div class="produk-gambar">
               <img src="${p.gambar}" alt="${p.nama}">
-              <button class="btn-wishlist ${wishlist.some(w => w.id === p.id) ? 'active' : ''}" onclick="toggleWishlistItem(${p.id}, event)"><i class="fas fa-heart"></i></button>
+              <!-- Tombol wishlist dihapus -->
               <button class="btn-quickview" onclick="openQuickview(${p.id})"><i class="fas fa-eye"></i> Lihat</button>
-              <div class="stiker-promo stiker-hot">HOT</div>
             </div>
             <div class="produk-info">
               <div class="produk-nama">${p.nama}</div>
@@ -2561,7 +2492,7 @@
             </div>
           </div>
         `).join('');
-      }, 500); // simulasi loading
+      }, 500);
     }
 
     function renderSemuaProduk() {
@@ -2576,9 +2507,8 @@
           <div class="produk-card">
             <div class="produk-gambar">
               <img src="${p.gambar}" alt="${p.nama}">
-              <button class="btn-wishlist ${wishlist.some(w => w.id === p.id) ? 'active' : ''}" onclick="toggleWishlistItem(${p.id}, event)"><i class="fas fa-heart"></i></button>
+              <!-- Tombol wishlist dihapus -->
               <button class="btn-quickview" onclick="openQuickview(${p.id})"><i class="fas fa-eye"></i> Lihat</button>
-              <div class="stiker-promo">SALE</div>
             </div>
             <div class="produk-info">
               <div class="produk-nama">${p.nama}</div>
@@ -2601,16 +2531,13 @@
     };
 
     // ========== CART ==========
-    window.tambahKeKeranjang = function(id, fromWishlist = false) {
+    window.tambahKeKeranjang = function(id) {
       const produk = produkRetail.find(p => p.id === id);
       const existing = cart.find(i => i.id === id);
       if (existing) existing.quantity++;
       else cart.push({...produk, quantity:1});
       saveCart(); updateCartUI(); showToast(`${produk.nama} ditambahkan ke keranjang`,'success');
       createFloatingEmoji('🛒');
-      if (fromWishlist) {
-        // optional hapus dari wishlist?
-      }
     };
 
     window.updateQuantity = function(id, change) {
@@ -2651,51 +2578,6 @@
 
     window.toggleCart = ()=> document.getElementById('cartSidebar').classList.toggle('open');
 
-    // ========== WISHLIST ==========
-    window.toggleWishlistItem = function(id, event) {
-      if (event) event.stopPropagation();
-      const produk = produkRetail.find(p => p.id === id);
-      const existingIndex = wishlist.findIndex(w => w.id === id);
-      if (existingIndex !== -1) {
-        wishlist.splice(existingIndex, 1);
-        showToast(`${produk.nama} dihapus dari wishlist`, 'success');
-      } else {
-        wishlist.push(produk);
-        showToast(`${produk.nama} ditambahkan ke wishlist`, 'success');
-        createFloatingEmoji('❤️');
-      }
-      saveWishlist();
-      updateWishlistUI();
-      renderProdukHome();
-      renderSemuaProduk();
-    };
-
-    function saveWishlist() { localStorage.setItem('wishlistRetail', JSON.stringify(wishlist)); }
-
-    function updateWishlistUI() {
-      document.getElementById('wishlistCount').textContent = wishlist.length;
-      if (wishlist.length === 0) document.getElementById('wishlistCount').classList.add('hidden');
-      else document.getElementById('wishlistCount').classList.remove('hidden');
-
-      const wishlistItems = document.getElementById('wishlistItems');
-      if (wishlist.length === 0) wishlistItems.innerHTML = '<p style="text-align:center;color:var(--abu);">Wishlist kosong</p>';
-      else wishlistItems.innerHTML = wishlist.map(item => `
-        <div class="wishlist-item">
-          <img src="${item.gambar}" alt="${item.nama}">
-          <div class="wishlist-item-info">
-            <div class="wishlist-item-name">${item.nama}</div>
-            <div class="wishlist-item-price">Rp ${item.harga.toLocaleString()}</div>
-            <div class="wishlist-item-actions">
-              <button class="wishlist-add-cart" onclick="tambahKeKeranjang(${item.id}, true)"><i class="fas fa-cart-plus"></i> Keranjang</button>
-              <button class="wishlist-remove" onclick="toggleWishlistItem(${item.id})"><i class="fas fa-trash"></i></button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    window.toggleWishlist = ()=> document.getElementById('wishlistSidebar').classList.toggle('open');
-
     // ========== QUICK VIEW ==========
     window.openQuickview = function(id) {
       const produk = produkRetail.find(p => p.id === id);
@@ -2705,7 +2587,6 @@
       document.getElementById('quickviewBerat').innerHTML = `<i class="fas fa-weight-hanging"></i> ${produk.berat}`;
       document.getElementById('quickviewDesc').textContent = produk.deskripsi || 'Tidak ada deskripsi.';
       document.getElementById('quickviewAddCart').onclick = function() { tambahKeKeranjang(produk.id); closeQuickview(); };
-      document.getElementById('quickviewAddWishlist').onclick = function() { toggleWishlistItem(produk.id); closeQuickview(); };
       document.getElementById('quickviewModal').classList.add('active');
     };
 
@@ -2796,7 +2677,7 @@
       cart = []; saveCart(); updateCartUI(); closeModal();
       document.getElementById('customerName').value = ''; document.getElementById('customerPhone').value = ''; document.getElementById('customerAddress').value = ''; 
       showToast('Pesanan dikirim!','success');
-      launchConfetti(); // rayakan
+      launchConfetti();
     };
 
     // ========== ADMIN ==========
@@ -2848,24 +2729,9 @@
       else backToTop.classList.remove('show');
     });
 
-    // ========== SCROLL REVEAL ==========
-    function revealOnScroll() {
-      const reveals = document.querySelectorAll('.reveal');
-      for (let i = 0; i < reveals.length; i++) {
-        const windowHeight = window.innerHeight;
-        const revealTop = reveals[i].getBoundingClientRect().top;
-        const revealPoint = 150;
-        if (revealTop < windowHeight - revealPoint) {
-          reveals[i].classList.add('active');
-        }
-      }
-    }
-    window.addEventListener('scroll', revealOnScroll);
-
     // ========== INIT ==========
     renderProdukHome();
     updateCartUI();
-    updateWishlistUI();
 
     window.onclick = e => { 
       if (e.target.classList.contains('modal')) e.target.classList.remove('active');
@@ -2875,7 +2741,6 @@
       if(e.key==='Escape') { 
         document.querySelectorAll('.modal.active, .quickview-modal.active').forEach(m=>m.classList.remove('active')); 
         document.getElementById('cartSidebar').classList.remove('open'); 
-        document.getElementById('wishlistSidebar').classList.remove('open');
         closeMenu(); 
       } 
     });
