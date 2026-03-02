@@ -84,19 +84,24 @@
     }
 
     .splash-logo {
-      width: 150px;
-      height: 150px;
-      background: white;
-      border-radius: 50%;
+      width: 170px;
+      height: 170px;
+      background: transparent;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       margin: 0 auto 30px;
-      font-size: 4.5rem;
-      font-weight: 800;
-      color: var(--merah);
       box-shadow: 0 20px 40px rgba(0,0,0,0.4);
       animation: logoEntrance 2s ease, float 3s ease-in-out infinite 2s;
+      overflow: hidden;
+    }
+
+    .splash-logo img, .logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
     }
 
     .splash-text {
@@ -196,15 +201,13 @@
     .logo-icon {
       width: 48px;
       height: 48px;
-      background: var(--putih);
-      border-radius: var(--radius-sm);
+      background: transparent;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
-      font-size: 1.8rem;
-      color: var(--merah);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      overflow: hidden;
     }
 
     .logo h1 {
@@ -1357,7 +1360,7 @@
   <!-- SPLASH SCREEN DENGAN TOMBOL -->
   <div class="splash-screen" id="splashScreen">
     <div class="splash-content">
-      <div class="splash-logo">TY</div>
+        <div class="splash-logo"><img src="assets/logoyola.svg" alt="Logo Loyola"></div>
       <div class="splash-text">Assalamualaikum</div>
       <div class="splash-sub">Selamat Datang di TOSERBA YOLA</div>
       <button class="splash-button" id="enterButton">MASUK</button>
@@ -1367,7 +1370,7 @@
   <header>
     <div class="nav-container">
       <div class="logo">
-        <div class="logo-icon">TY</div>
+        <div class="logo-icon"><img src="assets/logoyola.svg" alt="Logo Loyola"></div>
         <h1>TOSERBA YOLA <span>PROMO</span></h1>
       </div>
       <div class="search-box">

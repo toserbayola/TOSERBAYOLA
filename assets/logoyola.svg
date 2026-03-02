@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Stylized shield / crest with Y letter (generic placeholder) -->
+  <defs>
+    <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#C62828"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="28" fill="url(#g1)" />
+  <g transform="translate(20,20) scale(0.9)" fill="#FFFFFF">
+    <text x="100" y="115" font-family="Poppins,Arial,sans-serif" font-size="98" font-weight="800" text-anchor="middle" alignment-baseline="middle">Y</text>
+  </g>
+</svg>
