@@ -3164,10 +3164,16 @@
     localStorage.setItem('visitorCount', visitorCount);
 
     // Cek session admin
-    isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
-    if (isAdminLoggedIn) {
-      document.getElementById('adminLogin').style.display = 'none';
-      document.getElementById('adminPanel').style.display = 'block';
+    try {
+      isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+      if (isAdminLoggedIn) {
+        const adminLoginEl = document.getElementById('adminLogin');
+        const adminPanelEl = document.getElementById('adminPanel');
+        if (adminLoginEl) adminLoginEl.style.display = 'none';
+        if (adminPanelEl) adminPanelEl.style.display = 'block';
+      }
+    } catch (e) {
+      console.error('Error checking admin session:', e);
     }
 
     // ========== DARK MODE ==========
@@ -3184,43 +3190,56 @@
     }
 
     if (localStorage.getItem('darkMode') === 'enabled') {
-      document.body.classList.add('dark-mode');
-      document.querySelector('#darkModeToggle i').className = 'fas fa-sun';
+      try {
+        document.body.classList.add('dark-mode');
+        const icon = document.querySelector('#darkModeToggle i');
+        if (icon) icon.className = 'fas fa-sun';
+      } catch (e) {
+        console.error('Error applying dark mode:', e);
+      }
     }
 
     // ========== PARTIKEL (OPTIMIZED) ==========
     function createParticles() {
-      const particlesContainer = document.getElementById('particles');
-      if (!particlesContainer) return;
-      for (let i = 0; i < 5; i++) { // reduced from 15 to 5
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        const size = Math.random() * 10 + 5;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDuration = Math.random() * 10 + 10 + 's';
-        particle.style.animationDelay = Math.random() * 5 + 's';
-        particle.style.background = i % 2 === 0 ? 'rgba(198,40,40,0.1)' : 'rgba(46,125,50,0.1)';
-        particlesContainer.appendChild(particle);
+      try {
+        const particlesContainer = document.getElementById('particles');
+        if (!particlesContainer) return;
+        for (let i = 0; i < 5; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          const size = Math.random() * 10 + 5;
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+          particle.style.animationDelay = Math.random() * 5 + 's';
+          particle.style.background = i % 2 === 0 ? 'rgba(198,40,40,0.1)' : 'rgba(46,125,50,0.1)';
+          particlesContainer.appendChild(particle);
+        }
+      } catch (e) {
+        console.error('Error creating particles:', e);
       }
     }
     createParticles();
 
     function createSplashParticles() {
-      const splashParticles = document.getElementById('splashParticles');
-      if (!splashParticles) return;
-      for (let i = 0; i < 5; i++) { // reduced from 15 to 5
-        const particle = document.createElement('div');
-        particle.className = 'splash-particle';
-        const size = Math.random() * 15 + 5;
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDuration = Math.random() * 10 + 10 + 's';
-        particle.style.animationDelay = Math.random() * 5 + 's';
-        particle.style.background = i % 2 === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)';
-        splashParticles.appendChild(particle);
+      try {
+        const splashParticles = document.getElementById('splashParticles');
+        if (!splashParticles) return;
+        for (let i = 0; i < 5; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'splash-particle';
+          const size = Math.random() * 15 + 5;
+          particle.style.width = size + 'px';
+          particle.style.height = size + 'px';
+          particle.style.left = Math.random() * 100 + '%';
+          particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+          particle.style.animationDelay = Math.random() * 5 + 's';
+          particle.style.background = i % 2 === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)';
+          splashParticles.appendChild(particle);
+        }
+      } catch (e) {
+        console.error('Error creating splash particles:', e);
       }
     }
     createSplashParticles();
@@ -3243,26 +3262,35 @@
 
     // ========== COUNTDOWN TIMER ==========
     function updateCountdown() {
-      const targetDate = new Date('March 5, 2026 23:59:59').getTime();
-      const now = new Date().getTime();
-      const diff = targetDate - now;
-      if (diff < 0) {
-        document.getElementById('countdownTimer').style.display = 'none';
-        return;
+      try {
+        const targetDate = new Date('March 5, 2026 23:59:59').getTime();
+        const now = new Date().getTime();
+        const diff = targetDate - now;
+        if (diff < 0) {
+          const timer = document.getElementById('countdownTimer');
+          if (timer) timer.style.display = 'none';
+          return;
+        }
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+        if (daysEl) daysEl.textContent = String(days).padStart(2,'0');
+        if (hoursEl) hoursEl.textContent = String(hours).padStart(2,'0');
+        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2,'0');
+        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2,'0');
+      } catch (e) {
+        console.error('Error updating countdown:', e);
       }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      document.getElementById('days').textContent = String(days).padStart(2,'0');
-      document.getElementById('hours').textContent = String(hours).padStart(2,'0');
-      document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
-      document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
     }
     setInterval(updateCountdown, 5000); // optimized: 5sec instead of 1sec for countdown
 
-    document.getElementById('enterButton').addEventListener('click', function() {
-      document.getElementById('splashScreen').classList.add('hidden');
+    document.getElementById('enterButton')?.addEventListener('click', function() {
+      document.getElementById('splashScreen')?.classList.add('hidden');
     });
 
     // ========== MENU ==========
@@ -3333,7 +3361,7 @@
     // Single event delegation for kategori (avoid re-adding listeners)
     document.addEventListener('click', (e) => {
       const kategoriItem = e.target.closest('[data-kategori]');
-      if (kategoriItem && kategoriItem.parentElement.id === 'kategoriProduk') {
+      if (kategoriItem && kategoriItem.parentElement?.id === 'kategoriProduk') {
         filterKategori(kategoriItem.dataset.kategori, 'produk');
       }
     });
@@ -3397,13 +3425,9 @@
         filterTimer = setTimeout(() => {
           if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
         }, 300);
-      });
-    }
-      });
-    }
+      });    }
 
     // ========== RENDER PRODUK ==========
-    function renderProdukHome() {
       const container = document.getElementById('produkPromo');
       if (!container) return;
       
@@ -3431,8 +3455,7 @@
             </div>
           </div>
         `).join('');
-      }, 500);
-    }
+  
 
     function renderSemuaProduk() {
       const container = document.getElementById('semuaProduk');
@@ -3484,12 +3507,12 @@
     }
 
     function searchProduk() {
-      if (document.getElementById('home').classList.contains('active')) renderProdukHome();
-      else if (document.getElementById('produk').classList.contains('active')) renderSemuaProduk();
+      if (document.getElementById('home')?.classList.contains('active')) renderProdukHome();
+      else if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
     }
 
-    document.getElementById('searchDesktop').addEventListener('input', debounce(searchProduk, 500));
-    document.getElementById('searchMobile').addEventListener('input', debounce(searchProduk, 500));
+    document.getElementById('searchDesktop')?.addEventListener('input', debounce(searchProduk, 500));
+    document.getElementById('searchMobile')?.addEventListener('input', debounce(searchProduk, 500));
 
     // ========== TOMBOL SHARE ==========
     window.shareProduct = function(id, event) {
@@ -3619,7 +3642,10 @@
       renderRekomendasi();
     }
 
-    window.toggleCart = ()=> document.getElementById('cartSidebar').classList.toggle('open');
+    window.toggleCart = ()=> {
+      const cartSidebar = document.getElementById('cartSidebar');
+      if (cartSidebar) cartSidebar.classList.toggle('open');
+    };
 
     // ========== QUICK VIEW ==========
     window.openQuickview = function(id) {
@@ -3767,12 +3793,15 @@
     };
 
     // Tampilkan/sembunyikan alamat berdasarkan metode pengambilan
-    document.querySelectorAll('input[name="delivery"]').forEach(r => {
-      r.addEventListener('change', function() {
-        document.getElementById('addressGroup').style.display = 
-          this.value === 'delivery' ? 'block' : 'none';
+    const deliveryInputs = document.querySelectorAll('input[name="delivery"]');
+    if (deliveryInputs.length > 0) {
+      deliveryInputs.forEach(r => {
+        r.addEventListener('change', function() {
+          const addressGroup = document.getElementById('addressGroup');
+          if (addressGroup) addressGroup.style.display = this.value === 'delivery' ? 'block' : 'none';
+        });
       });
-    });
+    }
 
     window.submitOrder = function() {
       // Ambil data dari form
@@ -4497,49 +4526,92 @@
     // ========== BACK TO TOP ==========
     window.addEventListener('scroll', function() {
       const backToTop = document.getElementById('backToTop');
-      if (window.scrollY > 300) backToTop.classList.add('show');
-      else backToTop.classList.remove('show');
+      if (backToTop) {
+        if (window.scrollY > 300) backToTop.classList.add('show');
+        else backToTop.classList.remove('show');
+      }
     });
 
     // ========== INIT ==========
     function init() {
-      renderProdukHome();
-      updateCartUI();
+      try {
+        renderProdukHome();
+      } catch (e) {
+        console.error('Error rendering home:', e);
+      }
+      try {
+        updateCartUI();
+      } catch (e) {
+        console.error('Error updating cart:', e);
+      }
       
       // Cek session customer
-      if (currentCustomer) {
-        document.getElementById('loginMenu').style.display = 'none';
-        document.getElementById('logoutMenu').style.display = 'block';
-        document.getElementById('customerDashboardMenu').style.display = 'block';
-        document.getElementById('myOrdersMenu').style.display = 'block';
-        
-        // Tampilkan menu tracking di desktop
-        document.getElementById('desktopTrackingMenu').style.display = 'flex';
-      } else {
-        document.getElementById('loginMenu').style.display = 'block';
-        document.getElementById('logoutMenu').style.display = 'none';
-        document.getElementById('customerDashboardMenu').style.display = 'none';
-        document.getElementById('myOrdersMenu').style.display = 'none';
-        
-        // Sembunyikan menu tracking di desktop
-        document.getElementById('desktopTrackingMenu').style.display = 'none';
+      try {
+        if (currentCustomer) {
+          const loginMenu = document.getElementById('loginMenu');
+          const logoutMenu = document.getElementById('logoutMenu');
+          const dashMenu = document.getElementById('customerDashboardMenu');
+          const ordersMenu = document.getElementById('myOrdersMenu');
+          const trackMenu = document.getElementById('desktopTrackingMenu');
+          
+          if (loginMenu) loginMenu.style.display = 'none';
+          if (logoutMenu) logoutMenu.style.display = 'block';
+          if (dashMenu) dashMenu.style.display = 'block';
+          if (ordersMenu) ordersMenu.style.display = 'block';
+          if (trackMenu) trackMenu.style.display = 'flex';
+        } else {
+          const loginMenu = document.getElementById('loginMenu');
+          const logoutMenu = document.getElementById('logoutMenu');
+          const dashMenu = document.getElementById('customerDashboardMenu');
+          const ordersMenu = document.getElementById('myOrdersMenu');
+          const trackMenu = document.getElementById('desktopTrackingMenu');
+          
+          if (loginMenu) loginMenu.style.display = 'block';
+          if (logoutMenu) logoutMenu.style.display = 'none';
+          if (dashMenu) dashMenu.style.display = 'none';
+          if (ordersMenu) ordersMenu.style.display = 'none';
+          if (trackMenu) trackMenu.style.display = 'none';
+        }
+      } catch (e) {
+        console.error('Error checking customer:', e);
       }
 
       // Cek hash
-      if (window.location.hash === '#admin') showPage('admin');
+      if (window.location.hash === '#admin') {
+        try {
+          showPage('admin');
+        } catch (e) {
+          console.error('Error showing admin page:', e);
+        }
+      }
     }
 
-    window.onclick = e => { 
-      if (e.target.classList.contains('modal')) e.target.classList.remove('active');
-      if (e.target.classList.contains('quickview-modal')) e.target.classList.remove('active');
+    try {
+      init();
+    } catch (e) {
+      console.error('Critical error during init:', e);
+      alert('Terjadi kesalahan saat membuka aplikasi. Silakan refresh halaman.');
+    }
+
+    window.onclick = e => {
+      try {
+        if (e.target?.classList?.contains('modal')) e.target.classList.remove('active');
+        if (e.target?.classList?.contains('quickview-modal')) e.target.classList.remove('active');
+      } catch (err) {
+        // ignore click errors
+      }
     };
     
-    document.addEventListener('keydown', e => { 
-      if(e.key==='Escape') { 
-        document.querySelectorAll('.modal.active, .quickview-modal.active').forEach(m=>m.classList.remove('active')); 
-        document.getElementById('cartSidebar').classList.remove('open'); 
-        closeMenu(); 
-      } 
+    document.addEventListener('keydown', e => {
+      try {
+        if(e.key==='Escape') { 
+          document.querySelectorAll('.modal.active, .quickview-modal.active').forEach(m=>m.classList.remove('active')); 
+          document.getElementById('cartSidebar')?.classList.remove('open'); 
+          closeMenu(); 
+        }
+      } catch (err) {
+        console.error('Keyboard event error:', err);
+      }
     });
 
     init();
