@@ -4407,31 +4407,38 @@
     function toggleNotifications() { alert('Notifikasi'); }
     function exportOrders() { alert('Export orders'); }
 
-    // Override fungsi adminLogin agar memuat data setelah login
-    const originalAdminLogin = adminLogin;
-    adminLogin = function() {
-      originalAdminLogin();
-      if (isAdminLoggedIn) {
+    // ========== ADMIN LOGIN ==========
+    window.adminLogin = function() {
+      const usernameEl = document.getElementById('adminUser');
+      const passwordEl = document.getElementById('adminPass');
+      const username = usernameEl ? usernameEl.value.trim() : '';
+      const password = passwordEl ? passwordEl.value.trim() : '';
+
+      // Validasi sederhana (default: admin / admin123)
+      if (username === 'admin' && password === 'admin123') {
+        sessionStorage.setItem('adminLoggedIn', 'true');
+        isAdminLoggedIn = true;
+        if (document.getElementById('adminLogin')) document.getElementById('adminLogin').style.display = 'none';
+        if (document.getElementById('adminPanel')) document.getElementById('adminPanel').style.display = 'block';
+        if (usernameEl) usernameEl.value = '';
+        if (passwordEl) passwordEl.value = '';
+        showToast('Login berhasil!', 'success');
         loadAdminDashboard();
         loadCategoriesAdmin();
-        // Jika tab orders aktif, muat orders
-        if (document.getElementById('adminOrders').classList.contains('active')) {
-          loadOrders();
-        }
+        const adminOrdersEl = document.getElementById('adminOrders');
+        if (adminOrdersEl && adminOrdersEl.classList.contains('active')) loadOrders();
+      } else {
+        showToast('Username atau password salah!', 'error');
       }
     };
-
-    // ========== ADMIN FUNCTIONS (ASLI) ==========
-    window.adminLogin = adminLogin; // sudah didefinisikan ulang di atas
 
     window.adminLogout = function() {
       sessionStorage.removeItem('adminLoggedIn');
       isAdminLoggedIn = false;
-      document.getElementById('adminLogin').style.display = 'block';
-      document.getElementById('adminPanel').style.display = 'none';
+      if (document.getElementById('adminLogin')) document.getElementById('adminLogin').style.display = 'block';
+      if (document.getElementById('adminPanel')) document.getElementById('adminPanel').style.display = 'none';
       showToast('Logout berhasil', 'success');
     };
-
     // Utility functions
     function showToast(msg, type='success') { 
       const t = document.getElementById('toastContainer'); 
