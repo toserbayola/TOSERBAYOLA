@@ -4386,7 +4386,39 @@
     // Placeholder untuk fungsi admin lain (dapat dikembangkan lebih lanjut)
     function loadProductsAdmin() { /* kosong, bisa diisi nanti */ }
     function viewOrderDetail(orderId) { alert('Detail order: ' + orderId); }
-    function updateOrderStatus(orderId) { alert('Update status order: ' + orderId); }
+    function updateOrderStatus(orderId) {
+      const order = orders.find(o => o.id === orderId);
+      if (!order) {
+        showToast('Order tidak ditemukan', 'error');
+        return;
+      }
+
+      const current = order.status || 'pending';
+      const choices = ['pending', 'proses', 'dikirim', 'selesai', 'batal'];
+      const choiceText = choices.map(c => (c === current ? `${c.toUpperCase()} (sekarang)` : c)).join(', ');
+      const input = prompt(`Ubah status order ${orderId}\nStatus sekarang: ${current}\nPilih status baru: ${choiceText}`, current);
+      if (!input) return; // dibatalkan
+
+      const newStatus = input.trim().toLowerCase();
+      if (!choices.includes(newStatus)) {
+        showToast('Status tidak valid', 'error');
+        return;
+      }
+      if (newStatus === current) {
+        showToast('Status tidak berubah', 'info');
+        return;
+      }
+
+      order.status = newStatus;
+      order.timeline = order.timeline || [];
+      order.timeline.push({ status: newStatus, waktu: new Date().toLocaleString('id-ID'), keterangan: `Status diubah menjadi ${getStatusText(newStatus)}` });
+
+      // Simpan ke localStorage dan update UI
+      localStorage.setItem('orders', JSON.stringify(orders));
+      showToast('Status order diperbarui', 'success');
+      try { loadOrders(); } catch (e) {}
+      try { loadAdminDashboard(); } catch (e) {}
+    }
     function chatCustomer(phone) { window.open(`https://wa.me/${phone}`, '_blank'); }
     function viewCustomerDetail(phone) { alert('Detail pelanggan: ' + phone); }
     function tambahPromo() { alert('Fitur tambah promo'); }
