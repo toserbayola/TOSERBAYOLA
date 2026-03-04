@@ -3152,28 +3152,16 @@
     let currentCustomer = JSON.parse(localStorage.getItem('currentCustomer')) || null;
     let slideIndex = 0;
     let visitorCount = localStorage.getItem('visitorCount') ? parseInt(localStorage.getItem('visitorCount')) : 0;
-    let filteredProducts = [];
-    let adminCurrentTab = 'dashboard';
     let isAdminLoggedIn = false;
-    let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-    let lastCheck = Date.now();
-    let stockHistory = JSON.parse(localStorage.getItem('stockHistory')) || [];
-    let activityLogs = JSON.parse(localStorage.getItem('activityLogs')) || [];
 
     visitorCount++;
     localStorage.setItem('visitorCount', visitorCount);
 
     // Cek session admin
-    try {
-      isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
-      if (isAdminLoggedIn) {
-        const adminLoginEl = document.getElementById('adminLogin');
-        const adminPanelEl = document.getElementById('adminPanel');
-        if (adminLoginEl) adminLoginEl.style.display = 'none';
-        if (adminPanelEl) adminPanelEl.style.display = 'block';
-      }
-    } catch (e) {
-      console.error('Error checking admin session:', e);
+    isAdminLoggedIn = sessionStorage.getItem('adminLoggedIn') === 'true';
+    if (isAdminLoggedIn) {
+      document.getElementById('adminLogin').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
     }
 
     // ========== DARK MODE ==========
@@ -3190,64 +3178,47 @@
     }
 
     if (localStorage.getItem('darkMode') === 'enabled') {
-      try {
-        document.body.classList.add('dark-mode');
-        const icon = document.querySelector('#darkModeToggle i');
-        if (icon) icon.className = 'fas fa-sun';
-      } catch (e) {
-        console.error('Error applying dark mode:', e);
-      }
+      document.body.classList.add('dark-mode');
+      document.querySelector('#darkModeToggle i').className = 'fas fa-sun';
     }
 
-    // ========== PARTIKEL (OPTIMIZED) ==========
+    // ========== PARTIKEL ==========
     function createParticles() {
-      try {
-        const particlesContainer = document.getElementById('particles');
-        if (!particlesContainer) return;
-        for (let i = 0; i < 5; i++) {
-          const particle = document.createElement('div');
-          particle.className = 'particle';
-          const size = Math.random() * 10 + 5;
-          particle.style.width = size + 'px';
-          particle.style.height = size + 'px';
-          particle.style.left = Math.random() * 100 + '%';
-          particle.style.animationDuration = Math.random() * 10 + 10 + 's';
-          particle.style.animationDelay = Math.random() * 5 + 's';
-          particle.style.background = i % 2 === 0 ? 'rgba(198,40,40,0.1)' : 'rgba(46,125,50,0.1)';
-          particlesContainer.appendChild(particle);
-        }
-      } catch (e) {
-        console.error('Error creating particles:', e);
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 10 + 5;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.background = i % 2 === 0 ? 'rgba(198,40,40,0.1)' : 'rgba(46,125,50,0.1)';
+        particlesContainer.appendChild(particle);
       }
     }
     createParticles();
 
     function createSplashParticles() {
-      try {
-        const splashParticles = document.getElementById('splashParticles');
-        if (!splashParticles) return;
-        for (let i = 0; i < 5; i++) {
-          const particle = document.createElement('div');
-          particle.className = 'splash-particle';
-          const size = Math.random() * 15 + 5;
-          particle.style.width = size + 'px';
-          particle.style.height = size + 'px';
-          particle.style.left = Math.random() * 100 + '%';
-          particle.style.animationDuration = Math.random() * 10 + 10 + 's';
-          particle.style.animationDelay = Math.random() * 5 + 's';
-          particle.style.background = i % 2 === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)';
-          splashParticles.appendChild(particle);
-        }
-      } catch (e) {
-        console.error('Error creating splash particles:', e);
+      const splashParticles = document.getElementById('splashParticles');
+      for (let i = 0; i < 15; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'splash-particle';
+        const size = Math.random() * 15 + 5;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+        particle.style.animationDelay = Math.random() * 5 + 's';
+        particle.style.background = i % 2 === 0 ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.5)';
+        splashParticles.appendChild(particle);
       }
     }
     createSplashParticles();
 
     function launchConfetti() {
-      try {
-        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } }); // reduced from 100
-      } catch (e) {}
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     }
 
     function createFloatingEmoji(emoji) {
@@ -3262,35 +3233,26 @@
 
     // ========== COUNTDOWN TIMER ==========
     function updateCountdown() {
-      try {
-        const targetDate = new Date('March 5, 2026 23:59:59').getTime();
-        const now = new Date().getTime();
-        const diff = targetDate - now;
-        if (diff < 0) {
-          const timer = document.getElementById('countdownTimer');
-          if (timer) timer.style.display = 'none';
-          return;
-        }
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        const daysEl = document.getElementById('days');
-        const hoursEl = document.getElementById('hours');
-        const minutesEl = document.getElementById('minutes');
-        const secondsEl = document.getElementById('seconds');
-        if (daysEl) daysEl.textContent = String(days).padStart(2,'0');
-        if (hoursEl) hoursEl.textContent = String(hours).padStart(2,'0');
-        if (minutesEl) minutesEl.textContent = String(minutes).padStart(2,'0');
-        if (secondsEl) secondsEl.textContent = String(seconds).padStart(2,'0');
-      } catch (e) {
-        console.error('Error updating countdown:', e);
+      const targetDate = new Date('March 5, 2026 23:59:59').getTime();
+      const now = new Date().getTime();
+      const diff = targetDate - now;
+      if (diff < 0) {
+        document.getElementById('countdownTimer').style.display = 'none';
+        return;
       }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+      document.getElementById('days').textContent = String(days).padStart(2,'0');
+      document.getElementById('hours').textContent = String(hours).padStart(2,'0');
+      document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
+      document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
     }
-    setInterval(updateCountdown, 5000); // optimized: 5sec instead of 1sec for countdown
+    setInterval(updateCountdown, 1000);
 
-    document.getElementById('enterButton')?.addEventListener('click', function() {
-      document.getElementById('splashScreen')?.classList.add('hidden');
+    document.getElementById('enterButton').addEventListener('click', function() {
+      document.getElementById('splashScreen').classList.add('hidden');
     });
 
     // ========== MENU ==========
@@ -3319,24 +3281,24 @@
     window.nextSlide = ()=> { slideIndex++; showSlide(slideIndex); };
     window.prevSlide = ()=> { slideIndex--; showSlide(slideIndex); };
     window.gotoSlide = (idx)=> { slideIndex = idx; showSlide(slideIndex); };
-    let carouselTimer = setInterval(()=> { slideIndex++; showSlide(slideIndex); }, 7000); // optimized: 7sec
+    setInterval(()=> { slideIndex++; showSlide(slideIndex); }, 5000);
 
     // ========== PROMO ==========
     window.pilihPromo = function(promo) {
       currentPromo = promo;
-      const cards = document.querySelectorAll('.promo-card');
-      cards.forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.promo-card').forEach(c => c.classList.remove('active'));
       const el = document.getElementById(`promo${promo.charAt(0).toUpperCase()+promo.slice(1)}`);
-      el?.classList.add('active');
+      if (el) el.classList.add('active');
       renderProdukHome();
     };
 
     // ========== FILTER KATEGORI ==========
     window.filterKategori = function(kategori, from = 'produk') {
       currentKategori = kategori;
-      const items = document.querySelectorAll('#kategoriProduk .kategori-item');
-      items.forEach(item => {
-        item.classList.toggle('active', item.dataset.kategori === kategori);
+      document.querySelectorAll('#kategoriProduk .kategori-item').forEach(item => {
+        const itemKategori = item.dataset.kategori;
+        if (itemKategori === kategori) item.classList.add('active');
+        else item.classList.remove('active');
       });
       if (from === 'produk') renderSemuaProduk();
     };
@@ -3356,15 +3318,14 @@
           </div>
         `;
       }).join('');
+
+      container.querySelectorAll('.kategori-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const kategori = item.dataset.kategori;
+          filterKategori(kategori, 'produk');
+        });
+      });
     }
-    
-    // Single event delegation for kategori (avoid re-adding listeners)
-    document.addEventListener('click', (e) => {
-      const kategoriItem = e.target.closest('[data-kategori]');
-      if (kategoriItem && kategoriItem.parentElement?.id === 'kategoriProduk') {
-        filterKategori(kategoriItem.dataset.kategori, 'produk');
-      }
-    });
 
     function getIconKategori(kategori) {
       const icons = {
@@ -3376,7 +3337,6 @@
     }
 
     // ========== FILTER HARGA ==========
-    let filterHargaSetup = false; // flag untuk menghindari setup berulang
     function setupFilterHarga() {
       const minSlider = document.getElementById('hargaMin');
       const maxSlider = document.getElementById('hargaMax');
@@ -3385,8 +3345,7 @@
       const minLabel = document.getElementById('hargaMinLabel');
       const maxLabel = document.getElementById('hargaMaxLabel');
 
-      if (!minSlider || filterHargaSetup) return;
-      filterHargaSetup = true;
+      if (!minSlider) return;
 
       const hargaList = produkRetail.map(p => p.harga);
       const globalMin = Math.min(...hargaList);
@@ -3402,17 +3361,13 @@
       minLabel.textContent = globalMin.toLocaleString();
       maxLabel.textContent = globalMax.toLocaleString();
 
-      let filterTimer;
       minSlider.addEventListener('input', function() {
         if (parseInt(minSlider.value) > parseInt(maxSlider.value)) {
           minSlider.value = maxSlider.value;
         }
         minVal.textContent = parseInt(minSlider.value).toLocaleString();
         minLabel.textContent = parseInt(minSlider.value).toLocaleString();
-        clearTimeout(filterTimer);
-        filterTimer = setTimeout(() => {
-          if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
-        }, 300);
+        if (document.getElementById('produk').classList.contains('active')) renderSemuaProduk();
       });
 
       maxSlider.addEventListener('input', function() {
@@ -3421,23 +3376,24 @@
         }
         maxVal.textContent = parseInt(maxSlider.value).toLocaleString();
         maxLabel.textContent = parseInt(maxSlider.value).toLocaleString();
-        clearTimeout(filterTimer);
-        filterTimer = setTimeout(() => {
-          if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
-        }, 300);
-      });    }
+        if (document.getElementById('produk').classList.contains('active')) renderSemuaProduk();
+      });
+    }
 
     // ========== RENDER PRODUK ==========
+    function renderProdukHome() {
       const container = document.getElementById('produkPromo');
       if (!container) return;
       
-      let filtered = produkRetail.filter(p => p.promo === currentPromo);
-      if (filtered.length === 0) {
-        container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
-        return;
-      }
+      container.innerHTML = '<div class="skeleton"></div>'.repeat(5);
+      setTimeout(() => {
+        let filtered = produkRetail.filter(p => p.promo === currentPromo);
+        if (filtered.length === 0) {
+          container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
+          return;
+        }
 
-      container.innerHTML = filtered.map(p => `
+        container.innerHTML = filtered.map(p => `
           <div class="produk-card">
             <div class="produk-gambar">
               <img src="${p.gambar || 'https://via.placeholder.com/150?text=Produk'}" alt="${p.nama}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
@@ -3455,21 +3411,24 @@
             </div>
           </div>
         `).join('');
-  
+      }, 500);
+    }
 
     function renderSemuaProduk() {
       const container = document.getElementById('semuaProduk');
       if (!container) return;
       
-      let filtered = produkRetail;
-      if (currentKategori !== 'all') filtered = filtered.filter(p => p.kategori === currentKategori);
+      container.innerHTML = '<div class="skeleton"></div>'.repeat(5);
+      setTimeout(() => {
+        let filtered = produkRetail;
+        if (currentKategori !== 'all') filtered = filtered.filter(p => p.kategori === currentKategori);
 
-      if (filtered.length === 0) {
-        container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
-        return;
-      }
+        if (filtered.length === 0) {
+          container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
+          return;
+        }
 
-      container.innerHTML = filtered.map(p => `
+        container.innerHTML = filtered.map(p => `
           <div class="produk-card">
             <div class="produk-gambar">
               <img src="${p.gambar || 'https://via.placeholder.com/150?text=Produk'}" alt="${p.nama}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
@@ -3487,6 +3446,7 @@
             </div>
           </div>
         `).join('');
+      }, 500);
     }
 
     document.addEventListener('click', function(e) {
@@ -3507,12 +3467,12 @@
     }
 
     function searchProduk() {
-      if (document.getElementById('home')?.classList.contains('active')) renderProdukHome();
-      else if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
+      if (document.getElementById('home').classList.contains('active')) renderProdukHome();
+      else if (document.getElementById('produk').classList.contains('active')) renderSemuaProduk();
     }
 
-    document.getElementById('searchDesktop')?.addEventListener('input', debounce(searchProduk, 500));
-    document.getElementById('searchMobile')?.addEventListener('input', debounce(searchProduk, 500));
+    document.getElementById('searchDesktop').addEventListener('input', debounce(searchProduk, 500));
+    document.getElementById('searchMobile').addEventListener('input', debounce(searchProduk, 500));
 
     // ========== TOMBOL SHARE ==========
     window.shareProduct = function(id, event) {
@@ -3642,10 +3602,7 @@
       renderRekomendasi();
     }
 
-    window.toggleCart = ()=> {
-      const cartSidebar = document.getElementById('cartSidebar');
-      if (cartSidebar) cartSidebar.classList.toggle('open');
-    };
+    window.toggleCart = ()=> document.getElementById('cartSidebar').classList.toggle('open');
 
     // ========== QUICK VIEW ==========
     window.openQuickview = function(id) {
@@ -3665,15 +3622,14 @@
 
     // ========== PAGE NAVIGATION ==========
     window.showPage = function(pageId) {
-      const pages = document.querySelectorAll('.page');
-      const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
       
-      pages.forEach(p => p.classList.remove('active'));
-      document.getElementById(pageId)?.classList.add('active');
-      
-      navItems.forEach(item => item.classList.remove('active'));
+      document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
       const navMap = { 'home': 0, 'about': 1, 'produk': 2, 'my-orders': 3 };
-      if (navMap[pageId] !== undefined) navItems[navMap[pageId]]?.classList.add('active');
+      if (navMap[pageId] !== undefined) {
+        document.querySelectorAll('.bottom-nav .nav-item')[navMap[pageId]].classList.add('active');
+      }
       
       if (pageId === 'home') {
         renderProdukHome();
@@ -3793,15 +3749,12 @@
     };
 
     // Tampilkan/sembunyikan alamat berdasarkan metode pengambilan
-    const deliveryInputs = document.querySelectorAll('input[name="delivery"]');
-    if (deliveryInputs.length > 0) {
-      deliveryInputs.forEach(r => {
-        r.addEventListener('change', function() {
-          const addressGroup = document.getElementById('addressGroup');
-          if (addressGroup) addressGroup.style.display = this.value === 'delivery' ? 'block' : 'none';
-        });
+    document.querySelectorAll('input[name="delivery"]').forEach(r => {
+      r.addEventListener('change', function() {
+        document.getElementById('addressGroup').style.display = 
+          this.value === 'delivery' ? 'block' : 'none';
       });
-    }
+    });
 
     window.submitOrder = function() {
       // Ambil data dari form
@@ -4427,39 +4380,7 @@
     // Placeholder untuk fungsi admin lain (dapat dikembangkan lebih lanjut)
     function loadProductsAdmin() { /* kosong, bisa diisi nanti */ }
     function viewOrderDetail(orderId) { alert('Detail order: ' + orderId); }
-    function updateOrderStatus(orderId) {
-      const order = orders.find(o => o.id === orderId);
-      if (!order) {
-        showToast('Order tidak ditemukan', 'error');
-        return;
-      }
-
-      const current = order.status || 'pending';
-      const choices = ['pending', 'proses', 'dikirim', 'selesai', 'batal'];
-      const choiceText = choices.map(c => (c === current ? `${c.toUpperCase()} (sekarang)` : c)).join(', ');
-      const input = prompt(`Ubah status order ${orderId}\nStatus sekarang: ${current}\nPilih status baru: ${choiceText}`, current);
-      if (!input) return; // dibatalkan
-
-      const newStatus = input.trim().toLowerCase();
-      if (!choices.includes(newStatus)) {
-        showToast('Status tidak valid', 'error');
-        return;
-      }
-      if (newStatus === current) {
-        showToast('Status tidak berubah', 'info');
-        return;
-      }
-
-      order.status = newStatus;
-      order.timeline = order.timeline || [];
-      order.timeline.push({ status: newStatus, waktu: new Date().toLocaleString('id-ID'), keterangan: `Status diubah menjadi ${getStatusText(newStatus)}` });
-
-      // Simpan ke localStorage dan update UI
-      localStorage.setItem('orders', JSON.stringify(orders));
-      showToast('Status order diperbarui', 'success');
-      try { loadOrders(); } catch (e) {}
-      try { loadAdminDashboard(); } catch (e) {}
-    }
+    function updateOrderStatus(orderId) { alert('Update status order: ' + orderId); }
     function chatCustomer(phone) { window.open(`https://wa.me/${phone}`, '_blank'); }
     function viewCustomerDetail(phone) { alert('Detail pelanggan: ' + phone); }
     function tambahPromo() { alert('Fitur tambah promo'); }
@@ -4480,38 +4401,37 @@
     function toggleNotifications() { alert('Notifikasi'); }
     function exportOrders() { alert('Export orders'); }
 
-    // ========== ADMIN LOGIN ==========
+    // ========== ADMIN FUNCTIONS ASLI ==========
     window.adminLogin = function() {
-      const usernameEl = document.getElementById('adminUser');
-      const passwordEl = document.getElementById('adminPass');
-      const username = usernameEl ? usernameEl.value.trim() : '';
-      const password = passwordEl ? passwordEl.value.trim() : '';
-
-      // Validasi sederhana (default: admin / admin123)
-      if (username === 'admin' && password === 'admin123') {
+      const user = document.getElementById('adminUser').value;
+      const pass = document.getElementById('adminPass').value;
+      
+      if (user === 'admin' && pass === '@Yola123') {
         sessionStorage.setItem('adminLoggedIn', 'true');
         isAdminLoggedIn = true;
-        if (document.getElementById('adminLogin')) document.getElementById('adminLogin').style.display = 'none';
-        if (document.getElementById('adminPanel')) document.getElementById('adminPanel').style.display = 'block';
-        if (usernameEl) usernameEl.value = '';
-        if (passwordEl) passwordEl.value = '';
-        showToast('Login berhasil!', 'success');
+        document.getElementById('adminLogin').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        showToast('Login berhasil', 'success');
+        
+        // Muat data setelah login
         loadAdminDashboard();
         loadCategoriesAdmin();
-        const adminOrdersEl = document.getElementById('adminOrders');
-        if (adminOrdersEl && adminOrdersEl.classList.contains('active')) loadOrders();
+        if (document.getElementById('adminOrders').classList.contains('active')) {
+          loadOrders();
+        }
       } else {
-        showToast('Username atau password salah!', 'error');
+        showToast('Username atau password salah', 'error');
       }
     };
 
     window.adminLogout = function() {
       sessionStorage.removeItem('adminLoggedIn');
       isAdminLoggedIn = false;
-      if (document.getElementById('adminLogin')) document.getElementById('adminLogin').style.display = 'block';
-      if (document.getElementById('adminPanel')) document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('adminLogin').style.display = 'block';
+      document.getElementById('adminPanel').style.display = 'none';
       showToast('Logout berhasil', 'success');
     };
+
     // Utility functions
     function showToast(msg, type='success') { 
       const t = document.getElementById('toastContainer'); 
@@ -4526,92 +4446,49 @@
     // ========== BACK TO TOP ==========
     window.addEventListener('scroll', function() {
       const backToTop = document.getElementById('backToTop');
-      if (backToTop) {
-        if (window.scrollY > 300) backToTop.classList.add('show');
-        else backToTop.classList.remove('show');
-      }
+      if (window.scrollY > 300) backToTop.classList.add('show');
+      else backToTop.classList.remove('show');
     });
 
     // ========== INIT ==========
     function init() {
-      try {
-        renderProdukHome();
-      } catch (e) {
-        console.error('Error rendering home:', e);
-      }
-      try {
-        updateCartUI();
-      } catch (e) {
-        console.error('Error updating cart:', e);
-      }
+      renderProdukHome();
+      updateCartUI();
       
       // Cek session customer
-      try {
-        if (currentCustomer) {
-          const loginMenu = document.getElementById('loginMenu');
-          const logoutMenu = document.getElementById('logoutMenu');
-          const dashMenu = document.getElementById('customerDashboardMenu');
-          const ordersMenu = document.getElementById('myOrdersMenu');
-          const trackMenu = document.getElementById('desktopTrackingMenu');
-          
-          if (loginMenu) loginMenu.style.display = 'none';
-          if (logoutMenu) logoutMenu.style.display = 'block';
-          if (dashMenu) dashMenu.style.display = 'block';
-          if (ordersMenu) ordersMenu.style.display = 'block';
-          if (trackMenu) trackMenu.style.display = 'flex';
-        } else {
-          const loginMenu = document.getElementById('loginMenu');
-          const logoutMenu = document.getElementById('logoutMenu');
-          const dashMenu = document.getElementById('customerDashboardMenu');
-          const ordersMenu = document.getElementById('myOrdersMenu');
-          const trackMenu = document.getElementById('desktopTrackingMenu');
-          
-          if (loginMenu) loginMenu.style.display = 'block';
-          if (logoutMenu) logoutMenu.style.display = 'none';
-          if (dashMenu) dashMenu.style.display = 'none';
-          if (ordersMenu) ordersMenu.style.display = 'none';
-          if (trackMenu) trackMenu.style.display = 'none';
-        }
-      } catch (e) {
-        console.error('Error checking customer:', e);
+      if (currentCustomer) {
+        document.getElementById('loginMenu').style.display = 'none';
+        document.getElementById('logoutMenu').style.display = 'block';
+        document.getElementById('customerDashboardMenu').style.display = 'block';
+        document.getElementById('myOrdersMenu').style.display = 'block';
+        
+        // Tampilkan menu tracking di desktop
+        document.getElementById('desktopTrackingMenu').style.display = 'flex';
+      } else {
+        document.getElementById('loginMenu').style.display = 'block';
+        document.getElementById('logoutMenu').style.display = 'none';
+        document.getElementById('customerDashboardMenu').style.display = 'none';
+        document.getElementById('myOrdersMenu').style.display = 'none';
+        
+        // Sembunyikan menu tracking di desktop
+        document.getElementById('desktopTrackingMenu').style.display = 'none';
       }
 
       // Cek hash
-      if (window.location.hash === '#admin') {
-        try {
-          showPage('admin');
-        } catch (e) {
-          console.error('Error showing admin page:', e);
-        }
-      }
+      if (window.location.hash === '#admin') showPage('admin');
     }
 
-    try {
-      init();
-    } catch (e) {
-      console.error('Critical error during init:', e);
-      alert('Terjadi kesalahan saat membuka aplikasi. Silakan refresh halaman.');
-    }
-
-    window.onclick = e => {
-      try {
-        if (e.target?.classList?.contains('modal')) e.target.classList.remove('active');
-        if (e.target?.classList?.contains('quickview-modal')) e.target.classList.remove('active');
-      } catch (err) {
-        // ignore click errors
-      }
+    window.onclick = e => { 
+      if (e.target.classList.contains('modal')) e.target.classList.remove('active');
+      if (e.target.classList.contains('quickview-modal')) e.target.classList.remove('active');
     };
     
-    document.addEventListener('keydown', e => {
-      try {
-        if(e.key==='Escape') { 
-          document.querySelectorAll('.modal.active, .quickview-modal.active').forEach(m=>m.classList.remove('active')); 
-          document.getElementById('cartSidebar')?.classList.remove('open'); 
-          closeMenu(); 
-        }
-      } catch (err) {
-        console.error('Keyboard event error:', err);
-      }
+    document.addEventListener('keydown', e => { 
+      if(e.key==='Escape') { 
+        document.querySelectorAll('.modal.active, .quickview-modal.active').forEach(m=>m.classList.remove('active')); 
+        document.getElementById('cartSidebar').classList.remove('open'); 
+        closeMenu(); 
+      } 
     });
 
     init();
