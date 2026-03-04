@@ -4219,21 +4219,210 @@
       document.getElementById(modalId).classList.remove('active');
     };
 
-    // ========== ADMIN FUNCTIONS (DIPERSINGKAT UNTUK KEJELASAN) ==========
-    window.adminLogin = function() {
-      const user = document.getElementById('adminUser').value;
-      const pass = document.getElementById('adminPass').value;
-      
-      if (user === 'admin' && pass === '@Yola123') {
-        sessionStorage.setItem('adminLoggedIn', 'true');
-        isAdminLoggedIn = true;
-        document.getElementById('adminLogin').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
-        showToast('Login berhasil', 'success');
-      } else {
-        showToast('Username atau password salah', 'error');
+    // ========== FUNGSI ADMIN LENGKAP ==========
+    // Switch tab admin dengan update class active berdasarkan teks
+    function switchAdminTab(tabName) {
+      // Sembunyikan semua section admin
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      // Tampilkan section yang dipilih
+      const sectionId = 'admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      document.getElementById(sectionId).classList.add('active');
+
+      // Update class active pada tab
+      document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+      const tabText = {
+        'dashboard': 'Dashboard',
+        'products': 'Produk',
+        'orders': 'Orders',
+        'customers': 'Pelanggan',
+        'promos': 'Promo',
+        'categories': 'Kategori',
+        'reports': 'Laporan',
+        'logs': 'Log',
+        'settings': 'Pengaturan'
+      };
+      document.querySelectorAll('.admin-tab').forEach(t => {
+        if (t.innerText.includes(tabText[tabName])) {
+          t.classList.add('active');
+        }
+      });
+
+      // Muat data sesuai tab
+      if (tabName === 'orders') {
+        loadOrders();
+      } else if (tabName === 'products') {
+        loadProductsAdmin();
+      } else if (tabName === 'customers') {
+        loadCustomers();
+      } else if (tabName === 'dashboard') {
+        loadAdminDashboard();
+      }
+    }
+
+    // Memuat daftar order ke tabel admin
+    function loadOrders(status = 'all') {
+      const ordersData = JSON.parse(localStorage.getItem('orders')) || [];
+      const tbody = document.getElementById('ordersList');
+      if (!tbody) return;
+
+      let filtered = ordersData;
+      if (status !== 'all') {
+        filtered = ordersData.filter(o => o.status === status);
+      }
+
+      const dateFilter = document.getElementById('orderDate')?.value;
+      if (dateFilter) {
+        filtered = filtered.filter(o => {
+          const orderDate = o.waktu.split(' ')[0]; // ambil tanggal saja
+          return orderDate === dateFilter.split('-').reverse().join('/'); // sesuaikan format
+        });
+      }
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">Tidak ada order</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(order => `
+        <tr>
+          <td>${order.id}</td>
+          <td>${order.waktu}</td>
+          <td>${order.nama}<br><small>${order.telepon}</small></td>
+          <td>Rp ${order.total.toLocaleString()}</td>
+          <td>${order.metode}</td>
+          <td>${order.pembayaran || '-'}</td>
+          <td><span class="badge-status badge-${order.status}">${getStatusText(order.status)}</span></td>
+          <td class="admin-actions">
+            <button class="admin-btn admin-btn-view" onclick="viewOrderDetail('${order.id}')"><i class="fas fa-eye"></i></button>
+            <button class="admin-btn admin-btn-edit" onclick="updateOrderStatus('${order.id}')"><i class="fas fa-edit"></i></button>
+            <button class="admin-btn admin-btn-wa" onclick="chatCustomer('${order.telepon}')"><i class="fab fa-whatsapp"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Filter order berdasarkan status dan tanggal
+    function filterOrders() {
+      const status = document.getElementById('orderStatus').value;
+      loadOrders(status);
+    }
+
+    // Dashboard admin: statistik dan grafik sederhana
+    function loadAdminDashboard() {
+      const ordersData = JSON.parse(localStorage.getItem('orders')) || [];
+      const products = produkRetail;
+      const totalOrders = ordersData.length;
+      const totalRevenue = ordersData.reduce((sum, o) => sum + o.total, 0);
+      const totalProducts = products.length;
+      const lowStock = products.filter(p => p.stok < 5).length;
+
+      document.getElementById('totalOrders').textContent = totalOrders;
+      document.getElementById('totalRevenue').textContent = `Rp ${totalRevenue.toLocaleString()}`;
+      document.getElementById('totalProducts').textContent = totalProducts;
+      document.getElementById('lowStock').textContent = lowStock;
+
+      const today = new Date().toLocaleDateString('id-ID');
+      const todayOrders = ordersData.filter(o => o.waktu.includes(today));
+      document.getElementById('todayOrders').textContent = todayOrders.length;
+      const todayRevenue = todayOrders.reduce((sum, o) => sum + o.total, 0);
+      document.getElementById('todayRevenue').textContent = `Rp ${todayRevenue.toLocaleString()}`;
+      document.getElementById('pendingOrders').textContent = ordersData.filter(o => o.status === 'pending').length;
+
+      // Produk terlaris
+      const productSales = {};
+      ordersData.forEach(o => {
+        o.items.forEach(item => {
+          if (!productSales[item.id]) productSales[item.id] = { qty: 0, revenue: 0, name: item.nama };
+          productSales[item.id].qty += item.quantity;
+          productSales[item.id].revenue += item.harga * item.quantity;
+        });
+      });
+      const topProducts = Object.values(productSales).sort((a,b) => b.qty - a.qty).slice(0,5);
+      const topTbody = document.getElementById('topProductsList');
+      if (topTbody) {
+        topTbody.innerHTML = topProducts.map(p => `
+          <tr><td>${p.name}</td><td>${p.qty}</td><td>Rp ${p.revenue.toLocaleString()}</td></tr>
+        `).join('');
+      }
+
+      // Stok menipis
+      const lowStockList = products.filter(p => p.stok < 5).slice(0,5);
+      const lowTbody = document.getElementById('lowStockList');
+      if (lowTbody) {
+        lowTbody.innerHTML = lowStockList.map(p => `
+          <tr><td>${p.nama}</td><td>${p.stok}</td><td><span class="badge-status badge-danger">Menipis</span></td></tr>
+        `).join('');
+      }
+    }
+
+    // Memuat daftar pelanggan (contoh sederhana)
+    function loadCustomers() {
+      const customersData = JSON.parse(localStorage.getItem('customers')) || [];
+      const tbody = document.getElementById('customersList');
+      if (!tbody) return;
+      tbody.innerHTML = customersData.map((c, index) => `
+        <tr>
+          <td>${index+1}</td>
+          <td>${c.nama}</td>
+          <td>${c.telepon}</td>
+          <td>${c.totalOrders || 0}</td>
+          <td>Rp ${(c.totalSpent || 0).toLocaleString()}</td>
+          <td>${c.joinDate || '-'}</td>
+          <td><button class="admin-btn admin-btn-view" onclick="viewCustomerDetail('${c.telepon}')">Detail</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Memuat kategori untuk dropdown admin produk
+    function loadCategoriesAdmin() {
+      const select = document.getElementById('filterCategory');
+      if (select) {
+        const kategoriSet = new Set(produkRetail.map(p => p.kategori));
+        select.innerHTML = '<option value="all">Semua Kategori</option>' + 
+          Array.from(kategoriSet).map(k => `<option value="${k}">${k}</option>`).join('');
+      }
+    }
+
+    // Placeholder untuk fungsi admin lain (dapat dikembangkan lebih lanjut)
+    function loadProductsAdmin() { /* kosong, bisa diisi nanti */ }
+    function viewOrderDetail(orderId) { alert('Detail order: ' + orderId); }
+    function updateOrderStatus(orderId) { alert('Update status order: ' + orderId); }
+    function chatCustomer(phone) { window.open(`https://wa.me/${phone}`, '_blank'); }
+    function viewCustomerDetail(phone) { alert('Detail pelanggan: ' + phone); }
+    function tambahPromo() { alert('Fitur tambah promo'); }
+    function editPromo(promo) { alert('Edit promo: ' + promo); }
+    function tambahKategori() { alert('Tambah kategori'); }
+    function loadReport() { alert('Load report'); }
+    function exportReport() { alert('Export report'); }
+    function loadLogs() { alert('Load logs'); }
+    function exportLogs() { alert('Export logs'); }
+    function backupData() { alert('Backup data'); }
+    function restoreData(e) { alert('Restore data'); }
+    function changePassword(user) { alert('Ganti password: ' + user); }
+    function addAdminUser() { alert('Tambah admin'); }
+    function saveSettings() { alert('Simpan settings'); }
+    function tampilkanFormProduk() { alert('Tambah produk'); }
+    function filterProducts() { alert('Filter produk'); }
+    function exportProducts() { alert('Export produk'); }
+    function toggleNotifications() { alert('Notifikasi'); }
+    function exportOrders() { alert('Export orders'); }
+
+    // Override fungsi adminLogin agar memuat data setelah login
+    const originalAdminLogin = adminLogin;
+    adminLogin = function() {
+      originalAdminLogin();
+      if (isAdminLoggedIn) {
+        loadAdminDashboard();
+        loadCategoriesAdmin();
+        // Jika tab orders aktif, muat orders
+        if (document.getElementById('adminOrders').classList.contains('active')) {
+          loadOrders();
+        }
       }
     };
+
+    // ========== ADMIN FUNCTIONS (ASLI) ==========
+    window.adminLogin = adminLogin; // sudah didefinisikan ulang di atas
 
     window.adminLogout = function() {
       sessionStorage.removeItem('adminLoggedIn');
