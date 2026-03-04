@@ -387,6 +387,32 @@
       transform: scale(1.1);
     }
 
+    /* Tooltip untuk desktop */
+    .nav-icon[data-tooltip] {
+      position: relative;
+    }
+
+    .nav-icon[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--hitam);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    body.dark-mode .nav-icon[data-tooltip]:hover::after {
+      background: var(--putih);
+      color: var(--hitam);
+    }
+
     .nav-icon i {
       font-size: 1.2rem;
       color: white;
@@ -2278,6 +2304,10 @@
         <div class="menu-icon" id="menuToggle">
           <i class="fas fa-bars"></i>
         </div>
+        <!-- TOMBOL TRACKING UNTUK DESKTOP -->
+        <div class="nav-icon" onclick="showPage('my-orders')" data-tooltip="Tracking Pesanan" id="desktopTrackingMenu" style="display: none;">
+          <i class="fas fa-truck"></i>
+        </div>
         <div class="nav-icon" onclick="toggleCart()" data-tooltip="Keranjang">
           <i class="fas fa-shopping-cart"></i>
           <span class="cart-badge hidden" id="cartCount">0</span>
@@ -2480,7 +2510,7 @@
       </div>
     </div>
 
-    <!-- CHECKOUT MODAL - DIPERBAIKI -->
+    <!-- CHECKOUT MODAL -->
     <div class="modal" id="checkoutModal">
       <div class="modal-content">
         <div class="modal-header">
@@ -2490,12 +2520,12 @@
         
         <div class="form-group">
           <label>Nama Lengkap *</label>
-          <input type="text" id="customerName" placeholder="Masukkan nama" required>
+          <input type="text" id="checkoutName" placeholder="Masukkan nama" required>
         </div>
         
         <div class="form-group">
           <label>Nomor WhatsApp *</label>
-          <input type="tel" id="customerPhone" placeholder="08123456789" required>
+          <input type="tel" id="checkoutPhone" placeholder="08123456789" required>
         </div>
         
         <div class="form-group">
@@ -3675,6 +3705,9 @@
       document.getElementById('logoutMenu').style.display = 'block';
       document.getElementById('customerDashboardMenu').style.display = 'block';
       document.getElementById('myOrdersMenu').style.display = 'block';
+      
+      // Tampilkan menu tracking di desktop
+      document.getElementById('desktopTrackingMenu').style.display = 'flex';
 
       closeModal('loginModal');
       showCustomerDashboard();
@@ -3690,11 +3723,14 @@
       document.getElementById('customerDashboardMenu').style.display = 'none';
       document.getElementById('myOrdersMenu').style.display = 'none';
       
+      // Sembunyikan menu tracking di desktop
+      document.getElementById('desktopTrackingMenu').style.display = 'none';
+      
       showPage('home');
       showToast('Berhasil logout', 'success');
     };
 
-    // ========== CHECKOUT - DIPERBAIKI ==========
+    // ========== CHECKOUT ==========
     window.openCheckoutModal = function() {
       if (cart.length === 0) {
         showToast('Keranjang kosong', 'error');
@@ -3703,9 +3739,17 @@
       
       // Isi otomatis jika customer sudah login
       if (currentCustomer) {
-        document.getElementById('customerName').value = currentCustomer.nama;
-        document.getElementById('customerPhone').value = currentCustomer.telepon;
+        document.getElementById('checkoutName').value = currentCustomer.nama;
+        document.getElementById('checkoutPhone').value = currentCustomer.telepon;
+      } else {
+        document.getElementById('checkoutName').value = '';
+        document.getElementById('checkoutPhone').value = '';
       }
+      
+      // Reset form
+      document.getElementById('customerAddress').value = '';
+      document.getElementById('customerNotes').value = '';
+      document.getElementById('addressGroup').style.display = 'none';
       
       document.getElementById('checkoutModal').classList.add('active');
     };
@@ -3720,23 +3764,38 @@
 
     window.submitOrder = function() {
       // Ambil data dari form
-      const name = document.getElementById('customerName').value.trim();
-      const phone = document.getElementById('customerPhone').value.trim();
-      const delivery = document.querySelector('input[name="delivery"]:checked').value;
-      const payment = document.querySelector('input[name="payment"]:checked').value;
+      const name = document.getElementById('checkoutName').value.trim();
+      const phone = document.getElementById('checkoutPhone').value.trim();
+      
+      // Validasi radio buttons
+      const deliveryRadio = document.querySelector('input[name="delivery"]:checked');
+      const paymentRadio = document.querySelector('input[name="payment"]:checked');
+      
+      if (!deliveryRadio) {
+        showToast('Pilih metode pengambilan', 'error');
+        return;
+      }
+      
+      if (!paymentRadio) {
+        showToast('Pilih metode pembayaran', 'error');
+        return;
+      }
+      
+      const delivery = deliveryRadio.value;
+      const payment = paymentRadio.value;
       const address = document.getElementById('customerAddress').value.trim();
       const notes = document.getElementById('customerNotes').value.trim();
 
       // Validasi
       if (!name) {
         showToast('Nama harus diisi', 'error');
-        document.getElementById('customerName').focus();
+        document.getElementById('checkoutName').focus();
         return;
       }
       
       if (!phone) {
         showToast('Nomor WhatsApp harus diisi', 'error');
-        document.getElementById('customerPhone').focus();
+        document.getElementById('checkoutPhone').focus();
         return;
       }
 
@@ -3828,8 +3887,8 @@
       closeModal('checkoutModal');
       
       // Reset form
-      document.getElementById('customerName').value = '';
-      document.getElementById('customerPhone').value = '';
+      document.getElementById('checkoutName').value = '';
+      document.getElementById('checkoutPhone').value = '';
       document.getElementById('customerAddress').value = '';
       document.getElementById('customerNotes').value = '';
       
@@ -4130,6 +4189,8 @@
             <i class="fas fa-truck"></i> Anda memiliki ${pendingOrders} pesanan aktif
           </div>
         `;
+      } else {
+        customerNotifications.innerHTML = '<p style="color: var(--abu); text-align: center;">Tidak ada notifikasi</p>';
       }
 
       // Rekomendasi produk
@@ -4158,7 +4219,7 @@
       document.getElementById(modalId).classList.remove('active');
     };
 
-    // ========== ADMIN FUNCTIONS ==========
+    // ========== ADMIN FUNCTIONS (DIPERSINGKAT UNTUK KEJELASAN) ==========
     window.adminLogin = function() {
       const user = document.getElementById('adminUser').value;
       const pass = document.getElementById('adminPass').value;
@@ -4168,12 +4229,6 @@
         isAdminLoggedIn = true;
         document.getElementById('adminLogin').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-        addLog('login', 'Login admin', `User: ${user}`);
-        loadAdminDashboard();
-        loadCategoriesAdmin();
-        updateDateTime();
-        setInterval(updateDateTime, 1000);
-        startNotificationChecker();
         showToast('Login berhasil', 'success');
       } else {
         showToast('Username atau password salah', 'error');
@@ -4185,940 +4240,13 @@
       isAdminLoggedIn = false;
       document.getElementById('adminLogin').style.display = 'block';
       document.getElementById('adminPanel').style.display = 'none';
-      addLog('login', 'Logout admin', '');
-    };
-
-    function updateDateTime() {
-      const now = new Date();
-      const elem = document.getElementById('adminDateTime');
-      if (elem) elem.textContent = now.toLocaleString('id-ID');
-    }
-
-    window.switchAdminTab = function(tabName) {
-      adminCurrentTab = tabName;
-      document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      
-      document.querySelectorAll('.admin-section').forEach(section => section.classList.remove('active'));
-      const sectionId = `admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`;
-      document.getElementById(sectionId).classList.add('active');
-      
-      if (tabName === 'products') loadProductsAdmin();
-      if (tabName === 'orders') filterOrders();
-      if (tabName === 'customers') loadCustomers();
-      if (tabName === 'reports') loadReport();
-      if (tabName === 'logs') loadLogs();
-    };
-
-    function loadAdminDashboard() {
-      document.getElementById('totalProducts').textContent = produkRetail.length;
-      document.getElementById('totalOrders').textContent = orders.length;
-      const totalRevenue = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-      document.getElementById('totalRevenue').textContent = `Rp ${totalRevenue.toLocaleString()}`;
-      document.getElementById('lowStock').textContent = produkRetail.filter(p => p.stok < 5).length;
-      
-      const today = new Date().toDateString();
-      const todayOrders = orders.filter(o => new Date(o.waktu).toDateString() === today);
-      document.getElementById('todayOrders').textContent = todayOrders.length;
-      document.getElementById('todayRevenue').textContent = `Rp ${todayOrders.reduce((sum, o) => sum + (o.total || 0), 0).toLocaleString()}`;
-      document.getElementById('pendingOrders').textContent = orders.filter(o => o.status === 'pending').length;
-      
-      const productSales = {};
-      orders.forEach(order => {
-        if (order.items) {
-          order.items.forEach(item => {
-            productSales[item.id] = (productSales[item.id] || 0) + item.quantity;
-          });
-        }
-      });
-      
-      const topProducts = Object.entries(productSales)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5)
-        .map(([id, qty]) => {
-          const product = produkRetail.find(p => p.id == id);
-          return { ...product, terjual: qty };
-        });
-      
-      const topList = document.getElementById('topProductsList');
-      if (topList) {
-        topList.innerHTML = topProducts.map(p => `
-          <tr>
-            <td>${p ? p.nama : 'Produk'}</td>
-            <td>${p ? p.terjual : 0}</td>
-            <td>Rp ${(p ? p.terjual * p.harga : 0).toLocaleString()}</td>
-          </tr>
-        `).join('');
-      }
-      
-      const lowStock = produkRetail.filter(p => p.stok < 5);
-      const lowList = document.getElementById('lowStockList');
-      if (lowList) {
-        lowList.innerHTML = lowStock.map(p => `
-          <tr>
-            <td>${p.nama}</td>
-            <td class="stock-low">${p.stok}</td>
-            <td><span class="badge-status badge-pending">Segera Restock</span></td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    function loadProductsAdmin() {
-      const categoryFilter = document.getElementById('filterCategory');
-      if (!categoryFilter) return;
-      
-      const categories = [...new Set(produkRetail.map(p => p.kategori))];
-      categoryFilter.innerHTML = '<option value="all">Semua Kategori</option>' + 
-        categories.map(c => `<option value="${c}">${c}</option>`).join('');
-      
-      filterProducts();
-    }
-
-    window.filterProducts = function() {
-      const search = document.getElementById('searchProduct')?.value.toLowerCase() || '';
-      const category = document.getElementById('filterCategory')?.value || 'all';
-      const stock = document.getElementById('filterStock')?.value || 'all';
-      
-      filteredProducts = produkRetail.filter(p => {
-        const matchSearch = p.nama.toLowerCase().includes(search);
-        const matchCategory = category === 'all' || p.kategori === category;
-        const matchStock = stock === 'all' || 
-                          (stock === 'low' && p.stok < 5) || 
-                          (stock === 'out' && p.stok === 0);
-        return matchSearch && matchCategory && (stock === 'all' || matchStock);
-      });
-      
-      renderProductsTable();
-    };
-
-    function renderProductsTable() {
-      const tbody = document.getElementById('daftarProdukAdmin');
-      if (!tbody) return;
-      
-      tbody.innerHTML = filteredProducts.map(p => `
-        <tr>
-          <td>${p.id}</td>
-          <td><img src="${p.gambar || 'https://via.placeholder.com/50'}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;"></td>
-          <td>${p.nama}</td>
-          <td>${p.kategori}</td>
-          <td>Rp ${p.harga.toLocaleString()}</td>
-          <td>
-            <span class="${p.stok < 5 ? 'stock-low' : ''}">${p.stok}</span>
-            <div class="stock-progress">
-              <div class="stock-progress-bar" style="width: ${Math.min(100, (p.stok/10)*100)}%"></div>
-            </div>
-          </td>
-          <td>${p.promo || '-'}</td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-view" onclick="openQuickview(${p.id})" title="Lihat"><i class="fas fa-eye"></i></button>
-            <button class="admin-btn admin-btn-edit" onclick="editProduk(${p.id})" title="Edit"><i class="fas fa-edit"></i></button>
-            <button class="admin-btn admin-btn-duplicate" onclick="duplicateProduct(${p.id})" title="Duplikat"><i class="fas fa-copy"></i></button>
-            <button class="admin-btn admin-btn-history" onclick="showStockHistory(${p.id})" title="History Stok"><i class="fas fa-history"></i></button>
-            <button class="admin-btn admin-btn-delete" onclick="hapusProduk(${p.id})" title="Hapus"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    window.duplicateProduct = function(id) {
-      const original = produkRetail.find(p => p.id === id);
-      const newProduct = {
-        ...original,
-        id: produkRetail.length + 1,
-        nama: original.nama + ' (Copy)'
-      };
-      produkRetail.push(newProduct);
-      addLog('produk', 'Duplikat produk', `ID: ${id}, Nama: ${original.nama}`);
-      loadProductsAdmin();
-      showToast('Produk berhasil diduplikasi', 'success');
-    };
-
-    window.exportProducts = function() {
-      const csv = convertToCSV(produkRetail);
-      downloadFile(csv, 'produk.csv', 'text/csv');
-      showToast('Export produk berhasil', 'success');
-    };
-
-    window.filterOrders = function() {
-      const status = document.getElementById('orderStatus')?.value || 'all';
-      const date = document.getElementById('orderDate')?.value || '';
-      
-      let filtered = [...orders];
-      
-      if (status !== 'all') {
-        filtered = filtered.filter(o => o.status === status);
-      }
-      
-      if (date) {
-        filtered = filtered.filter(o => o.waktu.split(' ')[0] === date.split('-').reverse().join('/'));
-      }
-      
-      renderOrdersTable(filtered);
-    };
-
-    function renderOrdersTable(ordersList) {
-      const tbody = document.getElementById('ordersList');
-      if (!tbody) return;
-      
-      tbody.innerHTML = ordersList.reverse().map(o => `
-        <tr>
-          <td>#${o.id}</td>
-          <td>${o.waktu}</td>
-          <td>${o.nama}</td>
-          <td>Rp ${(o.total || 0).toLocaleString()}</td>
-          <td>${o.metode || '-'}</td>
-          <td>${o.pembayaran || 'QRIS/Cash'}</td>
-          <td>
-            <select class="badge-status" onchange="updateOrderStatus('${o.id}', this.value)" style="background: ${getStatusColor(o.status)};">
-              <option value="pending" ${o.status === 'pending' ? 'selected' : ''}>Pending</option>
-              <option value="proses" ${o.status === 'proses' ? 'selected' : ''}>Diproses</option>
-              <option value="dikirim" ${o.status === 'dikirim' ? 'selected' : ''}>Dikirim</option>
-              <option value="selesai" ${o.status === 'selesai' ? 'selected' : ''}>Selesai</option>
-            </select>
-          </td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-view" onclick="viewOrderDetail('${o.id}')"><i class="fas fa-eye"></i></button>
-            <button class="admin-btn admin-btn-delete" onclick="deleteOrder('${o.id}')"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    window.updateOrderStatus = function(orderId, newStatus) {
-      const order = orders.find(o => o.id === orderId);
-      if (order) {
-        const oldStatus = order.status;
-        order.status = newStatus;
-        
-        if (!order.timeline) order.timeline = [];
-        order.timeline.push({
-          status: newStatus,
-          waktu: new Date().toLocaleString(),
-          keterangan: `Status diubah dari ${oldStatus} ke ${newStatus}`
-        });
-        
-        localStorage.setItem('orders', JSON.stringify(orders));
-        addLog('order', 'Update status order', `ID: ${orderId}, ${oldStatus} → ${newStatus}`);
-        filterOrders();
-        showToast('Status order diperbarui', 'success');
-      }
-    };
-
-    window.viewOrderDetail = function(orderId) {
-      const order = orders.find(o => o.id === orderId);
-      if (!order) return;
-      
-      const content = document.getElementById('orderDetailContent');
-      content.innerHTML = `
-        <div style="padding: 20px;">
-          <p><strong>ID Order:</strong> #${order.id}</p>
-          <p><strong>Waktu:</strong> ${order.waktu}</p>
-          <p><strong>Customer:</strong> ${order.nama}</p>
-          <p><strong>Telepon:</strong> ${order.telepon}</p>
-          <p><strong>Metode:</strong> ${order.metode || '-'}</p>
-          <p><strong>Pembayaran:</strong> ${order.pembayaran || 'QRIS/Cash'}</p>
-          <p><strong>Alamat:</strong> ${order.alamat || '-'}</p>
-          <p><strong>Catatan:</strong> ${order.notes || '-'}</p>
-          <h4 style="margin-top: 20px;">Detail Produk:</h4>
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Produk</th>
-                <th>Harga</th>
-                <th>Qty</th>
-                <th>Subtotal</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${order.items ? order.items.map(item => `
-                <tr>
-                  <td>${item.nama || 'Produk'}</td>
-                  <td>Rp ${(item.harga || 0).toLocaleString()}</td>
-                  <td>${item.quantity}</td>
-                  <td>Rp ${((item.harga || 0) * item.quantity).toLocaleString()}</td>
-                </tr>
-              `).join('') : ''}
-            </tbody>
-            <tfoot>
-              <tr>
-                <th colspan="3">Total</th>
-                <th>Rp ${(order.total || 0).toLocaleString()}</th>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-      `;
-      
-      document.getElementById('orderDetailModal').classList.add('active');
-    };
-
-    window.deleteOrder = function(orderId) {
-      if (confirm('Yakin ingin menghapus order ini?')) {
-        orders = orders.filter(o => o.id !== orderId);
-        localStorage.setItem('orders', JSON.stringify(orders));
-        addLog('order', 'Hapus order', `ID: ${orderId}`);
-        filterOrders();
-        showToast('Order dihapus', 'success');
-      }
-    };
-
-    window.exportOrders = function() {
-      const csv = convertToCSV(orders);
-      downloadFile(csv, 'orders.csv', 'text/csv');
-      showToast('Export berhasil', 'success');
-    };
-
-    // Customer functions
-    window.loadCustomers = function() {
-      const customerMap = new Map();
-      
-      orders.forEach(order => {
-        const key = order.telepon;
-        if (!customerMap.has(key)) {
-          customerMap.set(key, {
-            nama: order.nama,
-            telepon: order.telepon,
-            orders: [],
-            totalBelanja: 0,
-            lastOrder: order.waktu
-          });
-        }
-        const customer = customerMap.get(key);
-        customer.orders.push(order);
-        customer.totalBelanja += order.total || 0;
-        if (new Date(order.waktu) > new Date(customer.lastOrder)) {
-          customer.lastOrder = order.waktu;
-        }
-      });
-      
-      let customersList = Array.from(customerMap.values());
-      
-      const sortBy = document.getElementById('customerSort')?.value || 'terbaru';
-      if (sortBy === 'terbaru') {
-        customersList.sort((a, b) => new Date(b.lastOrder) - new Date(a.lastOrder));
-      } else if (sortBy === 'terlama') {
-        customersList.sort((a, b) => new Date(a.lastOrder) - new Date(b.lastOrder));
-      } else if (sortBy === 'total') {
-        customersList.sort((a, b) => b.totalBelanja - a.totalBelanja);
-      } else if (sortBy === 'order') {
-        customersList.sort((a, b) => b.orders.length - a.orders.length);
-      }
-      
-      renderCustomers(customersList);
-    };
-
-    window.filterCustomers = function() {
-      const search = document.getElementById('searchCustomer')?.value.toLowerCase() || '';
-      const customerMap = new Map();
-      
-      orders.forEach(order => {
-        const key = order.telepon;
-        if (!customerMap.has(key)) {
-          customerMap.set(key, {
-            nama: order.nama,
-            telepon: order.telepon,
-            orders: [],
-            totalBelanja: 0,
-            lastOrder: order.waktu
-          });
-        }
-        const customer = customerMap.get(key);
-        customer.orders.push(order);
-        customer.totalBelanja += order.total || 0;
-      });
-      
-      const customersList = Array.from(customerMap.values());
-      const filtered = customersList.filter(c => 
-        c.nama.toLowerCase().includes(search) || 
-        c.telepon.includes(search)
-      );
-      
-      renderCustomers(filtered);
-    };
-
-    function renderCustomers(customersList) {
-      const tbody = document.getElementById('customersList');
-      if (!tbody) return;
-      
-      tbody.innerHTML = customersList.map((c, index) => `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${c.nama}</td>
-          <td>${c.telepon}</td>
-          <td>${c.orders.length}</td>
-          <td>Rp ${c.totalBelanja.toLocaleString()}</td>
-          <td>${c.lastOrder}</td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-view" onclick="viewCustomer('${c.telepon}')"><i class="fas fa-eye"></i></button>
-            <button class="admin-btn admin-btn-wa" onclick="chatCustomer('${c.telepon}')"><i class="fab fa-whatsapp"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    window.viewCustomer = function(telepon) {
-      const customerOrders = orders.filter(o => o.telepon === telepon);
-      const customer = {
-        nama: customerOrders[0].nama,
-        telepon: telepon,
-        orders: customerOrders,
-        totalBelanja: customerOrders.reduce((sum, o) => sum + (o.total || 0), 0)
-      };
-      
-      const content = document.getElementById('customerDetailContent');
-      content.innerHTML = `
-        <div style="padding: 20px;">
-          <p><strong>Nama:</strong> ${customer.nama}</p>
-          <p><strong>Telepon:</strong> ${customer.telepon}</p>
-          <p><strong>Total Order:</strong> ${customer.orders.length}</p>
-          <p><strong>Total Belanja:</strong> Rp ${customer.totalBelanja.toLocaleString()}</p>
-          
-          <h4 style="margin-top: 20px;">Riwayat Order</h4>
-          <table class="admin-table">
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${customer.orders.map(o => `
-                <tr>
-                  <td>${o.waktu}</td>
-                  <td>Rp ${(o.total || 0).toLocaleString()}</td>
-                  <td><span class="badge-status" style="background:${getStatusColor(o.status)};">${o.status}</span></td>
-                  <td><button class="admin-btn admin-btn-view" onclick="viewOrderDetail('${o.id}'); closeModal('customerDetailModal');"><i class="fas fa-eye"></i></button></td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-      `;
-      
-      document.getElementById('customerDetailModal').classList.add('active');
-    };
-
-    window.chatCustomer = function(telepon) {
-      window.open(`https://wa.me/${telepon}`, '_blank');
-    };
-
-    // Stock history functions
-    window.tambahKeStockHistory = function(produkId, perubahan, stokAkhir, keterangan) {
-      stockHistory.push({
-        id: Date.now(),
-        produkId: produkId,
-        waktu: new Date().toLocaleString('id-ID'),
-        perubahan: perubahan,
-        stokAkhir: stokAkhir,
-        keterangan: keterangan
-      });
-      localStorage.setItem('stockHistory', JSON.stringify(stockHistory));
-    };
-
-    window.showStockHistory = function(produkId) {
-      const produk = produkRetail.find(p => p.id === produkId);
-      document.getElementById('stockHistoryProductName').textContent = produk.nama;
-      
-      const history = stockHistory.filter(h => h.produkId === produkId).reverse();
-      const list = document.getElementById('stockHistoryList');
-      
-      list.innerHTML = history.map(h => `
-        <tr>
-          <td>${h.waktu}</td>
-          <td style="color: ${h.perubahan > 0 ? 'green' : 'red'}">${h.perubahan > 0 ? '+' : ''}${h.perubahan}</td>
-          <td>${h.stokAkhir}</td>
-          <td>${h.keterangan}</td>
-        </tr>
-      `).join('');
-      
-      if (history.length === 0) {
-        list.innerHTML = '<tr><td colspan="4" style="text-align:center;">Belum ada history stok</td></tr>';
-      }
-      
-      document.getElementById('stockHistoryModal').classList.add('active');
-    };
-
-    // Log functions
-    function addLog(tipe, aktivitas, detail = '') {
-      activityLogs.push({
-        id: Date.now(),
-        waktu: new Date().toLocaleString('id-ID'),
-        user: 'admin',
-        tipe: tipe,
-        aktivitas: aktivitas,
-        detail: detail
-      });
-      localStorage.setItem('activityLogs', JSON.stringify(activityLogs));
-    }
-
-    window.loadLogs = function() {
-      const tipe = document.getElementById('logType')?.value || 'all';
-      const date = document.getElementById('logDate')?.value || '';
-      
-      let filtered = [...activityLogs];
-      
-      if (tipe !== 'all') {
-        filtered = filtered.filter(l => l.tipe === tipe);
-      }
-      
-      if (date) {
-        filtered = filtered.filter(l => l.waktu.split(' ')[0] === date.split('-').reverse().join('/'));
-      }
-      
-      const tbody = document.getElementById('logsList');
-      if (!tbody) return;
-      
-      tbody.innerHTML = filtered.reverse().map(l => `
-        <tr>
-          <td>${l.waktu}</td>
-          <td>${l.user}</td>
-          <td><span class="badge-status" style="background:${getLogColor(l.tipe)};">${l.tipe}</span></td>
-          <td>${l.aktivitas}</td>
-          <td>${l.detail || '-'}</td>
-        </tr>
-      `).join('');
-    };
-
-    function getLogColor(tipe) {
-      const colors = {
-        login: '#1976D2',
-        produk: '#388E3C',
-        order: '#FFA000',
-        stok: '#9C27B0'
-      };
-      return colors[tipe] || '#757575';
-    }
-
-    window.exportLogs = function() {
-      const csv = convertToCSV(activityLogs);
-      downloadFile(csv, 'logs.csv', 'text/csv');
-      showToast('Export log berhasil', 'success');
-    };
-
-    // Form produk functions
-    window.tampilkanFormProduk = function(produk = null) {
-      const container = document.getElementById('formProdukContainer');
-      const isEdit = produk !== null;
-      container.style.display = 'block';
-      container.innerHTML = `
-        <div class="form-produk">
-          <h3 style="grid-column: span 2;">${isEdit ? 'Edit Produk' : 'Tambah Produk Baru'}</h3>
-          <input type="text" id="produkNama" placeholder="Nama Produk" value="${produk?.nama || ''}">
-          <select id="produkKategori">
-            <option value="sembako" ${produk?.kategori === 'sembako' ? 'selected' : ''}>Sembako</option>
-            <option value="dapur" ${produk?.kategori === 'dapur' ? 'selected' : ''}>Dapur</option>
-            <option value="makanan" ${produk?.kategori === 'makanan' ? 'selected' : ''}>Makanan</option>
-            <option value="minuman" ${produk?.kategori === 'minuman' ? 'selected' : ''}>Minuman</option>
-            <option value="perawatan" ${produk?.kategori === 'perawatan' ? 'selected' : ''}>Perawatan</option>
-            <option value="cemilan" ${produk?.kategori === 'cemilan' ? 'selected' : ''}>Cemilan</option>
-            <option value="buah" ${produk?.kategori === 'buah' ? 'selected' : ''}>Buah</option>
-            <option value="bayi" ${produk?.kategori === 'bayi' ? 'selected' : ''}>Bayi</option>
-            <option value="rumah" ${produk?.kategori === 'rumah' ? 'selected' : ''}>Rumah</option>
-          </select>
-          <input type="number" id="produkHarga" placeholder="Harga Promo" value="${produk?.harga || ''}">
-          <input type="number" id="produkHargaAsli" placeholder="Harga Asli" value="${produk?.hargaAsli || ''}">
-          <input type="text" id="produkGambar" placeholder="URL Gambar" value="${produk?.gambar || ''}">
-          <input type="text" id="produkBerat" placeholder="Berat (contoh: 500g)" value="${produk?.berat || ''}">
-          <input type="text" id="produkPromo" placeholder="Promo (sensabu/jusami/gajian/bulanan)" value="${produk?.promo || ''}">
-          <textarea id="produkDeskripsi" placeholder="Deskripsi" class="full-width" rows="3">${produk?.deskripsi || ''}</textarea>
-          <input type="number" id="produkStok" placeholder="Stok" value="${produk?.stok || 10}" class="full-width">
-          <button onclick="${isEdit ? `updateProduk(${produk.id})` : 'simpanProdukBaru()'}" class="full-width">${isEdit ? 'Update' : 'Simpan'}</button>
-          <button onclick="document.getElementById('formProdukContainer').style.display='none'" class="full-width" style="background:var(--abu);">Batal</button>
-        </div>
-      `;
-    };
-
-    window.simpanProdukBaru = function() {
-      const produkBaru = {
-        id: produkRetail.length + 1,
-        nama: document.getElementById('produkNama').value,
-        kategori: document.getElementById('produkKategori').value,
-        harga: parseInt(document.getElementById('produkHarga').value) || 0,
-        hargaAsli: parseInt(document.getElementById('produkHargaAsli').value) || 0,
-        gambar: document.getElementById('produkGambar').value,
-        berat: document.getElementById('produkBerat').value,
-        promo: document.getElementById('produkPromo').value,
-        deskripsi: document.getElementById('produkDeskripsi').value,
-        stok: parseInt(document.getElementById('produkStok').value) || 10
-      };
-      produkRetail.push(produkBaru);
-      addLog('produk', 'Tambah produk', `ID: ${produkBaru.id}, Nama: ${produkBaru.nama}`);
-      loadProductsAdmin();
-      document.getElementById('formProdukContainer').style.display = 'none';
-      showToast('Produk berhasil ditambahkan', 'success');
-    };
-
-    window.editProduk = function(id) {
-      const produk = produkRetail.find(p => p.id === id);
-      tampilkanFormProduk(produk);
-    };
-
-    window.updateProduk = function(id) {
-      const index = produkRetail.findIndex(p => p.id === id);
-      if (index !== -1) {
-        const stokLama = produkRetail[index].stok;
-        const stokBaru = parseInt(document.getElementById('produkStok').value) || 10;
-        const perubahan = stokBaru - stokLama;
-        
-        produkRetail[index] = {
-          ...produkRetail[index],
-          nama: document.getElementById('produkNama').value,
-          kategori: document.getElementById('produkKategori').value,
-          harga: parseInt(document.getElementById('produkHarga').value) || 0,
-          hargaAsli: parseInt(document.getElementById('produkHargaAsli').value) || 0,
-          gambar: document.getElementById('produkGambar').value,
-          berat: document.getElementById('produkBerat').value,
-          promo: document.getElementById('produkPromo').value,
-          deskripsi: document.getElementById('produkDeskripsi').value,
-          stok: stokBaru
-        };
-        
-        if (perubahan !== 0) {
-          tambahKeStockHistory(id, perubahan, stokBaru, 'Update manual');
-          addLog('stok', 'Update stok', `ID: ${id}, Perubahan: ${perubahan}`);
-        }
-        
-        addLog('produk', 'Update produk', `ID: ${id}`);
-        loadProductsAdmin();
-        document.getElementById('formProdukContainer').style.display = 'none';
-        showToast('Produk berhasil diupdate', 'success');
-      }
-    };
-
-    window.hapusProduk = function(id) {
-      if (confirm('Yakin ingin menghapus produk ini?')) {
-        const produk = produkRetail.find(p => p.id === id);
-        produkRetail = produkRetail.filter(p => p.id !== id);
-        addLog('produk', 'Hapus produk', `ID: ${id}, Nama: ${produk.nama}`);
-        loadProductsAdmin();
-        showToast('Produk dihapus', 'success');
-      }
-    };
-
-    // Category functions
-    function loadCategoriesAdmin() {
-      const categories = [...new Set(produkRetail.map(p => p.kategori))];
-      const tbody = document.getElementById('kategoriList');
-      if (!tbody) return;
-      
-      tbody.innerHTML = categories.map(cat => `
-        <tr>
-          <td>${cat}</td>
-          <td><i class="fas fa-${getIconKategori(cat)}"></i></td>
-          <td>${produkRetail.filter(p => p.kategori === cat).length}</td>
-          <td class="admin-actions">
-            <button class="admin-btn admin-btn-edit" onclick="editKategori('${cat}')"><i class="fas fa-edit"></i></button>
-            <button class="admin-btn admin-btn-delete" onclick="hapusKategori('${cat}')"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    window.tambahKategori = function() {
-      const nama = prompt('Masukkan nama kategori baru:');
-      if (nama) {
-        const existing = produkRetail.find(p => p.kategori.toLowerCase() === nama.toLowerCase());
-        if (existing) {
-          showToast('Kategori sudah ada', 'error');
-          return;
-        }
-        showToast('Kategori berhasil ditambahkan (silahkan tambah produk dengan kategori ini)', 'success');
-        addLog('kategori', 'Tambah kategori', nama);
-        loadCategoriesAdmin();
-      }
-    };
-
-    window.editKategori = function(oldName) {
-      const newName = prompt('Ubah nama kategori:', oldName);
-      if (newName && newName !== oldName) {
-        produkRetail.forEach(p => {
-          if (p.kategori === oldName) {
-            p.kategori = newName.toLowerCase();
-          }
-        });
-        addLog('kategori', 'Edit kategori', `${oldName} → ${newName}`);
-        loadCategoriesAdmin();
-        showToast('Kategori diubah', 'success');
-      }
-    };
-
-    window.hapusKategori = function(kategori) {
-      const count = produkRetail.filter(p => p.kategori === kategori).length;
-      if (count > 0) {
-        if (!confirm(`Kategori ${kategori} memiliki ${count} produk. Yakin ingin menghapus?`)) return;
-        produkRetail = produkRetail.filter(p => p.kategori !== kategori);
-      }
-      addLog('kategori', 'Hapus kategori', kategori);
-      loadCategoriesAdmin();
-      showToast('Kategori dihapus', 'success');
-    };
-
-    // Promo functions
-    window.tambahPromo = function() {
-      document.getElementById('promoModalTitle').textContent = 'Tambah Promo';
-      document.getElementById('promoName').value = '';
-      document.getElementById('promoType').value = 'percent';
-      document.getElementById('promoValue').value = '';
-      document.getElementById('promoStart').value = '';
-      document.getElementById('promoEnd').value = '';
-      document.getElementById('promoModal').classList.add('active');
-    };
-
-    window.editPromo = function(promoId) {
-      document.getElementById('promoModalTitle').textContent = 'Edit Promo';
-      document.getElementById('promoModal').classList.add('active');
-    };
-
-    window.savePromo = function() {
-      showToast('Promo disimpan', 'success');
-      addLog('promo', 'Simpan promo', document.getElementById('promoName').value);
-      closeModal('promoModal');
-    };
-
-    // Report functions
-    window.loadReport = function() {
-      const period = document.getElementById('reportPeriod')?.value || 'daily';
-      const reportData = generateReportData(orders, period);
-      
-      const tbody = document.getElementById('reportTable');
-      if (!tbody) return;
-      
-      tbody.innerHTML = reportData.map(d => `
-        <tr>
-          <td>${d.period}</td>
-          <td>${d.count}</td>
-          <td>Rp ${d.revenue.toLocaleString()}</td>
-          <td>Rp ${(d.revenue / (d.count || 1) || 0).toLocaleString()}</td>
-        </tr>
-      `).join('');
-      
-      drawSalesChart(reportData);
-    };
-
-    function generateReportData(orders, period) {
-      const grouped = {};
-      orders.forEach(order => {
-        let key;
-        const date = new Date(order.waktu);
-        if (period === 'daily') key = date.toLocaleDateString('id-ID');
-        else if (period === 'weekly') key = `Minggu ${getWeekNumber(date)}`;
-        else if (period === 'monthly') key = date.toLocaleString('id-ID', { month: 'long', year: 'numeric' });
-        else key = date.getFullYear();
-        
-        if (!grouped[key]) {
-          grouped[key] = { period: key, count: 0, revenue: 0 };
-        }
-        grouped[key].count++;
-        grouped[key].revenue += order.total || 0;
-      });
-      
-      return Object.values(grouped).sort((a, b) => a.period.localeCompare(b.period));
-    }
-
-    function getWeekNumber(date) {
-      const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-      const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-      return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-    }
-
-    function drawSalesChart(data) {
-      const canvas = document.getElementById('salesChart');
-      if (!canvas) return;
-      
-      const ctx = canvas.getContext('2d');
-      const width = canvas.width;
-      const height = canvas.height;
-      
-      ctx.clearRect(0, 0, width, height);
-      
-      const maxRevenue = Math.max(...data.map(d => d.revenue), 1);
-      const barWidth = width / data.length - 10;
-      
-      data.forEach((d, i) => {
-        const barHeight = (d.revenue / maxRevenue) * (height - 50);
-        const x = i * (barWidth + 10) + 10;
-        const y = height - barHeight - 30;
-        
-        ctx.fillStyle = '#2E7D32';
-        ctx.fillRect(x, y, barWidth, barHeight);
-        
-        ctx.fillStyle = '#000';
-        ctx.font = '10px Poppins';
-        ctx.fillText(d.period, x, height - 15);
-        ctx.fillText(`Rp ${(d.revenue/1000).toFixed(0)}k`, x, y - 5);
-      });
-    }
-
-    window.exportReport = function() {
-      showToast('Fitur export PDF akan segera hadir', 'info');
-    };
-
-    // Notification functions
-    function startNotificationChecker() {
-      setInterval(checkNewOrders, 10000);
-    }
-
-    function checkNewOrders() {
-      const newOrders = orders.filter(o => new Date(o.waktu).getTime() > lastCheck);
-      if (newOrders.length > 0) {
-        newOrders.forEach(order => {
-          notifications.push({
-            id: Date.now() + Math.random(),
-            type: 'order',
-            message: `Order baru dari ${order.nama}`,
-            time: new Date().toLocaleString(),
-            read: false,
-            data: order
-          });
-        });
-        localStorage.setItem('notifications', JSON.stringify(notifications));
-        updateNotificationBadge();
-        
-        showToast(`${newOrders.length} order baru masuk!`, 'info');
-      }
-      lastCheck = Date.now();
-    }
-
-    function updateNotificationBadge() {
-      const unread = notifications.filter(n => !n.read).length;
-      const badge = document.getElementById('notificationBadge');
-      if (badge) {
-        if (unread > 0) {
-          badge.style.display = 'flex';
-          badge.textContent = unread;
-        } else {
-          badge.style.display = 'none';
-        }
-      }
-    }
-
-    window.toggleNotifications = function() {
-      const list = document.getElementById('notificationList');
-      if (!list) return;
-      
-      list.innerHTML = notifications.length ? notifications.map(n => `
-        <div style="padding: 10px; border-bottom: 1px solid var(--abu-muda); ${n.read ? 'opacity: 0.6;' : 'background: var(--abu-muda);'}" onclick="markNotificationRead(${n.id})">
-          <p><strong>${n.message}</strong></p>
-          <small>${n.time}</small>
-        </div>
-      `).join('') : '<p style="text-align:center; padding:20px;">Tidak ada notifikasi</p>';
-      
-      document.getElementById('notificationModal').classList.add('active');
-    };
-
-    window.markNotificationRead = function(id) {
-      const notif = notifications.find(n => n.id === id);
-      if (notif) {
-        notif.read = true;
-        localStorage.setItem('notifications', JSON.stringify(notifications));
-        updateNotificationBadge();
-      }
-    };
-
-    // Backup & Restore functions
-    window.backupData = function() {
-      const data = {
-        produk: produkRetail,
-        orders: orders,
-        customers: customers,
-        visitors: visitorCount,
-        stockHistory: stockHistory,
-        activityLogs: activityLogs,
-        tanggal: new Date().toISOString()
-      };
-      
-      const json = JSON.stringify(data, null, 2);
-      downloadFile(json, `backup-toserba-yola-${new Date().toISOString().split('T')[0]}.json`, 'application/json');
-      addLog('backup', 'Backup data', '');
-      showToast('Backup berhasil', 'success');
-    };
-
-    window.restoreData = function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const data = JSON.parse(e.target.result);
-          
-          if (confirm('Yakin ingin merestore data? Data saat ini akan ditimpa!')) {
-            if (data.produk) produkRetail = data.produk;
-            if (data.orders) {
-              orders = data.orders;
-              localStorage.setItem('orders', JSON.stringify(orders));
-            }
-            if (data.customers) {
-              customers = data.customers;
-              localStorage.setItem('customers', JSON.stringify(customers));
-            }
-            if (data.visitors) {
-              visitorCount = data.visitors;
-              localStorage.setItem('visitorCount', visitorCount);
-            }
-            if (data.stockHistory) {
-              stockHistory = data.stockHistory;
-              localStorage.setItem('stockHistory', JSON.stringify(stockHistory));
-            }
-            if (data.activityLogs) {
-              activityLogs = data.activityLogs;
-              localStorage.setItem('activityLogs', JSON.stringify(activityLogs));
-            }
-            
-            addLog('restore', 'Restore data', '');
-            showToast('Restore berhasil', 'success');
-            location.reload();
-          }
-        } catch (err) {
-          showToast('File backup tidak valid', 'error');
-        }
-      };
-      reader.readAsText(file);
-    };
-
-    // Settings functions
-    window.saveSettings = function() {
-      showToast('Pengaturan disimpan', 'success');
-      addLog('settings', 'Update pengaturan', '');
-    };
-
-    window.addAdminUser = function() {
-      showToast('Fitur tambah admin akan segera hadir', 'info');
-    };
-
-    window.changePassword = function(username) {
-      showToast('Fitur ganti password akan segera hadir', 'info');
+      showToast('Logout berhasil', 'success');
     };
 
     // Utility functions
-    function convertToCSV(data) {
-      if (data.length === 0) return '';
-      const headers = Object.keys(data[0]);
-      const csv = [
-        headers.join(','),
-        ...data.map(row => headers.map(h => `"${row[h] || ''}"`).join(','))
-      ];
-      return csv.join('\n');
-    }
-
-    function downloadFile(content, fileName, mimeType) {
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-
-    // ========== TOAST ==========
     function showToast(msg, type='success') { 
       const t = document.getElementById('toastContainer'); 
       if (!t) return;
-      
       const toast = document.createElement('div'); 
       toast.className=`toast ${type}`; 
       toast.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i><span>${msg}</span>`; 
@@ -5144,11 +4272,17 @@
         document.getElementById('logoutMenu').style.display = 'block';
         document.getElementById('customerDashboardMenu').style.display = 'block';
         document.getElementById('myOrdersMenu').style.display = 'block';
+        
+        // Tampilkan menu tracking di desktop
+        document.getElementById('desktopTrackingMenu').style.display = 'flex';
       } else {
         document.getElementById('loginMenu').style.display = 'block';
         document.getElementById('logoutMenu').style.display = 'none';
         document.getElementById('customerDashboardMenu').style.display = 'none';
         document.getElementById('myOrdersMenu').style.display = 'none';
+        
+        // Sembunyikan menu tracking di desktop
+        document.getElementById('desktopTrackingMenu').style.display = 'none';
       }
 
       // Cek hash
