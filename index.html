@@ -3188,10 +3188,11 @@
       document.querySelector('#darkModeToggle i').className = 'fas fa-sun';
     }
 
-    // ========== PARTIKEL ==========
+    // ========== PARTIKEL (OPTIMIZED) ==========
     function createParticles() {
       const particlesContainer = document.getElementById('particles');
-      for (let i = 0; i < 15; i++) {
+      if (!particlesContainer) return;
+      for (let i = 0; i < 5; i++) { // reduced from 15 to 5
         const particle = document.createElement('div');
         particle.className = 'particle';
         const size = Math.random() * 10 + 5;
@@ -3208,7 +3209,8 @@
 
     function createSplashParticles() {
       const splashParticles = document.getElementById('splashParticles');
-      for (let i = 0; i < 15; i++) {
+      if (!splashParticles) return;
+      for (let i = 0; i < 5; i++) { // reduced from 15 to 5
         const particle = document.createElement('div');
         particle.className = 'splash-particle';
         const size = Math.random() * 15 + 5;
@@ -3224,7 +3226,9 @@
     createSplashParticles();
 
     function launchConfetti() {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      try {
+        confetti({ particleCount: 50, spread: 70, origin: { y: 0.6 } }); // reduced from 100
+      } catch (e) {}
     }
 
     function createFloatingEmoji(emoji) {
@@ -3255,7 +3259,7 @@
       document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
       document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
     }
-    setInterval(updateCountdown, 1000);
+    setInterval(updateCountdown, 5000); // optimized: 5sec instead of 1sec for countdown
 
     document.getElementById('enterButton').addEventListener('click', function() {
       document.getElementById('splashScreen').classList.add('hidden');
@@ -3287,24 +3291,24 @@
     window.nextSlide = ()=> { slideIndex++; showSlide(slideIndex); };
     window.prevSlide = ()=> { slideIndex--; showSlide(slideIndex); };
     window.gotoSlide = (idx)=> { slideIndex = idx; showSlide(slideIndex); };
-    setInterval(()=> { slideIndex++; showSlide(slideIndex); }, 5000);
+    let carouselTimer = setInterval(()=> { slideIndex++; showSlide(slideIndex); }, 7000); // optimized: 7sec
 
     // ========== PROMO ==========
     window.pilihPromo = function(promo) {
       currentPromo = promo;
-      document.querySelectorAll('.promo-card').forEach(c => c.classList.remove('active'));
+      const cards = document.querySelectorAll('.promo-card');
+      cards.forEach(c => c.classList.remove('active'));
       const el = document.getElementById(`promo${promo.charAt(0).toUpperCase()+promo.slice(1)}`);
-      if (el) el.classList.add('active');
+      el?.classList.add('active');
       renderProdukHome();
     };
 
     // ========== FILTER KATEGORI ==========
     window.filterKategori = function(kategori, from = 'produk') {
       currentKategori = kategori;
-      document.querySelectorAll('#kategoriProduk .kategori-item').forEach(item => {
-        const itemKategori = item.dataset.kategori;
-        if (itemKategori === kategori) item.classList.add('active');
-        else item.classList.remove('active');
+      const items = document.querySelectorAll('#kategoriProduk .kategori-item');
+      items.forEach(item => {
+        item.classList.toggle('active', item.dataset.kategori === kategori);
       });
       if (from === 'produk') renderSemuaProduk();
     };
@@ -3324,14 +3328,15 @@
           </div>
         `;
       }).join('');
-
-      container.querySelectorAll('.kategori-item').forEach(item => {
-        item.addEventListener('click', () => {
-          const kategori = item.dataset.kategori;
-          filterKategori(kategori, 'produk');
-        });
-      });
     }
+    
+    // Single event delegation for kategori (avoid re-adding listeners)
+    document.addEventListener('click', (e) => {
+      const kategoriItem = e.target.closest('[data-kategori]');
+      if (kategoriItem && kategoriItem.parentElement.id === 'kategoriProduk') {
+        filterKategori(kategoriItem.dataset.kategori, 'produk');
+      }
+    });
 
     function getIconKategori(kategori) {
       const icons = {
@@ -3343,6 +3348,7 @@
     }
 
     // ========== FILTER HARGA ==========
+    let filterHargaSetup = false; // flag untuk menghindari setup berulang
     function setupFilterHarga() {
       const minSlider = document.getElementById('hargaMin');
       const maxSlider = document.getElementById('hargaMax');
@@ -3351,7 +3357,8 @@
       const minLabel = document.getElementById('hargaMinLabel');
       const maxLabel = document.getElementById('hargaMaxLabel');
 
-      if (!minSlider) return;
+      if (!minSlider || filterHargaSetup) return;
+      filterHargaSetup = true;
 
       const hargaList = produkRetail.map(p => p.harga);
       const globalMin = Math.min(...hargaList);
@@ -3367,13 +3374,17 @@
       minLabel.textContent = globalMin.toLocaleString();
       maxLabel.textContent = globalMax.toLocaleString();
 
+      let filterTimer;
       minSlider.addEventListener('input', function() {
         if (parseInt(minSlider.value) > parseInt(maxSlider.value)) {
           minSlider.value = maxSlider.value;
         }
         minVal.textContent = parseInt(minSlider.value).toLocaleString();
         minLabel.textContent = parseInt(minSlider.value).toLocaleString();
-        if (document.getElementById('produk').classList.contains('active')) renderSemuaProduk();
+        clearTimeout(filterTimer);
+        filterTimer = setTimeout(() => {
+          if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
+        }, 300);
       });
 
       maxSlider.addEventListener('input', function() {
@@ -3382,7 +3393,12 @@
         }
         maxVal.textContent = parseInt(maxSlider.value).toLocaleString();
         maxLabel.textContent = parseInt(maxSlider.value).toLocaleString();
-        if (document.getElementById('produk').classList.contains('active')) renderSemuaProduk();
+        clearTimeout(filterTimer);
+        filterTimer = setTimeout(() => {
+          if (document.getElementById('produk')?.classList.contains('active')) renderSemuaProduk();
+        }, 300);
+      });
+    }
       });
     }
 
@@ -3391,15 +3407,13 @@
       const container = document.getElementById('produkPromo');
       if (!container) return;
       
-      container.innerHTML = '<div class="skeleton"></div>'.repeat(5);
-      setTimeout(() => {
-        let filtered = produkRetail.filter(p => p.promo === currentPromo);
-        if (filtered.length === 0) {
-          container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
-          return;
-        }
+      let filtered = produkRetail.filter(p => p.promo === currentPromo);
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
+        return;
+      }
 
-        container.innerHTML = filtered.map(p => `
+      container.innerHTML = filtered.map(p => `
           <div class="produk-card">
             <div class="produk-gambar">
               <img src="${p.gambar || 'https://via.placeholder.com/150?text=Produk'}" alt="${p.nama}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
@@ -3424,17 +3438,15 @@
       const container = document.getElementById('semuaProduk');
       if (!container) return;
       
-      container.innerHTML = '<div class="skeleton"></div>'.repeat(5);
-      setTimeout(() => {
-        let filtered = produkRetail;
-        if (currentKategori !== 'all') filtered = filtered.filter(p => p.kategori === currentKategori);
+      let filtered = produkRetail;
+      if (currentKategori !== 'all') filtered = filtered.filter(p => p.kategori === currentKategori);
 
-        if (filtered.length === 0) {
-          container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
-          return;
-        }
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; grid-column:1/-1; padding:40px;">😞 Produk tidak ditemukan</p>';
+        return;
+      }
 
-        container.innerHTML = filtered.map(p => `
+      container.innerHTML = filtered.map(p => `
           <div class="produk-card">
             <div class="produk-gambar">
               <img src="${p.gambar || 'https://via.placeholder.com/150?text=Produk'}" alt="${p.nama}" onerror="this.src='https://via.placeholder.com/150?text=No+Image'">
@@ -3452,7 +3464,6 @@
             </div>
           </div>
         `).join('');
-      }, 500);
     }
 
     document.addEventListener('click', function(e) {
@@ -3628,14 +3639,15 @@
 
     // ========== PAGE NAVIGATION ==========
     window.showPage = function(pageId) {
-      document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-      document.getElementById(pageId).classList.add('active');
+      const pages = document.querySelectorAll('.page');
+      const navItems = document.querySelectorAll('.bottom-nav .nav-item');
       
-      document.querySelectorAll('.bottom-nav .nav-item').forEach(item => item.classList.remove('active'));
+      pages.forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId)?.classList.add('active');
+      
+      navItems.forEach(item => item.classList.remove('active'));
       const navMap = { 'home': 0, 'about': 1, 'produk': 2, 'my-orders': 3 };
-      if (navMap[pageId] !== undefined) {
-        document.querySelectorAll('.bottom-nav .nav-item')[navMap[pageId]].classList.add('active');
-      }
+      if (navMap[pageId] !== undefined) navItems[navMap[pageId]]?.classList.add('active');
       
       if (pageId === 'home') {
         renderProdukHome();
