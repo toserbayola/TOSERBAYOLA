@@ -3,17 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>TOSERBA YOLA | Minimarket Terlengkap</title>
+  <title>TOSERBA YOLA | Pusat Promo Harian</title>
   
-  <meta name="description" content="Toserba Yola - Minimarket lengkap dan murah di Rancah.">
+  <meta name="description" content="Toserba Yola - Pusat belanja khusus promo dan diskon setiap hari.">
   <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Setup Tailwind dengan dukungan Dark Mode -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {} }
+    }
+  </script>
   
   <style>
-    body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; background-color: #f8fafc; }
+    body { font-family: 'Poppins', sans-serif; scroll-behavior: smooth; }
     
     .modal-overlay {
       opacity: 0; pointer-events: none; transition: all 0.3s ease;
@@ -31,73 +39,90 @@
       border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+    
+    .animate-pulse-soft { animation: pulse-soft 2s infinite; }
 
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    
+    .dark ::-webkit-scrollbar-track { background: #1e293b; }
+    .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
     .category-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
+    .dark .category-btn.active { background-color: #3b82f6; border-color: #3b82f6; }
     
     .auth-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+    .dark .auth-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+    
     .heart-active { color: #ef4444 !important; transform: scale(1.2); }
   </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
 
   <!-- ==========================================
        0. GERBANG LOGIN / REGISTER (AUTH)
        ========================================== -->
   <div id="authApp" class="fixed inset-0 auth-bg flex items-center justify-center p-4 z-[9999]">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col">
-      <div class="bg-slate-50 p-6 text-center border-b border-gray-100 relative">
-        <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">🛒</div>
-        <h2 class="text-2xl font-extrabold text-blue-900">TOSERBA YOLA</h2>
-        <p class="text-sm text-gray-500 mt-1">Silakan masuk untuk melanjutkan</p>
+    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transition-colors">
+      <div class="bg-slate-50 dark:bg-slate-800/50 p-6 text-center border-b border-gray-100 dark:border-slate-700 relative">
+        <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">🔥</div>
+        <h2 class="text-2xl font-extrabold text-blue-900 dark:text-blue-400">TOSERBA YOLA</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Pusat Promo & Diskon Harian</p>
       </div>
 
-      <div class="flex border-b border-gray-200">
-        <button id="tabCustBtn" onclick="switchAuthTab('customer')" class="flex-1 py-4 font-bold text-sm text-blue-600 border-b-2 border-blue-600 bg-blue-50/30 transition">Pelanggan</button>
-        <button id="tabAdminBtn" onclick="switchAuthTab('admin')" class="flex-1 py-4 font-bold text-sm text-gray-500 border-b-2 border-transparent hover:bg-gray-50 transition">Administrator</button>
+      <div class="flex border-b border-gray-200 dark:border-slate-700">
+        <button id="tabCustBtn" onclick="switchAuthTab('customer')" class="flex-1 py-4 font-bold text-sm text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-blue-50/30 dark:bg-blue-900/20 transition">Pelanggan</button>
+        <button id="tabAdminBtn" onclick="switchAuthTab('admin')" class="flex-1 py-4 font-bold text-sm text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:bg-gray-50 dark:hover:bg-slate-700 transition">Administrator</button>
       </div>
 
       <div class="p-6 md:p-8">
         <!-- Form Pelanggan -->
         <form id="formCustomer" onsubmit="handleCustomerLogin(event)" class="space-y-4 block">
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Lengkap</label>
+            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nama Lengkap</label>
             <div class="relative">
               <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="regName" required placeholder="Nama Anda" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition">
+              <input type="text" id="regName" required placeholder="Nama Anda" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nomor WhatsApp Aktif</label>
+            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nomor WhatsApp (Sebagai ID)</label>
             <div class="relative">
               <i class="fab fa-whatsapp absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="tel" id="regPhone" required placeholder="081234567890" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition">
+              <input type="tel" id="regPhone" required placeholder="081234567890" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
             </div>
           </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition transform hover:-translate-y-0.5 mt-2">Masuk Toko</button>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Password Akun</label>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              <input type="password" id="regPass" required placeholder="Buat / Masukkan password" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
+            </div>
+            <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">*Jika nomor WA belum terdaftar, otomatis daftar baru.</p>
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition transform hover:-translate-y-0.5 mt-2">Buru Promo Sekarang!</button>
         </form>
 
         <!-- Form Admin -->
         <form id="formAdmin" onsubmit="handleAdminLogin(event)" class="space-y-4 hidden">
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username Admin</label>
+            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Username Admin</label>
             <div class="relative">
               <i class="fas fa-user-shield absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="adminUser" required placeholder="admin" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition">
+              <input type="password" id="adminUser" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Password</label>
             <div class="relative">
               <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="password" id="adminPass" required placeholder="@Yola123" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none transition">
+              <input type="password" id="adminPass" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
             </div>
           </div>
-          <button type="submit" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 shadow-md transition transform hover:-translate-y-0.5 mt-2">Masuk Panel Admin</button>
+          <button type="submit" class="w-full bg-slate-900 dark:bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-blue-700 shadow-md transition transform hover:-translate-y-0.5 mt-2">Masuk Panel Admin</button>
         </form>
       </div>
     </div>
@@ -107,35 +132,45 @@
   <!-- ==========================================
        1. APLIKASI CUSTOMER (STOREFRONT)
        ========================================== -->
-  <div id="customerApp" class="hidden min-h-screen flex flex-col">
+  <div id="customerApp" class="hidden min-h-screen flex flex-col relative overflow-x-hidden">
     <!-- Navbar Customer -->
-    <nav class="bg-blue-600 text-white shadow-lg sticky top-0 z-40">
+    <nav class="bg-blue-600 dark:bg-slate-800 text-white shadow-lg sticky top-0 z-40 transition-colors">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center cursor-pointer" onclick="showCustPage('home')">
-            <span class="text-3xl mr-2 drop-shadow-md">🛒</span>
-            <span class="font-bold text-xl tracking-wide hidden sm:block">TOSERBA YOLA</span>
+            <span class="text-3xl mr-2 drop-shadow-md">🔥</span>
+            <span class="font-bold text-xl tracking-wide hidden sm:block">YOLA PROMO</span>
           </div>
           
           <div class="hidden md:flex space-x-6 items-center">
-            <a href="#" onclick="showCustPage('home')" class="hover:text-yellow-300 font-medium transition">Beranda</a>
+            <a href="#" onclick="showCustPage('home')" class="hover:text-yellow-300 font-medium transition">Promo Hari Ini</a>
             <a href="#" onclick="showCustPage('favorites')" class="hover:text-yellow-300 font-medium transition"><i class="fas fa-heart"></i> Favorit</a>
             <a href="#" onclick="showCustPage('dashboard')" class="hover:text-yellow-300 font-medium transition">Pesanan Saya</a>
             <a href="#" onclick="showCustPage('profile')" class="hover:text-yellow-300 font-medium transition">Profil</a>
             
-            <div class="h-6 w-px bg-blue-400 mx-2"></div>
-            <button onclick="logout()" class="text-red-200 hover:text-red-400 transition font-bold" title="Keluar"><i class="fas fa-sign-out-alt mr-1"></i> Keluar</button>
+            <div class="h-6 w-px bg-blue-400 dark:bg-slate-600 mx-2"></div>
             
-            <button onclick="toggleCart()" class="relative p-2 hover:scale-110 transition ml-2 bg-blue-700 rounded-full w-10 h-10 flex items-center justify-center">
+            <!-- Dark Mode Toggle Desktop -->
+            <button onclick="toggleDarkMode()" class="text-yellow-200 hover:text-white transition text-lg" title="Ganti Tema">
+              <i id="themeIconDesk" class="fas fa-moon"></i>
+            </button>
+            
+            <button onclick="logout()" class="text-red-200 hover:text-red-400 transition font-bold ml-2" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
+            
+            <button onclick="toggleCart()" class="relative p-2 hover:scale-110 transition ml-2 bg-blue-700 dark:bg-slate-700 rounded-full w-10 h-10 flex items-center justify-center">
               <i class="fas fa-shopping-cart text-lg"></i>
-              <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-blue-600">0</span>
+              <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-blue-600 dark:border-slate-800">0</span>
             </button>
           </div>
           
           <div class="md:hidden flex items-center space-x-3">
-            <button onclick="toggleCart()" class="relative p-2 bg-blue-700 rounded-full w-9 h-9 flex items-center justify-center">
+             <!-- Dark Mode Toggle Mobile -->
+            <button onclick="toggleDarkMode()" class="text-yellow-200 hover:text-white transition text-lg mr-1">
+              <i id="themeIconMob" class="fas fa-moon"></i>
+            </button>
+            <button onclick="toggleCart()" class="relative p-2 bg-blue-700 dark:bg-slate-700 rounded-full w-9 h-9 flex items-center justify-center">
               <i class="fas fa-shopping-cart text-sm"></i>
-              <span id="cartCountMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-blue-600">0</span>
+              <span id="cartCountMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-blue-600 dark:border-slate-800">0</span>
             </button>
             <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="p-2 focus:outline-none">
               <i class="fas fa-bars text-xl"></i>
@@ -144,106 +179,118 @@
         </div>
       </div>
       <!-- Mobile Menu -->
-      <div id="mobileMenu" class="hidden md:hidden bg-blue-800 px-4 py-4 space-y-3 shadow-inner absolute w-full z-50 border-t border-blue-700">
-        <div class="flex items-center space-x-3 bg-blue-900 p-3 rounded-xl border border-blue-700 mb-2" onclick="showCustPage('profile'); document.getElementById('mobileMenu').classList.add('hidden')">
+      <div id="mobileMenu" class="hidden md:hidden bg-blue-800 dark:bg-slate-900 px-4 py-4 space-y-3 shadow-inner absolute w-full z-50 border-t border-blue-700 dark:border-slate-800">
+        <div class="flex items-center space-x-3 bg-blue-900 dark:bg-slate-800 p-3 rounded-xl border border-blue-700 dark:border-slate-700 mb-2" onclick="showCustPage('profile'); document.getElementById('mobileMenu').classList.add('hidden')">
           <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-blue-900 font-bold text-lg"><i class="fas fa-user"></i></div>
           <div>
             <p class="font-bold text-white leading-none mb-1" id="mobCustName">User</p>
-            <p class="text-[10px] text-blue-300 uppercase font-bold tracking-wider">Edit Profil & Alamat <i class="fas fa-chevron-right ml-1"></i></p>
+            <p class="text-[10px] text-blue-300 dark:text-gray-400 uppercase font-bold tracking-wider">Edit Profil & Alamat <i class="fas fa-chevron-right ml-1"></i></p>
           </div>
         </div>
-        <a href="#" onclick="showCustPage('home'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-home w-6 text-center"></i> Beranda Belanja</a>
-        <a href="#" onclick="showCustPage('favorites'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-heart w-6 text-center"></i> Produk Favorit</a>
+        <a href="#" onclick="showCustPage('home'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-fire w-6 text-center"></i> Promo Hari Ini</a>
+        <a href="#" onclick="showCustPage('favorites'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-heart w-6 text-center"></i> Diskon Favorit</a>
         <a href="#" onclick="showCustPage('dashboard'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-history w-6 text-center"></i> Riwayat Pesanan</a>
-        <hr class="border-blue-600">
+        <hr class="border-blue-600 dark:border-slate-700">
         <button onclick="logout(); this.parentNode.classList.add('hidden')" class="block w-full text-left text-red-300 font-bold"><i class="fas fa-sign-out-alt w-6 text-center"></i> Keluar Akun</button>
       </div>
     </nav>
 
-    <!-- Hal: Katalog Utama -->
+    <!-- Hal: Katalog Promo Utama -->
     <main id="custHomePage" class="flex-1 w-full max-w-7xl mx-auto px-4 py-6 block">
-      <div class="bg-gradient-to-r from-blue-100 to-blue-50 rounded-3xl p-6 md:p-10 mb-8 flex flex-col md:flex-row items-center justify-between shadow-sm border border-blue-100 relative overflow-hidden">
+      
+      <!-- HERO BANNER (Dikelola Admin) -->
+      <div class="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-slate-800 dark:to-slate-800 rounded-3xl p-6 md:p-10 mb-8 flex flex-col md:flex-row items-center justify-between shadow-sm border border-blue-100 dark:border-slate-700 relative overflow-hidden transition-colors">
         <div class="md:w-1/2 z-10 relative">
-          <span class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block shadow-sm animate-pulse">PROMO SPESIAL</span>
-          <h1 class="text-3xl md:text-5xl font-extrabold text-blue-900 mb-4 leading-tight">Belanja Kebutuhan<br>Jadi Lebih Mudah</h1>
-          <button onclick="document.getElementById('productsSection').scrollIntoView()" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 hover:shadow-lg transition mt-2">Mulai Belanja <i class="fas fa-arrow-down ml-2"></i></button>
+          <span id="heroBadge" class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block shadow-sm animate-pulse">PROMO SPESIAL</span>
+          <h1 id="heroTitle" class="text-3xl md:text-5xl font-extrabold text-blue-900 dark:text-white mb-4 leading-tight whitespace-pre-line">Belanja Kebutuhan<br>Jadi Lebih Mudah</h1>
+          <p id="heroSubtitle" class="text-blue-700 dark:text-gray-300 mb-6 text-sm md:text-lg">Harga grosir, diskon maksimal. Amankan sekarang!</p>
+          <button onclick="document.getElementById('productsSection').scrollIntoView()" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 hover:shadow-lg transition mt-2">Sikat Promonya! <i class="fas fa-arrow-down ml-2"></i></button>
         </div>
-        <div class="text-[7rem] md:text-[8rem] mt-8 md:mt-0 drop-shadow-2xl animate-bounce z-10" style="animation-duration: 3s;">🛍️</div>
-        <div class="absolute -top-10 -right-10 w-64 h-64 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-50"></div>
+        <div id="heroEmoji" class="text-[7rem] md:text-[8rem] mt-8 md:mt-0 drop-shadow-2xl animate-bounce z-10" style="animation-duration: 3s;">🛍️</div>
+        <div class="absolute -top-10 -right-10 w-64 h-64 bg-blue-200 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-2xl opacity-50"></div>
       </div>
 
       <div id="productsSection" class="mb-6">
         <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-4 gap-4">
-          <h2 class="text-2xl font-bold text-gray-800 flex items-center shrink-0"><i class="fas fa-fire text-orange-500 mr-2"></i> Katalog Produk</h2>
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center shrink-0"><i class="fas fa-bolt text-yellow-500 mr-2"></i> Flash Sale & Promo</h2>
           <div class="relative w-full md:w-64 shrink-0">
             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="searchProductInput" onkeyup="searchProducts(this.value)" placeholder="Cari produk..." class="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-full focus:border-blue-500 outline-none shadow-sm text-sm">
+            <input type="text" id="searchProductInput" onkeyup="searchProducts(this.value)" placeholder="Cari barang diskon..." class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-white rounded-full focus:border-blue-500 outline-none shadow-sm text-sm">
           </div>
         </div>
+        
+        <!-- Filter Kategori Promo Khusus -->
         <div class="flex overflow-x-auto space-x-2 pb-2 mb-4 scrollbar-hide" id="categoryFilters">
-          <button onclick="filterProducts('Semua')" class="category-btn active px-4 py-1.5 rounded-full border border-gray-300 text-sm font-medium whitespace-nowrap transition">Semua</button>
-          <button onclick="filterProducts('Sembako')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 text-sm font-medium whitespace-nowrap transition">Sembako</button>
-          <button onclick="filterProducts('Minuman')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 text-sm font-medium whitespace-nowrap transition">Minuman</button>
-          <button onclick="filterProducts('Rumah Tangga')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 text-sm font-medium whitespace-nowrap transition">Rumah Tangga</button>
+          <button onclick="filterProducts('Semua')" class="category-btn active px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Semua Promo</button>
+          <button onclick="filterProducts('Promo Sensabu')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Promo Sensabu</button>
+          <button onclick="filterProducts('Jusami')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Jusami</button>
+          <button onclick="filterProducts('Promo Gajian')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Promo Gajian</button>
+          <button onclick="filterProducts('Promo Hemat Setiap Hari')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Hemat Setiap Hari</button>
         </div>
+        
         <div id="productContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5"></div>
       </div>
     </main>
 
     <!-- Hal: Produk Favorit -->
     <main id="custFavoritesPage" class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 hidden">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2"><i class="fas fa-heart text-red-500 mr-2"></i> Produk Favorit Saya</h2>
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-heart text-red-500 mr-2"></i> Incaran Saya</h2>
       <div id="favProductContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5"></div>
     </main>
 
     <!-- Hal: Riwayat Pesanan -->
     <main id="custDashboardPage" class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 hidden">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2"><i class="fas fa-history text-blue-600 mr-2"></i> Riwayat Pesanan</h2>
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-history text-blue-600 mr-2"></i> Riwayat Pesanan</h2>
       <div id="customerOrders" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </main>
 
     <!-- Hal: Profil & Pengaturan -->
     <main id="custProfilePage" class="flex-1 w-full max-w-2xl mx-auto px-4 py-8 hidden">
-      <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2"><i class="fas fa-user-cog text-blue-600 mr-2"></i> Pengaturan Profil</h2>
-      <div class="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-user-cog text-blue-600 mr-2"></i> Pengaturan Profil</h2>
+      <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
         <form onsubmit="saveProfile(event)" class="space-y-5">
-          <div class="flex items-center space-x-4 mb-6 bg-blue-50 p-4 rounded-2xl border border-blue-100">
+          <div class="flex items-center space-x-4 mb-6 bg-blue-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-blue-100 dark:border-slate-600">
             <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold" id="profAvatar">U</div>
             <div>
-              <p class="text-xs text-blue-500 font-bold uppercase tracking-wider">Akun Terverifikasi</p>
-              <h3 class="font-bold text-xl text-blue-900" id="profNameDisplay">User</h3>
+              <p class="text-xs text-blue-500 dark:text-blue-400 font-bold uppercase tracking-wider">Pemburu Promo</p>
+              <h3 class="font-bold text-xl text-blue-900 dark:text-white" id="profNameDisplay">User</h3>
             </div>
           </div>
           <div>
-             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
-             <input type="text" id="profName" required class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none">
+             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
+             <input type="text" id="profName" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none text-gray-800 dark:text-white">
           </div>
           <div>
-             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nomor WhatsApp (Login ID)</label>
-             <input type="tel" id="profPhone" disabled class="w-full px-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-gray-500 cursor-not-allowed">
-             <p class="text-[10px] text-gray-400 mt-1">*Nomor WhatsApp tidak dapat diubah karena digunakan sebagai identitas login.</p>
+             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp (Login ID)</label>
+             <input type="tel" id="profPhone" disabled class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-600/50 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-500 dark:text-gray-400 cursor-not-allowed">
           </div>
           <div>
-             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Alamat Pengiriman Default</label>
-             <textarea id="profAddress" rows="3" placeholder="Masukkan alamat lengkap rumah Anda agar tidak perlu mengetik ulang saat checkout." class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:border-blue-500 outline-none resize-none"></textarea>
+             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Alamat Pengiriman Default</label>
+             <textarea id="profAddress" rows="3" placeholder="Masukkan alamat pengiriman..." class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none resize-none text-gray-800 dark:text-white"></textarea>
           </div>
           <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition">Simpan Perubahan</button>
         </form>
       </div>
     </main>
 
+    <!-- TOMBOL BANTUAN CS MENGAMBANG -->
+    <a href="https://wa.me/6289630336404?text=Halo%20Admin%20Toserba%20Yola,%20saya%20butuh%20bantuan..." target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-[0_4px_15px_rgba(34,197,94,0.4)] hover:scale-110 transition-transform z-30 group animate-pulse-soft" title="Hubungi CS">
+      <i class="fab fa-whatsapp"></i>
+      <span class="absolute right-16 bg-white dark:bg-slate-800 text-gray-800 dark:text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none uppercase tracking-wider border dark:border-slate-700">Tanya CS</span>
+    </a>
+
     <!-- Sidebar Keranjang -->
-    <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full md:w-[400px] bg-white shadow-2xl flex flex-col">
-      <div class="p-5 bg-blue-600 text-white flex justify-between items-center shadow-md z-10">
-        <h3 class="font-bold text-lg"><i class="fas fa-shopping-basket mr-2"></i> Keranjang</h3>
-        <button onclick="toggleCart()" class="text-white hover:text-red-200 bg-blue-700 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+    <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full md:w-[400px] bg-white dark:bg-slate-800 shadow-2xl flex flex-col border-l dark:border-slate-700 transition-colors">
+      <div class="p-5 bg-blue-600 dark:bg-slate-900 text-white flex justify-between items-center shadow-md z-10">
+        <h3 class="font-bold text-lg"><i class="fas fa-shopping-basket mr-2"></i> Keranjang Promo</h3>
+        <button onclick="toggleCart()" class="text-white hover:text-red-200 bg-blue-700 dark:bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
       </div>
-      <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50"></div>
-      <div class="p-5 bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
-        <div class="flex justify-between font-bold text-xl mb-4 text-gray-800">
-          <span>Total:</span><span id="cartTotal" class="text-blue-600">Rp 0</span>
+      <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-slate-900"></div>
+      <div class="p-5 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
+        <div class="flex justify-between font-bold text-xl mb-4 text-gray-800 dark:text-white">
+          <span>Total:</span><span id="cartTotal" class="text-blue-600 dark:text-blue-400">Rp 0</span>
         </div>
-        <button onclick="openCheckout()" class="w-full bg-green-500 text-white py-3.5 rounded-xl font-bold hover:bg-green-600 shadow-lg transition text-lg">Lanjut Pembayaran</button>
+        <button onclick="openCheckout()" class="w-full bg-green-500 text-white py-3.5 rounded-xl font-bold hover:bg-green-600 shadow-lg transition text-lg">Checkout Sekarang</button>
       </div>
     </div>
   </div>
@@ -252,14 +299,14 @@
   <!-- ==========================================
        2. APLIKASI ADMIN (DASHBOARD)
        ========================================== -->
-  <div id="adminApp" class="hidden min-h-screen bg-slate-50 flex flex-col md:flex-row">
-    <aside class="w-full md:w-64 bg-slate-900 text-white md:min-h-screen flex flex-col shrink-0 sticky top-0 md:h-screen shadow-xl z-20">
-      <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+  <div id="adminApp" class="hidden min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col md:flex-row transition-colors">
+    <aside class="w-full md:w-64 bg-slate-900 dark:bg-black text-white md:min-h-screen flex flex-col shrink-0 sticky top-0 md:h-screen shadow-xl z-20">
+      <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-950 dark:bg-black">
         <div class="flex items-center space-x-3">
           <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold shadow-md">Y</div>
           <div>
             <h2 class="font-extrabold text-lg tracking-wider text-white leading-none">ADMIN PANEL</h2>
-            <p class="text-[10px] text-blue-400 font-mono mt-1">ULTIMATE EDITION</p>
+            <p class="text-[10px] text-blue-400 font-mono mt-1">PROMO EDITION</p>
           </div>
         </div>
         <button class="md:hidden text-slate-400 hover:text-white" onclick="document.getElementById('adminNavLinks').classList.toggle('hidden')"><i class="fas fa-bars text-xl"></i></button>
@@ -267,85 +314,123 @@
       <nav id="adminNavLinks" class="flex-1 p-4 space-y-2 hidden md:block overflow-y-auto">
         <p class="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-2">Menu Utama</p>
         <button onclick="showAdminPage('overview')" id="btnAdmOverview" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-600 text-white transition text-left font-medium"><i class="fas fa-home w-5 text-center"></i> <span>Ringkasan</span></button>
-        <button onclick="showAdminPage('orders')" id="btnAdmOrders" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center"></i> <span>Pesanan</span></button>
-        <button onclick="showAdminPage('products')" id="btnAdmProducts" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-box w-5 text-center"></i> <span>Katalog Produk</span></button>
+        <button onclick="showAdminPage('orders')" id="btnAdmOrders" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center"></i> <span>Data Pesanan</span></button>
+        <button onclick="showAdminPage('products')" id="btnAdmProducts" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-tags w-5 text-center"></i> <span>Katalog Promo</span></button>
         <button onclick="showAdminPage('users')" id="btnAdmUsers" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-users w-5 text-center"></i> <span>Pelanggan</span></button>
+        <button onclick="showAdminPage('settings')" id="btnAdmSettings" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-bullhorn w-5 text-center"></i> <span>Pengaturan Promo</span></button>
+        
         <div class="my-6 border-t border-slate-800 pt-4"></div>
+        <button onclick="toggleDarkMode()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-yellow-300 hover:bg-slate-800 transition text-left font-medium"><i id="themeIconAdm" class="fas fa-moon w-5 text-center"></i> <span>Ganti Tema</span></button>
         <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition text-left font-medium"><i class="fas fa-sign-out-alt w-5 text-center"></i> <span>Keluar</span></button>
       </nav>
     </aside>
 
     <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full">
-      <div class="mb-8 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+      <div class="mb-8 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors">
         <div>
-          <h1 class="text-2xl font-bold text-slate-800">Administrator 👋</h1>
-          <p class="text-slate-500 text-sm mt-1">Pantau transaksi dan kelola toko Anda.</p>
+          <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Panel Administrator 👋</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Pantau transaksi diskon hari ini.</p>
         </div>
       </div>
       
+      <!-- Halaman Ringkasan -->
       <div id="admOverviewPage" class="block">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl"><i class="fas fa-wallet"></i></div><div><h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Total Pendapatan</h3><div id="statRevenue" class="text-xl font-extrabold text-slate-800">Rp 0</div></div></div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div><div><h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Pesanan Selesai</h3><div id="statCompleted" class="text-xl font-extrabold text-slate-800">0</div></div></div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div><div><h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Perlu Diproses</h3><div id="statPending" class="text-xl font-extrabold text-slate-800">0</div></div></div>
-          <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center text-xl"><i class="fas fa-users"></i></div><div><h3 class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Pelanggan</h3><div id="statUsers" class="text-xl font-extrabold text-slate-800">0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl"><i class="fas fa-wallet"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Total Omset</h3><div id="statRevenue" class="text-xl font-extrabold text-slate-800 dark:text-white">Rp 0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Pesanan Selesai</h3><div id="statCompleted" class="text-xl font-extrabold text-slate-800 dark:text-white">0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Perlu Diproses</h3><div id="statPending" class="text-xl font-extrabold text-slate-800 dark:text-white">0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-xl"><i class="fas fa-users"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Pelanggan</h3><div id="statUsers" class="text-xl font-extrabold text-slate-800 dark:text-white">0</div></div></div>
         </div>
       </div>
 
+      <!-- Halaman Pesanan -->
       <div id="admOrdersPage" class="hidden">
         <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
-          <h2 class="text-xl font-bold text-slate-800">Manajemen Pesanan</h2>
+          <h2 class="text-xl font-bold text-slate-800 dark:text-white">Manajemen Pesanan</h2>
           <div class="flex space-x-2">
-            <select id="adminFilterOrder" onchange="renderAdminOrders()" class="px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:border-blue-500 outline-none">
+            <select id="adminFilterOrder" onchange="renderAdminOrders()" class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:border-blue-500 outline-none text-gray-800 dark:text-white">
               <option value="Semua">Semua Status</option>
               <option value="Menunggu">Menunggu</option>
               <option value="Diproses">Diproses</option>
               <option value="Selesai">Selesai</option>
               <option value="Batal">Batal</option>
             </select>
-            <input type="text" id="adminSearchOrder" onkeyup="renderAdminOrders()" placeholder="Cari ID/Nama..." class="w-40 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:border-blue-500 outline-none">
+            <input type="text" id="adminSearchOrder" onkeyup="renderAdminOrders()" placeholder="Cari ID/Nama..." class="w-40 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:border-blue-500 outline-none text-gray-800 dark:text-white">
           </div>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[900px]">
+            <table class="w-full text-left border-collapse min-w-[1000px]">
               <thead>
-                <tr class="bg-slate-50 text-slate-500 border-b text-xs uppercase tracking-wider">
+                <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-xs uppercase tracking-wider">
                   <th class="p-4 font-semibold w-1/5">ID & Waktu</th>
                   <th class="p-4 font-semibold w-1/4">Info Pelanggan</th>
-                  <th class="p-4 font-semibold w-1/4">Tagihan</th>
+                  <th class="p-4 font-semibold w-1/4">Tagihan & Tipe</th>
                   <th class="p-4 font-semibold text-center">Status</th>
-                  <th class="p-4 font-semibold text-center">Aksi</th>
+                  <th class="p-4 font-semibold text-center">Aksi Manajemen</th>
                 </tr>
               </thead>
-              <tbody id="adminFullOrdersTableBody" class="divide-y divide-slate-100"></tbody>
+              <tbody id="adminFullOrdersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
             </table>
           </div>
         </div>
       </div>
 
+      <!-- Halaman Katalog Produk -->
       <div id="admProductsPage" class="hidden">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h2 class="text-xl font-bold text-slate-800">Katalog Produk</h2>
-          <button onclick="openProductModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-sm flex items-center"><i class="fas fa-plus mr-2"></i> Tambah Produk</button>
+          <h2 class="text-xl font-bold text-slate-800 dark:text-white">Katalog Item Promo</h2>
+          <button onclick="openProductModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-sm flex items-center"><i class="fas fa-plus mr-2"></i> Tambah Item Promo</button>
         </div>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <table class="w-full text-left border-collapse min-w-[700px]">
-            <thead><tr class="bg-slate-50 text-slate-500 border-b text-xs uppercase tracking-wider"><th class="p-4">Visual</th><th class="p-4">Produk</th><th class="p-4">Kategori</th><th class="p-4">Harga</th><th class="p-4 text-center">Opsi</th></tr></thead>
-            <tbody id="adminProductsTableBody" class="divide-y divide-slate-100"></tbody>
-          </table>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[700px]">
+              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-xs uppercase tracking-wider"><th class="p-4">Visual</th><th class="p-4">Produk</th><th class="p-4">Kategori Promo</th><th class="p-4">Harga Coret -> Diskon</th><th class="p-4 text-center">Opsi</th></tr></thead>
+              <tbody id="adminProductsTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      <!-- Halaman Pelanggan -->
       <div id="admUsersPage" class="hidden">
-        <h2 class="text-xl font-bold text-slate-800 mb-6">Data Pelanggan</h2>
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <table class="w-full text-left border-collapse min-w-[600px]">
-            <thead><tr class="bg-slate-50 text-slate-500 border-b text-xs uppercase tracking-wider"><th class="p-4">Nama Pelanggan</th><th class="p-4">WhatsApp</th><th class="p-4">Alamat Default</th><th class="p-4">Bergabung</th></tr></thead>
-            <tbody id="adminUsersTableBody" class="divide-y divide-slate-100"></tbody>
-          </table>
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Data Pelanggan</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[600px]">
+              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-xs uppercase tracking-wider"><th class="p-4">Nama Pelanggan</th><th class="p-4">Kontak WhatsApp</th><th class="p-4">Alamat Default</th><th class="p-4">Bergabung</th></tr></thead>
+              <tbody id="adminUsersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <!-- Halaman Pengaturan Banner -->
+      <div id="admSettingsPage" class="hidden">
+        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Pengaturan Banner Depan</h2>
+        <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 max-w-2xl">
+          <form onsubmit="saveBanner(event)" class="space-y-4">
+            <div>
+               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Teks Badge (Contoh: PROMO SPESIAL)</label>
+               <input type="text" id="banBadge" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-gray-800 dark:text-white">
+            </div>
+            <div>
+               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Judul Utama</label>
+               <input type="text" id="banTitle" required placeholder="Gunakan \n untuk baris baru" class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-gray-800 dark:text-white">
+            </div>
+            <div>
+               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Sub-judul / Keterangan</label>
+               <input type="text" id="banSubtitle" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-gray-800 dark:text-white">
+            </div>
+            <div>
+               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Emoji Besar</label>
+               <input type="text" id="banEmoji" required class="w-24 px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-center text-2xl text-gray-800 dark:text-white">
+            </div>
+            <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition mt-4">Simpan Banner</button>
+          </form>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -355,27 +440,43 @@
        ========================================== -->
 
   <!-- Modal Checkout -->
-  <div id="checkoutModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4">
-    <div class="modal-content bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="bg-blue-600 text-white p-5 flex justify-between items-center shrink-0">
-        <h3 class="font-bold text-lg"><i class="fas fa-truck mr-2"></i> Form Pengiriman</h3>
-        <button onclick="closeModal('checkoutModal')" class="bg-blue-700 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+  <div id="checkoutModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4 z-[999]">
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border dark:border-slate-700">
+      <div class="bg-blue-600 dark:bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-lg"><i class="fas fa-truck mr-2"></i> Form Pembayaran</h3>
+        <button onclick="closeModal('checkoutModal')" class="bg-blue-700 dark:bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
       </div>
-      <form id="checkoutForm" onsubmit="processCheckout(event)" class="p-6 space-y-4 overflow-y-auto bg-slate-50">
-        <div class="bg-blue-50 border border-blue-100 p-3 rounded-xl flex items-start space-x-3 mb-2">
-           <i class="fas fa-info-circle text-blue-500 mt-0.5"></i><p class="text-[11px] text-blue-800">Data terisi otomatis dari profil. Ubah jika dikirim ke tempat lain.</p>
+      <form id="checkoutForm" onsubmit="processCheckout(event)" class="p-6 space-y-4 overflow-y-auto bg-slate-50 dark:bg-slate-800">
+        <div class="bg-blue-50 dark:bg-slate-700/50 border border-blue-100 dark:border-slate-600 p-3 rounded-xl flex items-start space-x-3 mb-2">
+           <i class="fas fa-info-circle text-blue-500 mt-0.5"></i><p class="text-[11px] text-blue-800 dark:text-gray-300">Data terisi otomatis dari profil. Ubah jika dikirim ke tempat lain.</p>
+        </div>
+        <div class="flex space-x-3 mb-2">
+          <div class="w-1/2">
+            <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Pengiriman</label>
+            <select id="custShipping" class="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:border-blue-500 outline-none font-medium text-sm text-gray-800 dark:text-white">
+              <option value="Kurir Toko">Kirim via Kurir</option>
+              <option value="Ambil di Toko">Ambil di Toko</option>
+            </select>
+          </div>
+          <div class="w-1/2">
+            <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Pembayaran</label>
+            <select id="custPayment" class="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:border-blue-500 outline-none font-medium text-sm text-gray-800 dark:text-white">
+              <option value="COD (Cash)">COD (Bayar Tunai)</option>
+              <option value="Transfer Bank">Transfer Bank</option>
+            </select>
+          </div>
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nama Penerima</label>
-          <input type="text" id="custName" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-blue-500 outline-none font-medium">
+          <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Penerima</label>
+          <input type="text" id="custName" required class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none font-medium text-gray-800 dark:text-white">
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nomor WhatsApp Aktif</label>
-          <input type="tel" id="custPhone" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-blue-500 outline-none font-medium">
+          <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp Aktif</label>
+          <input type="tel" id="custPhone" required class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none font-medium text-gray-800 dark:text-white">
         </div>
         <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Alamat Lengkap</label>
-          <textarea id="custAddress" required rows="3" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:border-blue-500 outline-none resize-none"></textarea>
+          <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Alamat Tujuan</label>
+          <textarea id="custAddress" required rows="2" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none resize-none text-sm text-gray-800 dark:text-white"></textarea>
         </div>
         <button type="submit" id="btnSubmitOrder" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold hover:bg-green-600 shadow-md flex justify-center items-center space-x-2 mt-2">
           <span>Kirim Pesanan Sekarang</span><div id="submitLoader" class="loader hidden"></div>
@@ -385,68 +486,76 @@
   </div>
 
   <!-- Modal Struk/Invoice (Customer) -->
-  <div id="invoiceModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4">
-    <div class="modal-content bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col relative border-t-8 border-blue-600">
-      <button onclick="closeModal('invoiceModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><i class="fas fa-times text-xl"></i></button>
-      <div class="p-6 pt-8 text-center border-b border-dashed border-gray-300">
-        <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fas fa-receipt"></i></div>
-        <h2 class="font-bold text-xl text-gray-800">TOSERBA YOLA</h2>
-        <p class="text-xs text-gray-500" id="invDate">Tanggal</p>
+  <div id="invoiceModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4 z-[999]">
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col relative border-t-8 border-blue-600 dark:border-blue-500">
+      <button onclick="closeModal('invoiceModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
+      <div class="p-6 pt-8 text-center border-b border-dashed border-gray-300 dark:border-slate-600">
+        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fas fa-receipt"></i></div>
+        <h2 class="font-bold text-xl text-gray-800 dark:text-white">TOSERBA YOLA</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400" id="invDate">Tanggal</p>
       </div>
-      <div class="p-6 bg-gray-50 text-sm">
-        <div class="flex justify-between mb-2"><span class="text-gray-500">Order ID:</span><strong id="invId" class="text-blue-600">ORD-123</strong></div>
-        <div class="flex justify-between mb-4"><span class="text-gray-500">Status:</span><strong id="invStatus">Selesai</strong></div>
-        <div class="border-t border-b border-gray-200 py-3 mb-4 space-y-2" id="invItems"></div>
-        <div class="flex justify-between text-base"><span class="font-bold text-gray-700">Total Pembayaran:</span><strong id="invTotal" class="text-blue-700 text-lg">Rp 0</strong></div>
+      <div class="p-6 bg-gray-50 dark:bg-slate-700/30 text-sm">
+        <div class="flex justify-between mb-2"><span class="text-gray-500 dark:text-gray-400">Order ID:</span><strong id="invId" class="text-blue-600 dark:text-blue-400">ORD-123</strong></div>
+        <div class="flex justify-between mb-2"><span class="text-gray-500 dark:text-gray-400">Status:</span><strong id="invStatus" class="dark:text-white">Selesai</strong></div>
+        <div class="flex justify-between mb-4"><span class="text-gray-500 dark:text-gray-400">Metode:</span><strong id="invMethod" class="text-gray-800 dark:text-gray-200 text-right">COD</strong></div>
+        <div class="border-t border-b border-gray-200 dark:border-slate-600 py-3 mb-4 space-y-2" id="invItems"></div>
+        <div class="flex justify-between text-base"><span class="font-bold text-gray-700 dark:text-gray-300">Total Pembayaran:</span><strong id="invTotal" class="text-blue-700 dark:text-blue-400 text-lg">Rp 0</strong></div>
       </div>
-      <div class="p-4 bg-white text-center text-xs text-gray-400">Terima kasih telah berbelanja di Toserba Yola!</div>
+      <div class="p-4 bg-white dark:bg-slate-800 text-center text-xs text-gray-400 dark:text-gray-500 border-t dark:border-slate-700">Terima kasih telah memborong promo Yola!</div>
     </div>
   </div>
 
   <!-- Modal Form Produk (Admin Add/Edit) -->
   <div id="productFormModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4 z-[999]">
-    <div class="modal-content bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg" id="prodModalTitle"><i class="fas fa-box-open mr-2"></i> Form Produk</h3>
-        <button onclick="closeModal('productFormModal')" class="text-slate-400 bg-slate-800 w-8 h-8 rounded-full"><i class="fas fa-times"></i></button>
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border dark:border-slate-700">
+      <div class="bg-slate-900 dark:bg-black text-white p-5 flex justify-between items-center">
+        <h3 class="font-bold text-lg" id="prodModalTitle"><i class="fas fa-box-open mr-2"></i> Form Promo Produk</h3>
+        <button onclick="closeModal('productFormModal')" class="text-slate-400 bg-slate-800 dark:bg-slate-900 w-8 h-8 rounded-full"><i class="fas fa-times"></i></button>
       </div>
-      <form id="productForm" onsubmit="saveProduct(event)" class="p-6 space-y-4 bg-slate-50">
+      <form id="productForm" onsubmit="saveProduct(event)" class="p-6 space-y-4 bg-slate-50 dark:bg-slate-800">
         <input type="hidden" id="prodIdForm">
         <div class="flex space-x-4">
           <div class="w-1/3">
-            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Emoji</label>
-            <input type="text" id="prodEmoji" required placeholder="🍎" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 outline-none text-center text-xl shadow-sm">
+            <label class="block text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-1">Emoji</label>
+            <input type="text" id="prodEmoji" required placeholder="🍎" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-center text-xl shadow-sm dark:text-white">
           </div>
           <div class="w-2/3">
-            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Kategori</label>
-            <select id="prodCategory" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm font-medium">
-              <option value="Sembako">Sembako</option>
-              <option value="Minuman">Minuman</option>
-              <option value="Rumah Tangga">Rumah Tangga</option>
+            <label class="block text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-1">Kategori Promo</label>
+            <select id="prodCategory" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm font-medium dark:text-white">
+              <option value="Promo Sensabu">Promo Sensabu</option>
+              <option value="Jusami">Jusami</option>
+              <option value="Promo Gajian">Promo Gajian</option>
+              <option value="Promo Hemat Setiap Hari">Promo Hemat Setiap Hari</option>
             </select>
           </div>
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Produk</label>
-          <input type="text" id="prodName" required class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm">
+          <label class="block text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nama Produk Promo</label>
+          <input type="text" id="prodName" required class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm dark:text-white">
         </div>
-        <div>
-          <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Harga (Rp)</label>
-          <input type="number" id="prodPrice" required min="100" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm">
+        <div class="flex space-x-4">
+          <div class="w-1/2">
+            <label class="block text-[10px] font-bold text-red-500 dark:text-red-400 uppercase tracking-wider mb-1">Harga Asli (Dicoret)</label>
+            <input type="number" id="prodOrigPrice" required min="100" placeholder="15000" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-red-200 dark:border-red-900 rounded-xl focus:border-red-500 outline-none shadow-sm text-sm dark:text-white">
+          </div>
+          <div class="w-1/2">
+            <label class="block text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider mb-1">Harga Promo (Jual)</label>
+            <input type="number" id="prodPrice" required min="100" placeholder="10000" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-green-200 dark:border-green-900 rounded-xl focus:border-green-500 outline-none shadow-sm text-sm dark:text-white font-bold">
+          </div>
         </div>
-        <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 mt-4 shadow-md transition text-sm">Simpan Data</button>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 mt-4 shadow-md transition text-sm">Simpan Data Promo</button>
       </form>
     </div>
   </div>
 
   <!-- Custom Dialog -->
   <div id="customDialog" class="modal-overlay fixed inset-0 flex items-center justify-center px-4" style="z-index: 10000;">
-    <div class="bg-white rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center transform scale-95 transition-transform duration-200" id="dialogBox">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center transform scale-95 transition-transform duration-200 border dark:border-slate-700" id="dialogBox">
       <div id="dialogIcon" class="text-5xl mb-4">❓</div>
-      <h3 id="dialogTitle" class="text-xl font-extrabold text-gray-800 mb-2">Konfirmasi</h3>
-      <p id="dialogMessage" class="text-gray-500 mb-6 text-sm">Apakah Anda yakin?</p>
+      <h3 id="dialogTitle" class="text-xl font-extrabold text-gray-800 dark:text-white mb-2">Konfirmasi</h3>
+      <p id="dialogMessage" class="text-gray-500 dark:text-gray-400 mb-6 text-sm">Apakah Anda yakin?</p>
       <div class="flex space-x-3 justify-center">
-        <button id="dialogBtnCancel" class="flex-1 px-4 py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition hidden">Batal</button>
+        <button id="dialogBtnCancel" class="flex-1 px-4 py-3 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold hover:bg-gray-200 dark:hover:bg-slate-600 transition hidden">Batal</button>
         <button id="dialogBtnConfirm" class="flex-1 px-4 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md transition">Tutup</button>
       </div>
     </div>
@@ -457,38 +566,86 @@
        4. LOGIKA JAVASCRIPT UTAMA
        ========================================== -->
   <script>
-    // Konfigurasi URL Google Apps Script Anda 
     const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz_XXXXXXXXX_YYYYYYY/exec'; 
 
     const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
     
-    // Default Data
+    // Format nomor HP
+    const formatWaNumber = (phone) => {
+      let p = phone.toString().replace(/[^0-9]/g, '');
+      if(p.startsWith('0')) p = '62' + p.substring(1);
+      return p;
+    };
+    
+    // --- DARK MODE LOGIC ---
+    let isDarkMode = localStorage.getItem('yola_theme') === 'dark';
+    function applyTheme() {
+      if (isDarkMode) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      ['themeIconDesk', 'themeIconMob', 'themeIconAdm'].forEach(id => {
+        let el = document.getElementById(id);
+        if(el) el.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+      });
+    }
+    function toggleDarkMode() {
+      isDarkMode = !isDarkMode;
+      localStorage.setItem('yola_theme', isDarkMode ? 'dark' : 'light');
+      applyTheme();
+    }
+    applyTheme(); // Panggil di awal
+
+    // --- DEFAULT DATA PROMO ---
     const defaultProducts = [
-      { id: 1, name: 'Beras Premium 5kg', price: 65000, img: '🌾', category: 'Sembako' },
-      { id: 2, name: 'Minyak Goreng 2L', price: 34000, img: '🛢️', category: 'Sembako' },
-      { id: 3, name: 'Gula Pasir 1kg', price: 15000, img: '🍚', category: 'Sembako' },
-      { id: 4, name: 'Air Mineral 600ml', price: 3000, img: '💧', category: 'Minuman' },
-      { id: 5, name: 'Susu UHT 1L', price: 18000, img: '🥛', category: 'Minuman' },
-      { id: 6, name: 'Telur Ayam 1kg', price: 28000, img: '🥚', category: 'Sembako' },
-      { id: 7, name: 'Sabun Mandi Cair', price: 22000, img: '🧼', category: 'Rumah Tangga' },
-      { id: 8, name: 'Mie Instan (5 Pcs)', price: 15000, img: '🍜', category: 'Sembako' }
+      { id: 1, name: 'Beras Premium 5kg', originalPrice: 75000, price: 65000, img: '🌾', category: 'Promo Sensabu' },
+      { id: 2, name: 'Minyak Goreng 2L', originalPrice: 38000, price: 34000, img: '🛢️', category: 'Jusami' },
+      { id: 3, name: 'Gula Pasir 1kg', originalPrice: 18000, price: 15000, img: '🍚', category: 'Promo Hemat Setiap Hari' },
+      { id: 4, name: 'Susu UHT 1L', originalPrice: 22000, price: 18000, img: '🥛', category: 'Promo Sensabu' },
+      { id: 5, name: 'Telur Ayam 1kg', originalPrice: 30000, price: 27000, img: '🥚', category: 'Promo Gajian' },
+      { id: 6, name: 'Sabun Mandi Cair', originalPrice: 28000, price: 22000, img: '🧼', category: 'Jusami' },
+      { id: 7, name: 'Mie Instan (5 Pcs)', originalPrice: 17500, price: 15000, img: '🍜', category: 'Promo Hemat Setiap Hari' },
+      { id: 8, name: 'Kopi Kapal Api', originalPrice: 15000, price: 12500, img: '☕', category: 'Promo Gajian' }
     ];
 
-    let products = JSON.parse(localStorage.getItem('yola_products')) || defaultProducts;
-    if(products === defaultProducts) localStorage.setItem('yola_products', JSON.stringify(products));
+    let products = JSON.parse(localStorage.getItem('yola_products_v2'));
+    if(!products) {
+      products = defaultProducts;
+      localStorage.setItem('yola_products_v2', JSON.stringify(products));
+    }
+    
+    const defaultBanner = { badge: 'PROMO SPESIAL', title: 'Belanja Kebutuhan\nJadi Lebih Mudah', subtitle: 'Harga grosir, diskon maksimal. Amankan sekarang!', emoji: '🛍️' };
+    let bannerData = JSON.parse(localStorage.getItem('yola_banner')) || defaultBanner;
+
+    function applyBanner() {
+      document.getElementById('heroBadge').innerText = bannerData.badge;
+      document.getElementById('heroTitle').innerText = bannerData.title;
+      document.getElementById('heroSubtitle').innerText = bannerData.subtitle;
+      document.getElementById('heroEmoji').innerText = bannerData.emoji;
+      
+      // Isi form admin jika ada
+      if(document.getElementById('banBadge')) {
+        document.getElementById('banBadge').value = bannerData.badge;
+        document.getElementById('banTitle').value = bannerData.title.replace(/\n/g, '\\n');
+        document.getElementById('banSubtitle').value = bannerData.subtitle;
+        document.getElementById('banEmoji').value = bannerData.emoji;
+      }
+    }
     
     let cart = [], currentCategory = 'Semua', searchQuery = '', currentUser = null;
 
     // --- SISTEM AUTENTIKASI ---
     function switchAuthTab(type) {
+      const clsActiveCust = "flex-1 py-4 font-bold text-sm text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-blue-50/30 dark:bg-blue-900/20 transition";
+      const clsInactive = "flex-1 py-4 font-bold text-sm text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:bg-gray-50 dark:hover:bg-slate-700 transition";
+      const clsActiveAdm = "flex-1 py-4 font-bold text-sm text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-slate-500 bg-slate-50/30 dark:bg-slate-700/50 transition";
+      
       if (type === 'customer') {
-        document.getElementById('tabCustBtn').className = "flex-1 py-4 font-bold text-sm text-blue-600 border-b-2 border-blue-600 bg-blue-50/30 transition";
-        document.getElementById('tabAdminBtn').className = "flex-1 py-4 font-bold text-sm text-gray-500 border-b-2 border-transparent hover:bg-gray-50 transition";
+        document.getElementById('tabCustBtn').className = clsActiveCust;
+        document.getElementById('tabAdminBtn').className = clsInactive;
         document.getElementById('formCustomer').classList.replace('hidden', 'block');
         document.getElementById('formAdmin').classList.replace('block', 'hidden');
       } else {
-        document.getElementById('tabAdminBtn').className = "flex-1 py-4 font-bold text-sm text-slate-900 border-b-2 border-slate-900 bg-slate-50/30 transition";
-        document.getElementById('tabCustBtn').className = "flex-1 py-4 font-bold text-sm text-gray-500 border-b-2 border-transparent hover:bg-gray-50 transition";
+        document.getElementById('tabAdminBtn').className = clsActiveAdm;
+        document.getElementById('tabCustBtn').className = clsInactive;
         document.getElementById('formAdmin').classList.replace('hidden', 'block');
         document.getElementById('formCustomer').classList.replace('block', 'hidden');
       }
@@ -498,24 +655,30 @@
       e.preventDefault();
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
-      if(name.length < 3 || phone.length < 10) return showCustomDialog("Peringatan", "Nama dan WA harus diisi dengan benar.", "warning");
+      const pass = document.getElementById('regPass').value.trim();
+      
+      if(name.length < 3 || phone.length < 10 || pass.length < 4) {
+        return showCustomDialog("Peringatan", "Data tidak lengkap! Nama, Nomor WA, dan Password (min. 4 digit) wajib diisi.", "warning");
+      }
 
       let users = JSON.parse(localStorage.getItem('yola_users') || '[]');
       let user = users.find(u => u.phone === phone);
       
       if (!user) {
-        user = { name, phone, address: '', favorites: [], role: 'customer', joined: new Date().toLocaleDateString('id-ID') };
+        user = { name, phone, pass, address: '', favorites: [], role: 'customer', joined: new Date().toLocaleDateString('id-ID') };
         users.push(user);
+        showCustomDialog("Pendaftaran Berhasil", `Selamat bergabung, <b>${user.name}</b>! Akun berhasil dibuat.`, "success");
       } else {
-        user.name = name; // Update nama
+        if (user.pass !== pass) return showCustomDialog("Akses Ditolak", "Password yang Anda masukkan salah!", "error");
+        user.name = name; 
         if(!user.favorites) user.favorites = [];
         if(!user.address) user.address = '';
+        showCustomDialog("Berhasil Masuk", `Selamat datang kembali, <b>${user.name}</b>! Siap berburu promo?`, "success");
       }
       
       localStorage.setItem('yola_users', JSON.stringify(users));
       localStorage.setItem('yola_session', JSON.stringify(user));
       bootSystem();
-      showCustomDialog("Berhasil Masuk", `Selamat datang, <b>${user.name}</b>!`, "success");
     }
 
     function handleAdminLogin(e) {
@@ -526,7 +689,7 @@
         localStorage.setItem('yola_session', JSON.stringify({ name: 'Admin', phone: 'SYSTEM', role: 'admin' }));
         bootSystem();
       } else {
-        showCustomDialog("Akses Ditolak", "Username atau Password salah!", "error");
+        showCustomDialog("Akses Ditolak", "Username atau Password Admin salah!", "error");
       }
     }
 
@@ -537,6 +700,7 @@
     }
 
     function bootSystem() {
+      applyBanner();
       const session = localStorage.getItem('yola_session');
       if (session) {
         currentUser = JSON.parse(session);
@@ -553,7 +717,6 @@
           document.getElementById('navCustName').innerText = currentUser.name.split(' ')[0];
           document.getElementById('mobCustName').innerText = currentUser.name;
           
-          // Sinkronisasi data user terbaru dari DB lokal (untuk favorit & alamat)
           let users = JSON.parse(localStorage.getItem('yola_users') || '[]');
           let dbUser = users.find(u => u.phone === currentUser.phone);
           if(dbUser) currentUser = dbUser;
@@ -569,7 +732,7 @@
     }
 
     // --- FUNGSI PELANGGAN (STOREFRONT) ---
-    function filterProducts(cat) { currentCategory = cat; document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.innerText === cat)); renderCustomerProducts(); }
+    function filterProducts(cat) { currentCategory = cat; document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(cat) || (cat==='Semua' && b.innerText==='Semua Promo'))); renderCustomerProducts(); }
     function searchProducts(val) { searchQuery = val.toLowerCase(); renderCustomerProducts(); }
 
     function toggleFavorite(id, btnIcon) {
@@ -585,7 +748,7 @@
         
         users[userIndex].favorites = favs;
         localStorage.setItem('yola_users', JSON.stringify(users));
-        currentUser.favorites = favs; // update state lokal
+        currentUser.favorites = favs; 
         if(document.getElementById('custFavoritesPage').classList.contains('hidden') === false) renderFavorites();
       }
     }
@@ -594,16 +757,26 @@
       const isFav = currentUser && currentUser.favorites && currentUser.favorites.includes(p.id);
       if(isFavOnly && !isFav) return '';
       
+      const origPrice = p.originalPrice || p.price + 5000; // Fallback jika undefined
+      const discount = Math.round(((origPrice - p.price) / origPrice) * 100);
+      
       return `
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 hover:shadow-xl transition relative flex flex-col h-full">
-          <button onclick="toggleFavorite(${p.id}, this.querySelector('i'))" class="absolute top-3 right-3 text-gray-300 hover:text-red-500 z-10 transition focus:outline-none">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 hover:shadow-xl transition relative flex flex-col h-full overflow-hidden">
+          <div class="absolute top-0 left-0 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded-br-lg z-10">HEMAT ${discount}%</div>
+          <button onclick="toggleFavorite(${p.id}, this.querySelector('i'))" class="absolute top-3 right-3 text-gray-300 dark:text-gray-500 hover:text-red-500 z-10 transition focus:outline-none">
             <i class="${isFav ? 'fas heart-active' : 'far'} fa-heart text-xl transition-transform"></i>
           </button>
-          <div class="text-5xl text-center mb-3 bg-gradient-to-br from-blue-50 to-indigo-50 py-5 rounded-xl shadow-inner">${p.img}</div>
-          <span class="text-[9px] font-bold text-blue-500 uppercase tracking-wider mb-1 block">${p.category}</span>
-          <h3 class="font-bold text-gray-800 line-clamp-2 leading-tight flex-1 text-sm">${p.name}</h3>
-          <div class="text-blue-700 font-extrabold text-base sm:text-lg mt-1 mb-3">${formatRp(p.price)}</div>
-          <button onclick="addToCart(${p.id}, this)" class="w-full bg-blue-50 text-blue-700 font-bold py-2 rounded-xl border border-blue-100 hover:bg-blue-600 hover:text-white transition text-sm">
+          
+          <div class="text-5xl text-center mb-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-600 py-5 rounded-xl shadow-inner mt-2">${p.img}</div>
+          <span class="text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider mb-1 block">${p.category}</span>
+          <h3 class="font-bold text-gray-800 dark:text-white line-clamp-2 leading-tight flex-1 text-sm">${p.name}</h3>
+          
+          <div class="mt-2 mb-3">
+             <div class="text-xs text-gray-400 line-through">${formatRp(origPrice)}</div>
+             <div class="text-red-600 dark:text-red-400 font-extrabold text-base sm:text-lg">${formatRp(p.price)}</div>
+          </div>
+          
+          <button onclick="addToCart(${p.id}, this)" class="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold py-2 rounded-xl border border-blue-100 dark:border-blue-800/50 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white transition text-sm">
             <i class="fas fa-cart-plus mr-1"></i> Beli
           </button>
         </div>`;
@@ -612,13 +785,13 @@
     function renderCustomerProducts() {
       const container = document.getElementById('productContainer');
       let filtered = products.filter(p => (currentCategory === 'Semua' || p.category === currentCategory) && p.name.toLowerCase().includes(searchQuery));
-      container.innerHTML = filtered.length ? filtered.map(p => renderProductCard(p)).join('') : '<div class="col-span-full text-center py-10 text-gray-400">Produk tidak ditemukan.</div>';
+      container.innerHTML = filtered.length ? filtered.map(p => renderProductCard(p)).join('') : '<div class="col-span-full text-center py-10 text-gray-400">Barang promo tidak ditemukan.</div>';
     }
 
     function renderFavorites() {
       const container = document.getElementById('favProductContainer');
       if(!currentUser.favorites || currentUser.favorites.length === 0) {
-        container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400"><i class="far fa-heart text-5xl mb-3 block text-gray-200"></i>Belum ada produk favorit.</div>';
+        container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 dark:text-slate-500"><i class="far fa-heart text-5xl mb-3 block text-gray-200 dark:text-slate-600"></i>Belum ada produk favorit.</div>';
         return;
       }
       container.innerHTML = products.map(p => renderProductCard(p, true)).join('');
@@ -633,7 +806,12 @@
       const ori = btn.innerHTML;
       btn.innerHTML = '<i class="fas fa-check"></i> OK';
       btn.classList.replace('bg-blue-50', 'bg-green-500'); btn.classList.replace('text-blue-700', 'text-white');
-      setTimeout(() => { btn.innerHTML = ori; btn.classList.replace('bg-green-500', 'bg-blue-50'); btn.classList.replace('text-white', 'text-blue-700'); }, 800);
+      btn.classList.replace('dark:bg-blue-900/30', 'dark:bg-green-500'); btn.classList.replace('dark:text-blue-400', 'dark:text-white');
+      setTimeout(() => { 
+        btn.innerHTML = ori; 
+        btn.classList.replace('bg-green-500', 'bg-blue-50'); btn.classList.replace('text-white', 'text-blue-700');
+        btn.classList.replace('dark:bg-green-500', 'dark:bg-blue-900/30'); btn.classList.replace('dark:text-white', 'dark:text-blue-400');
+      }, 800);
     }
 
     function updateCartUI() {
@@ -641,13 +819,13 @@
       document.getElementById('cartCount').innerText = qty; document.getElementById('cartCountMobile').innerText = qty;
       const cItems = document.getElementById('cartItems');
       
-      if (!cart.length) { cItems.innerHTML = `<div class="text-center text-gray-400 mt-10"><i class="fas fa-shopping-basket text-5xl mb-3 text-gray-200"></i><p class="text-sm">Keranjang kosong</p></div>`; } 
+      if (!cart.length) { cItems.innerHTML = `<div class="text-center text-gray-400 dark:text-slate-500 mt-10"><i class="fas fa-shopping-basket text-5xl mb-3 text-gray-200 dark:text-slate-600"></i><p class="text-sm">Keranjang kosong</p></div>`; } 
       else {
         cItems.innerHTML = cart.map((i, idx) => `
-          <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm border border-gray-100">
-            <div class="flex items-center space-x-3"><div class="text-2xl bg-gray-50 p-2 rounded-lg border border-gray-100">${i.img}</div>
-            <div class="max-w-[130px]"><h4 class="font-bold text-sm text-gray-800 line-clamp-1">${i.name}</h4><div class="text-blue-600 text-xs font-semibold">${formatRp(i.price)}</div></div></div>
-            <div class="flex items-center space-x-1 bg-gray-50 rounded-lg p-1 border"><button onclick="cart[${idx}].qty--; if(cart[${idx}].qty<=0) cart.splice(${idx},1); updateCartUI();" class="w-6 h-6 bg-white rounded font-bold shadow-sm text-gray-600">-</button><span class="text-xs font-bold w-5 text-center">${i.qty}</span><button onclick="cart[${idx}].qty++; updateCartUI();" class="w-6 h-6 bg-white rounded font-bold shadow-sm text-gray-600">+</button></div>
+          <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
+            <div class="flex items-center space-x-3"><div class="text-2xl bg-gray-50 dark:bg-slate-700 p-2 rounded-lg border border-gray-100 dark:border-slate-600">${i.img}</div>
+            <div class="max-w-[130px]"><h4 class="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">${i.name}</h4><div class="text-red-500 text-xs font-semibold">${formatRp(i.price)}</div></div></div>
+            <div class="flex items-center space-x-1 bg-gray-50 dark:bg-slate-700 rounded-lg p-1 border dark:border-slate-600"><button onclick="cart[${idx}].qty--; if(cart[${idx}].qty<=0) cart.splice(${idx},1); updateCartUI();" class="w-6 h-6 bg-white dark:bg-slate-600 rounded font-bold shadow-sm text-gray-600 dark:text-gray-200">-</button><span class="text-xs font-bold w-5 text-center dark:text-white">${i.qty}</span><button onclick="cart[${idx}].qty++; updateCartUI();" class="w-6 h-6 bg-white dark:bg-slate-600 rounded font-bold shadow-sm text-gray-600 dark:text-gray-200">+</button></div>
           </div>`).join('');
       }
       document.getElementById('cartTotal').innerText = formatRp(cart.reduce((s, i) => s + (i.price * i.qty), 0));
@@ -655,7 +833,7 @@
     function toggleCart() { document.getElementById('cartSidebar').classList.toggle('open'); }
 
     function openCheckout() {
-      if (!cart.length) return showCustomDialog("Keranjang Kosong", "Pilih produk terlebih dahulu.", "warning");
+      if (!cart.length) return showCustomDialog("Keranjang Kosong", "Pilih produk promo terlebih dahulu.", "warning");
       document.getElementById('custName').value = currentUser.name;
       document.getElementById('custPhone').value = currentUser.phone;
       document.getElementById('custAddress').value = currentUser.address || '';
@@ -664,8 +842,13 @@
 
     async function processCheckout(e) {
       e.preventDefault();
-      const btn = document.getElementById('btnSubmitOrder'), loader = document.getElementById('submitLoader');
+      
+      const btn = document.getElementById('btnSubmitOrder');
+      const loader = document.getElementById('submitLoader');
       const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
+      
+      const shipMethod = document.getElementById('custShipping').value;
+      const payMethod = document.getElementById('custPayment').value;
       
       const payload = {
         orderId, date: new Date().toLocaleString('id-ID'),
@@ -673,7 +856,8 @@
         address: document.getElementById('custAddress').value,
         items: cart.map(i => `${i.name} (${i.qty})`).join(', '),
         total: cart.reduce((s, i) => s + (i.price * i.qty), 0),
-        status: 'Menunggu', ownerPhone: currentUser.phone, fullItems: [...cart]
+        status: 'Menunggu', ownerPhone: currentUser.phone, fullItems: [...cart],
+        shipping: shipMethod, payment: payMethod
       };
 
       btn.disabled = true; loader.classList.remove('hidden');
@@ -681,19 +865,18 @@
       try {
         if(!GOOGLE_SHEETS_WEB_APP_URL.includes('XXXXXXXXX')) {
           let fd = new FormData(); Object.keys(payload).forEach(k => fd.append(k, payload[k]));
-          await fetch(GOOGLE_SHEETS_WEB_APP_URL, { method: 'POST', body: fd });
+          await fetch(GOOGLE_SHEETS_WEB_APP_URL, { method: 'POST', body: fd, mode: 'no-cors' });
         } else { await new Promise(r => setTimeout(r, 1000)); }
 
         let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]');
         orders.unshift(payload); localStorage.setItem('yola_orders', JSON.stringify(orders));
         cart = []; updateCartUI(); closeModal('checkoutModal');
         
-        showCustomDialog("Pesanan Berhasil!", `ID Pesanan Anda: <b>${orderId}</b>`, "success", () => showCustPage('dashboard'));
+        showCustomDialog("Pesanan Berhasil!", `ID Pesanan: <b>${orderId}</b><br>Gunakan metode <b>${payMethod}</b> untuk melunasi.`, "success", () => showCustPage('dashboard'));
       } catch (err) { showCustomDialog("Gagal", "Koneksi server bermasalah.", "error"); } 
       finally { btn.disabled = false; loader.classList.add('hidden'); }
     }
 
-    // Profil Setting
     function setupProfilePage() {
       document.getElementById('profAvatar').innerText = currentUser.name.charAt(0).toUpperCase();
       document.getElementById('profNameDisplay').innerText = currentUser.name;
@@ -720,20 +903,19 @@
       }
     }
 
-    // Riwayat & Invoice (Customer)
     function renderCustomerDashboard() {
       let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]').filter(o => o.ownerPhone === currentUser.phone);
       const container = document.getElementById('customerOrders');
-      if(!orders.length) return container.innerHTML = '<div class="col-span-full text-center py-16"><i class="fas fa-receipt text-6xl text-gray-200 mb-4 block"></i><p class="text-gray-500 font-medium">Belum ada pesanan.</p></div>';
+      if(!orders.length) return container.innerHTML = '<div class="col-span-full text-center py-16"><i class="fas fa-receipt text-6xl text-gray-200 dark:text-slate-600 mb-4 block"></i><p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada pesanan.</p></div>';
 
       container.innerHTML = orders.map(o => `
-        <div class="border border-gray-100 rounded-2xl p-5 bg-white shadow-sm hover:shadow-md transition cursor-pointer" onclick="showInvoice('${o.orderId}')">
-          <div class="flex justify-between items-start border-b border-gray-50 pb-3 mb-3">
-            <div><div class="font-extrabold text-blue-800">${o.orderId}</div><div class="text-[10px] text-gray-400 mt-0.5">${o.date}</div></div>
-            <span class="px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${o.status==='Menunggu'?'bg-orange-50 text-orange-600 border-orange-200':(o.status==='Diproses'?'bg-blue-50 text-blue-600 border-blue-200':(o.status==='Selesai'?'bg-green-50 text-green-600 border-green-200':'bg-red-50 text-red-600 border-red-200'))}">${o.status}</span>
+        <div class="border border-gray-100 dark:border-slate-700 rounded-2xl p-5 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition cursor-pointer" onclick="showInvoice('${o.orderId}')">
+          <div class="flex justify-between items-start border-b border-gray-50 dark:border-slate-700 pb-3 mb-3">
+            <div><div class="font-extrabold text-blue-800 dark:text-blue-400">${o.orderId}</div><div class="text-[10px] text-gray-400 mt-0.5">${o.date}</div></div>
+            <span class="px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${o.status==='Menunggu'?'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800':(o.status==='Diproses'?'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800':(o.status==='Selesai'?'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800':'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'))}">${o.status}</span>
           </div>
-          <div class="text-xs text-gray-500 mb-3 line-clamp-2">${o.items}</div>
-          <div class="flex justify-between items-end border-t border-gray-50 pt-3 text-sm"><span class="text-xs">Total:</span><b class="text-gray-900">${formatRp(o.total)}</b></div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">${o.items}</div>
+          <div class="flex justify-between items-end border-t border-gray-50 dark:border-slate-700 pt-3 text-sm"><span class="text-xs dark:text-gray-400">Total:</span><b class="text-gray-900 dark:text-white">${formatRp(o.total)}</b></div>
         </div>`).join('');
     }
 
@@ -744,12 +926,12 @@
       document.getElementById('invId').innerText = order.orderId;
       document.getElementById('invStatus').innerText = order.status;
       
-      let htmlItems = '';
-      if(order.fullItems && order.fullItems.length > 0) {
-        htmlItems = order.fullItems.map(i => `<div class="flex justify-between text-xs"><span class="text-gray-600">${i.name} <span class="text-gray-400">x${i.qty}</span></span><span class="font-medium">Rp${(i.price*i.qty).toLocaleString('id-ID')}</span></div>`).join('');
-      } else {
-        htmlItems = `<div class="text-xs text-gray-600 italic">${order.items}</div>`;
-      }
+      let payShipText = `${order.payment || 'Tunai'} • ${order.shipping || 'Reguler'}`;
+      document.getElementById('invMethod').innerText = payShipText;
+      
+      let htmlItems = order.fullItems && order.fullItems.length > 0 ? 
+        order.fullItems.map(i => `<div class="flex justify-between text-xs"><span class="text-gray-600 dark:text-gray-300">${i.name} <span class="text-gray-400">x${i.qty}</span></span><span class="font-medium dark:text-white">Rp${(i.price*i.qty).toLocaleString('id-ID')}</span></div>`).join('') : 
+        `<div class="text-xs text-gray-600 dark:text-gray-400 italic">${order.items}</div>`;
       
       document.getElementById('invItems').innerHTML = htmlItems;
       document.getElementById('invTotal').innerText = formatRp(order.total);
@@ -762,10 +944,7 @@
       document.getElementById('statRevenue').innerText = formatRp(orders.filter(o => o.status === 'Selesai').reduce((s, o) => s + o.total, 0));
       document.getElementById('statCompleted').innerText = orders.filter(o => o.status === 'Selesai').length;
       document.getElementById('statPending').innerText = orders.filter(o => o.status === 'Menunggu').length;
-      document.getElementById('statUsers').innerText = JSON.parse(localStorage.getItem('yola_users') || '[]').length;
-
-      const recent = document.getElementById('admRecentOrdersTable');
-      recent.innerHTML = orders.length ? orders.slice(0, 5).map(o => `<tr class="border-b border-slate-50"><td class="p-4 font-bold text-blue-600 text-xs">${o.orderId}</td><td class="p-4 text-slate-700 font-medium text-xs">${o.name}</td><td class="p-4"><span class="text-[9px] font-bold uppercase px-2 py-1 rounded border ${o.status==='Selesai'?'bg-green-50 text-green-600 border-green-200':(o.status==='Menunggu'?'bg-orange-50 text-orange-600 border-orange-200':'bg-blue-50 text-blue-600 border-blue-200')}">${o.status}</span></td></tr>`).join('') : '<tr><td colspan="3" class="p-4 text-center text-xs text-slate-400">Kosong</td></tr>';
+      document.getElementById('statUsers').innerText = JSON.parse(localStorage.getItem('yola_users') || '[]').filter(u=>u.role!=='admin').length;
     }
 
     function renderAdminOrders() {
@@ -776,19 +955,28 @@
       let filtered = orders.filter(o => (filter === 'Semua' || o.status === filter) && (o.orderId.toLowerCase().includes(search) || o.name.toLowerCase().includes(search)));
       const tbody = document.getElementById('adminFullOrdersTableBody');
       
-      tbody.innerHTML = filtered.length ? filtered.map(o => `
-        <tr class="hover:bg-blue-50/20 bg-white">
-          <td class="p-4"><div class="font-extrabold text-blue-700 text-sm">${o.orderId}</div><div class="text-[10px] text-slate-400 mt-1">${o.date}</div></td>
-          <td class="p-4"><div class="font-bold text-slate-800 text-xs">${o.name}</div><div class="text-[10px] text-slate-500 font-mono"><i class="fab fa-whatsapp text-green-500"></i> ${o.phone}</div><div class="text-[10px] text-slate-400 line-clamp-1" title="${o.address}">${o.address}</div></td>
-          <td class="p-4"><div class="text-[10px] text-slate-500 line-clamp-1 mb-1">${o.items}</div><div class="font-bold text-slate-900 text-sm">${formatRp(o.total)}</div></td>
-          <td class="p-4 text-center"><span class="px-2 py-1 text-[9px] font-bold uppercase rounded border ${o.status==='Menunggu'?'bg-orange-50 text-orange-700 border-orange-200':(o.status==='Diproses'?'bg-blue-50 text-blue-700 border-blue-200':(o.status==='Selesai'?'bg-green-50 text-green-700 border-green-200':'bg-red-50 text-red-700 border-red-200'))}">${o.status}</span></td>
-          <td class="p-4 text-center flex justify-center space-x-1">
-            ${o.status === 'Menunggu' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Diproses')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Proses</button><button onclick="updateOrderStatus('${o.orderId}', 'Batal')" class="bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-[10px] font-bold">Tolak</button>` : ''}
-            ${o.status === 'Diproses' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Selesai')" class="bg-green-500 text-white px-4 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Selesai</button>` : ''}
-            ${o.status === 'Batal' ? `<button onclick="deleteOrder('${o.orderId}')" class="text-red-500 hover:text-red-700 text-xs" title="Hapus Data"><i class="fas fa-trash"></i></button>` : ''}
-            ${o.status === 'Selesai' ? `<span class="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded"><i class="fas fa-check-double"></i></span>` : ''}
+      tbody.innerHTML = filtered.length ? filtered.map(o => {
+        let waMsg = encodeURIComponent(`Halo ${o.name},\nKami dari Yola Promo ingin mengkonfirmasi pesanan Anda dengan ID *${o.orderId}*.\n\nDetail:\n${o.items}\nPengiriman: ${o.shipping||'-'}\nPembayaran: ${o.payment||'-'}\nTotal Tagihan: *${formatRp(o.total)}*\n\nTerima kasih.`);
+        let waLink = `https://wa.me/${formatWaNumber(o.phone)}?text=${waMsg}`;
+        
+        return `
+        <tr class="hover:bg-blue-50/20 dark:hover:bg-slate-700/50 bg-white dark:bg-slate-800 transition-colors">
+          <td class="p-4"><div class="font-extrabold text-blue-700 dark:text-blue-400 text-sm">${o.orderId}</div><div class="text-[10px] text-slate-400 mt-1">${o.date}</div></td>
+          <td class="p-4"><div class="font-bold text-slate-800 dark:text-white text-xs">${o.name}</div><div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono"><i class="fab fa-whatsapp text-green-500"></i> ${o.phone}</div><div class="text-[10px] text-slate-400 line-clamp-1" title="${o.address}">${o.address}</div></td>
+          <td class="p-4">
+             <div class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mb-1">${o.items}</div>
+             <div class="font-bold text-slate-900 dark:text-white text-sm">${formatRp(o.total)}</div>
+             <div class="text-[9px] text-blue-500 mt-1">${o.shipping||'-'} • ${o.payment||'-'}</div>
           </td>
-        </tr>`).join('') : '<tr><td colspan="5" class="p-10 text-center text-slate-400">Data pesanan tidak ditemukan.</td></tr>';
+          <td class="p-4 text-center"><span class="px-2 py-1 text-[9px] font-bold uppercase rounded border ${o.status==='Menunggu'?'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800':(o.status==='Diproses'?'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800':(o.status==='Selesai'?'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800':'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'))}">${o.status}</span></td>
+          <td class="p-4 text-center flex flex-wrap justify-center gap-1.5">
+            <a href="${waLink}" target="_blank" class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-green-500 hover:text-white transition flex items-center" title="Chat Pembeli"><i class="fab fa-whatsapp text-sm mr-1"></i> WA</a>
+            ${o.status === 'Menunggu' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Diproses')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Proses</button><button onclick="updateOrderStatus('${o.orderId}', 'Batal')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-3 py-1.5 rounded-lg text-[10px] font-bold">Tolak</button>` : ''}
+            ${o.status === 'Diproses' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Selesai')" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Selesai</button>` : ''}
+            ${o.status === 'Batal' ? `<button onclick="deleteOrder('${o.orderId}')" class="text-red-500 hover:text-red-700 text-xs px-2" title="Hapus Data"><i class="fas fa-trash"></i></button>` : ''}
+          </td>
+        </tr>`;
+      }).join('') : '<tr><td colspan="5" class="p-10 text-center text-slate-400">Data pesanan tidak ditemukan.</td></tr>';
     }
 
     function updateOrderStatus(id, st) {
@@ -800,26 +988,26 @@
     }
 
     function deleteOrder(id) {
-      confirmCustomDialog("Hapus Pesanan", "Hapus permanen pesanan ini dari history?", () => {
+      confirmCustomDialog("Hapus Pesanan", "Hapus permanen pesanan ini dari database?", () => {
         let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]').filter(o => o.orderId !== id);
         localStorage.setItem('yola_orders', JSON.stringify(orders)); renderAdminOrders();
       });
     }
 
-    // Katalog Admin (Add & Edit)
     function openProductModal(id = null) {
       document.getElementById('productForm').reset();
       document.getElementById('prodIdForm').value = '';
-      document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-box-open mr-2"></i> Tambah Produk';
+      document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-box-open mr-2"></i> Tambah Promo';
       
       if(id !== null) {
         const p = products.find(x => x.id === id);
         if(p) {
-          document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-edit mr-2"></i> Edit Produk';
+          document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-edit mr-2"></i> Edit Promo';
           document.getElementById('prodIdForm').value = p.id;
           document.getElementById('prodEmoji').value = p.img;
           document.getElementById('prodCategory').value = p.category;
           document.getElementById('prodName').value = p.name;
+          document.getElementById('prodOrigPrice').value = p.originalPrice || (p.price + 5000);
           document.getElementById('prodPrice').value = p.price;
         }
       }
@@ -831,45 +1019,83 @@
       const idForm = document.getElementById('prodIdForm').value;
       const data = {
         name: document.getElementById('prodName').value,
+        originalPrice: parseInt(document.getElementById('prodOrigPrice').value),
         price: parseInt(document.getElementById('prodPrice').value),
         img: document.getElementById('prodEmoji').value,
         category: document.getElementById('prodCategory').value
       };
       
+      if(data.price >= data.originalPrice) {
+        return showCustomDialog("Gagal", "Harga Promo harus lebih murah dari Harga Asli (Coret)!", "warning");
+      }
+      
       if(idForm) {
-        // Edit
         const idx = products.findIndex(p => p.id == idForm);
         if(idx !== -1) products[idx] = { ...products[idx], ...data };
       } else {
-        // Add Baru
         data.id = products.length ? Math.max(...products.map(p=>p.id)) + 1 : 1;
         products.push(data);
       }
       
-      localStorage.setItem('yola_products', JSON.stringify(products));
+      localStorage.setItem('yola_products_v2', JSON.stringify(products));
       closeModal('productFormModal'); renderAdminProductsTable(); renderCustomerProducts();
-      showCustomDialog("Sukses", "Data katalog berhasil diperbarui.", "success");
+      showCustomDialog("Sukses", "Data promo berhasil diperbarui.", "success");
     }
 
     function renderAdminProductsTable() {
       const tbody = document.getElementById('adminProductsTableBody');
-      tbody.innerHTML = products.length ? products.map(p => `
-        <tr class="bg-white border-b border-slate-100"><td class="p-4 text-center text-2xl">${p.img}</td><td class="p-4 font-bold text-slate-800 text-sm">${p.name}</td><td class="p-4 text-[10px] font-bold uppercase text-slate-500">${p.category}</td><td class="p-4 font-bold text-blue-600 text-sm">${formatRp(p.price)}</td><td class="p-4 text-center flex justify-center space-x-2">
-          <button onclick="openProductModal(${p.id})" class="text-blue-500 hover:bg-blue-50 p-2 rounded transition"><i class="fas fa-edit"></i></button>
-          <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:bg-red-50 p-2 rounded transition"><i class="fas fa-trash-alt"></i></button>
-        </td></tr>`).join('') : '<tr><td colspan="5" class="p-10 text-center text-slate-400">Kosong</td></tr>';
+      tbody.innerHTML = products.length ? products.map(p => {
+        const origPrice = p.originalPrice || p.price + 5000;
+        return `
+        <tr class="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 transition-colors">
+          <td class="p-4 text-center text-2xl">${p.img}</td>
+          <td class="p-4 font-bold text-slate-800 dark:text-white text-sm">${p.name}</td>
+          <td class="p-4 text-[10px] font-bold uppercase text-blue-500">${p.category}</td>
+          <td class="p-4">
+             <div class="text-xs text-red-500 line-through">${formatRp(origPrice)}</div>
+             <div class="font-bold text-green-600 dark:text-green-400 text-sm">${formatRp(p.price)}</div>
+          </td>
+          <td class="p-4 text-center flex justify-center space-x-2">
+          <button onclick="openProductModal(${p.id})" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 p-2 rounded transition"><i class="fas fa-edit"></i></button>
+          <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-2 rounded transition"><i class="fas fa-trash-alt"></i></button>
+        </td></tr>`
+      }).join('') : '<tr><td colspan="5" class="p-10 text-center text-slate-400">Belum ada promo.</td></tr>';
     }
 
     function deleteProduct(id) {
-      confirmCustomDialog("Hapus Produk", "Yakin hapus produk ini?", () => {
-        products = products.filter(p => p.id !== id); localStorage.setItem('yola_products', JSON.stringify(products));
+      confirmCustomDialog("Hapus Item", "Yakin hapus promo produk ini?", () => {
+        products = products.filter(p => p.id !== id); localStorage.setItem('yola_products_v2', JSON.stringify(products));
         renderAdminProductsTable(); renderCustomerProducts();
       });
     }
 
     function renderAdminUsersTable() {
       let users = JSON.parse(localStorage.getItem('yola_users') || '[]').filter(u=>u.role!=='admin');
-      document.getElementById('adminUsersTableBody').innerHTML = users.length ? users.map(u => `<tr class="bg-white border-b border-slate-100"><td class="p-4 font-bold text-sm"><i class="fas fa-user-circle text-blue-400 mr-2"></i>${u.name}</td><td class="p-4 font-mono text-xs text-slate-600"><i class="fab fa-whatsapp text-green-500 mr-1"></i>${u.phone}</td><td class="p-4 text-[10px] text-slate-500 line-clamp-2" title="${u.address}">${u.address || '-'}</td><td class="p-4 text-[10px]">${u.joined}</td></tr>`).join('') : '<tr><td colspan="4" class="p-6 text-center text-slate-400">Kosong</td></tr>';
+      document.getElementById('adminUsersTableBody').innerHTML = users.length ? users.map(u => `
+        <tr class="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 transition-colors">
+          <td class="p-4 font-bold text-sm dark:text-white"><i class="fas fa-user-circle text-blue-400 mr-2"></i>${u.name}</td>
+          <td class="p-4 font-mono text-xs text-slate-600 dark:text-slate-300">
+            <div class="flex items-center">
+              <span>${u.phone}</span>
+              <a href="https://wa.me/${formatWaNumber(u.phone)}?text=Halo%20kak%20${encodeURIComponent(u.name)}," target="_blank" class="ml-3 text-green-500 hover:text-green-700 transition" title="Chat Pembeli"><i class="fab fa-whatsapp text-lg"></i></a>
+            </div>
+          </td>
+          <td class="p-4 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2" title="${u.address}">${u.address || '-'}</td>
+          <td class="p-4 text-[10px] dark:text-slate-400">${u.joined}</td>
+        </tr>`).join('') : '<tr><td colspan="4" class="p-6 text-center text-slate-400">Kosong</td></tr>';
+    }
+
+    function saveBanner(e) {
+      e.preventDefault();
+      bannerData = {
+        badge: document.getElementById('banBadge').value,
+        title: document.getElementById('banTitle').value.replace(/\\n/g, '\n'),
+        subtitle: document.getElementById('banSubtitle').value,
+        emoji: document.getElementById('banEmoji').value
+      };
+      localStorage.setItem('yola_banner', JSON.stringify(bannerData));
+      applyBanner();
+      showCustomDialog("Sukses", "Banner depan berhasil diperbarui!", "success");
     }
 
     // --- NAVIGATION HELPERS ---
@@ -882,13 +1108,14 @@
     }
 
     function showAdminPage(page) {
-      ['btnAdmOverview','btnAdmOrders','btnAdmProducts','btnAdmUsers'].forEach(id => { const btn = document.getElementById(id); btn.classList.remove('bg-blue-600', 'text-white'); btn.classList.add('text-slate-300', 'hover:bg-slate-800'); });
-      ['admOverviewPage','admOrdersPage','admProductsPage','admUsersPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      ['btnAdmOverview','btnAdmOrders','btnAdmProducts','btnAdmUsers', 'btnAdmSettings'].forEach(id => { const btn = document.getElementById(id); btn.classList.remove('bg-blue-600', 'text-white'); btn.classList.add('text-slate-300', 'hover:bg-slate-800'); });
+      ['admOverviewPage','admOrdersPage','admProductsPage','admUsersPage', 'admSettingsPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
 
       if(page === 'overview') { renderAdminDashboard(); document.getElementById('admOverviewPage').classList.remove('hidden'); document.getElementById('btnAdmOverview').classList.add('bg-blue-600', 'text-white'); }
       if(page === 'orders') { renderAdminOrders(); document.getElementById('admOrdersPage').classList.remove('hidden'); document.getElementById('btnAdmOrders').classList.add('bg-blue-600', 'text-white'); }
       if(page === 'products') { renderAdminProductsTable(); document.getElementById('admProductsPage').classList.remove('hidden'); document.getElementById('btnAdmProducts').classList.add('bg-blue-600', 'text-white'); }
       if(page === 'users') { renderAdminUsersTable(); document.getElementById('admUsersPage').classList.remove('hidden'); document.getElementById('btnAdmUsers').classList.add('bg-blue-600', 'text-white'); }
+      if(page === 'settings') { document.getElementById('admSettingsPage').classList.remove('hidden'); document.getElementById('btnAdmSettings').classList.add('bg-blue-600', 'text-white'); applyBanner(); }
       
       document.getElementById('adminNavLinks').classList.add('hidden'); document.getElementById('adminNavLinks').classList.replace('block', 'md:block');
     }
