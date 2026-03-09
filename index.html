@@ -3781,6 +3781,14 @@
         }
       }
 
+      // Normalisasi nomor telepon ke format internasional
+      let phoneNormalized = phone.replace(/[\s\-().]/g, '');
+      if (phoneNormalized.startsWith('0')) {
+        phoneNormalized = '62' + phoneNormalized.slice(1);
+      } else if (phoneNormalized.startsWith('+')) {
+        phoneNormalized = phoneNormalized.slice(1);
+      }
+
       // Buat pesan WhatsApp
       let message = `*TOSERBA YOLA - PESANAN BARU*\n\n`;
       message += `👤 *Nama:* ${name}\n`;
@@ -3806,9 +3814,16 @@
       
       // Buka WhatsApp dengan nomor toko
       const waUrl = `https://wa.me/6282130998503?text=${encodedMessage}`;
+      // phoneNormalized sudah disiapkan di atas untuk referensi customer
       
-      // Buka di tab baru
-      window.open(waUrl, '_blank');
+      // Buka WhatsApp (gunakan anchor click agar tidak diblokir popup blocker)
+      const waLink = document.createElement('a');
+      waLink.href = waUrl;
+      waLink.target = '_blank';
+      waLink.rel = 'noopener noreferrer';
+      document.body.appendChild(waLink);
+      waLink.click();
+      document.body.removeChild(waLink);
 
       // Kosongkan keranjang
       cart = [];
