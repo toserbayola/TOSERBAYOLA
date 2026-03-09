@@ -3,15 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>TOSERBA YOLA | Pusat Promo Harian</title>
+  <title>TOSERBA YOLA | Pusat Promo Harian v4</title>
   
   <meta name="description" content="Toserba Yola - Pusat belanja khusus promo dan diskon setiap hari.">
-  <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛒</text></svg>">
+  <link rel="icon" type="image/png" href="https://placehold.co/100x100/dc2626/white?text=Y">
   
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Setup Tailwind dengan dukungan Dark Mode -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -25,19 +24,21 @@
     
     .modal-overlay {
       opacity: 0; pointer-events: none; transition: all 0.3s ease;
-      background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 1000;
+      background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 9999;
     }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .modal-content { transform: translateY(-30px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-content { transform: translateY(-30px) scale(0.95); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+    .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
     
-    #cartSidebar { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 900;}
+    #cartSidebar { transform: translateX(100%); transition: transform 0.3s ease-in-out; z-index: 9900;}
     #cartSidebar.open { transform: translateX(0); }
 
     .loader {
       border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff;
       border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite;
     }
+    .loader-red { border: 3px solid rgba(220, 38, 38, 0.3); border-top: 3px solid #dc2626; }
+    
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     @keyframes pulse-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
     
@@ -47,82 +48,132 @@
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
-    
     .dark ::-webkit-scrollbar-track { background: #1e293b; }
     .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
-    .category-btn.active { background-color: #2563eb; color: white; border-color: #2563eb; }
-    .dark .category-btn.active { background-color: #3b82f6; border-color: #3b82f6; }
+    /* RED THEME ADJUSTMENTS */
+    .category-btn.active { background-color: #dc2626; color: white; border-color: #dc2626; }
+    .dark .category-btn.active { background-color: #ef4444; border-color: #ef4444; }
     
-    .auth-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
-    .dark .auth-bg { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
-    
+    .auth-bg { background: linear-gradient(135deg, #7f1d1d 0%, #dc2626 100%); }
+    .dark .auth-bg { background: linear-gradient(135deg, #450a0a 0%, #991b1b 100%); }
     .heart-active { color: #ef4444 !important; transform: scale(1.2); }
+
+    /* Toast Notifications */
+    #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+    .toast { background: white; border-radius: 12px; padding: 12px 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); display: flex; align-items: center; gap: 12px; transform: translateX(120%); opacity: 0; transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55); pointer-events: auto; max-width: 300px; border-left: 4px solid #dc2626;}
+    .toast.show { transform: translateX(0); opacity: 1; }
+    .toast.success { border-left-color: #10b981; }
+    .toast.error { border-left-color: #ef4444; }
+    .toast.warning { border-left-color: #f59e0b; }
+    .dark .toast { background: #1e293b; color: #f8fafc; }
   </style>
 </head>
 <body class="text-gray-800 bg-slate-50 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300">
 
+  <div id="toast-container"></div>
+
+  <!-- Layar Loading Awal -->
+  <div id="appLoader" class="fixed inset-0 bg-white dark:bg-slate-900 z-[10000] flex flex-col items-center justify-center transition-opacity duration-500">
+    <img id="loaderLogo" src="https://placehold.co/150x150/dc2626/white?text=YOLA" class="w-20 h-20 rounded-2xl mb-4 shadow-lg object-cover animate-pulse" onerror="this.src='https://placehold.co/150x150/dc2626/white?text=Y'">
+    <h2 class="text-xl font-bold text-red-600 dark:text-red-400">TOSERBA YOLA</h2>
+    <div class="loader loader-red w-6 h-6 mt-3"></div>
+  </div>
+
   <!-- ==========================================
-       0. GERBANG LOGIN / REGISTER (AUTH)
+       0. MODAL AUTENTIKASI (LOGIN/REGISTER)
        ========================================== -->
-  <div id="authApp" class="fixed inset-0 auth-bg flex items-center justify-center p-4 z-[9999]">
-    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transition-colors">
-      <div class="bg-slate-50 dark:bg-slate-800/50 p-6 text-center border-b border-gray-100 dark:border-slate-700 relative">
-        <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">🔥</div>
-        <h2 class="text-2xl font-extrabold text-blue-900 dark:text-blue-400">TOSERBA YOLA</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Pusat Promo & Diskon Harian</p>
+  <div id="authAppModal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-content bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col relative">
+      <button onclick="window.closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:hover:text-white z-10 w-8 h-8 flex items-center justify-center bg-gray-100 dark:bg-slate-700 rounded-full"><i class="fas fa-times"></i></button>
+      
+      <div class="bg-red-50 dark:bg-slate-800/80 p-6 pt-8 text-center border-b border-gray-100 dark:border-slate-700 relative">
+        <img id="authLogo" src="https://placehold.co/150x150/dc2626/white?text=YOLA" class="w-16 h-16 rounded-full mx-auto mb-3 shadow-md object-cover border-4 border-white dark:border-slate-700">
+        <h2 class="text-xl font-extrabold text-red-900 dark:text-red-400">TOSERBA YOLA</h2>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Masuk untuk borong diskon</p>
       </div>
 
-      <div class="flex border-b border-gray-200 dark:border-slate-700">
-        <button id="tabCustBtn" onclick="switchAuthTab('customer')" class="flex-1 py-4 font-bold text-sm text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-blue-50/30 dark:bg-blue-900/20 transition">Pelanggan</button>
-        <button id="tabAdminBtn" onclick="switchAuthTab('admin')" class="flex-1 py-4 font-bold text-sm text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:bg-gray-50 dark:hover:bg-slate-700 transition">Administrator</button>
+      <!-- TABS -->
+      <div class="flex border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800" id="authTabs">
+        <button onclick="window.switchAuthTab('customer')" class="auth-tab-btn flex-1 py-3 font-bold text-xs text-red-600 dark:text-red-400 border-b-2 border-red-600 dark:border-red-400 bg-red-50/30 dark:bg-red-900/20" data-target="customer">Pelanggan</button>
+        <button onclick="window.switchAuthTab('admin')" class="auth-tab-btn flex-1 py-3 font-bold text-xs text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:bg-gray-50 dark:hover:bg-slate-700" data-target="admin">Admin / Staf</button>
       </div>
 
-      <div class="p-6 md:p-8">
-        <!-- Form Pelanggan -->
-        <form id="formCustomer" onsubmit="handleCustomerLogin(event)" class="space-y-4 block">
+      <div class="p-6">
+        <!-- FORM CUSTOMER -->
+        <form id="formCustomer" class="space-y-4 block">
           <div>
-            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nama Lengkap</label>
             <div class="relative">
               <i class="fas fa-user absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="text" id="regName" required placeholder="Nama Anda" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
+              <input type="text" id="regName" required placeholder="Nama Lengkap" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none text-sm dark:text-white">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nomor WhatsApp (Sebagai ID)</label>
             <div class="relative">
               <i class="fab fa-whatsapp absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="tel" id="regPhone" required placeholder="081234567890" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
+              <input type="tel" id="regPhone" required placeholder="No. WhatsApp (Mis: 0812...)" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none text-sm dark:text-white">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Password Akun</label>
             <div class="relative">
               <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="password" id="regPass" required placeholder="Buat / Masukkan password" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
+              <input type="password" id="regPass" required placeholder="Password Akun" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none text-sm dark:text-white">
             </div>
-            <p class="text-[10px] text-gray-400 dark:text-gray-500 mt-1">*Jika nomor WA belum terdaftar, otomatis daftar baru.</p>
+            <div class="flex justify-between items-center mt-2">
+              <p class="text-[9px] text-gray-400">*Otomatis daftar jika nomor baru.</p>
+              <button type="button" onclick="window.switchAuthTab('forgot')" class="text-[10px] font-bold text-red-600 hover:underline">Lupa Password?</button>
+            </div>
           </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition transform hover:-translate-y-0.5 mt-2">Buru Promo Sekarang!</button>
+          <button type="submit" id="btnCustLogin" class="w-full bg-red-600 text-white py-3.5 rounded-xl font-bold hover:bg-red-700 shadow-md transition flex justify-center items-center">
+             <span>Masuk / Daftar</span><div id="loaderCustLogin" class="loader ml-2 hidden"></div>
+          </button>
         </form>
 
-        <!-- Form Admin -->
-        <form id="formAdmin" onsubmit="handleAdminLogin(event)" class="space-y-4 hidden">
+        <!-- FORM LUPA PASSWORD -->
+        <div id="formForgot" class="hidden space-y-4">
+          <div class="text-center mb-4">
+            <div class="w-12 h-12 bg-orange-100 text-orange-500 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fas fa-key"></i></div>
+            <h3 class="font-bold text-gray-800 dark:text-white text-sm">Pemulihan Password</h3>
+            <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-1">1. Minta izin reset ke CS via WA.<br>2. Jika CS sudah setuju, buat password baru di sini.</p>
+          </div>
+          
+          <!-- Step 1 -->
+          <div class="bg-gray-50 dark:bg-slate-700/50 p-3 rounded-xl border border-gray-100 dark:border-slate-600 mb-3">
+             <label class="block text-[10px] font-bold text-gray-500 mb-1">Nomor WA Anda</label>
+             <input type="tel" id="forgotPhoneReq" placeholder="0812..." class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-sm mb-2 outline-none dark:text-white">
+             <button type="button" onclick="window.requestResetWA()" class="w-full bg-green-600 text-white py-2 rounded-lg font-bold text-xs flex justify-center items-center hover:bg-green-700 transition"><i class="fab fa-whatsapp mr-1"></i> Minta Izin ke CS</button>
+          </div>
+
+          <!-- Step 2 -->
+          <form id="formResetSubmit" class="bg-red-50 dark:bg-red-900/20 p-3 rounded-xl border border-red-100 dark:border-red-800/50">
+             <label class="block text-[10px] font-bold text-red-600 dark:text-red-400 mb-1">Sudah Diizinkan? Buat Password Baru</label>
+             <input type="tel" id="forgotPhoneConfirm" required placeholder="Ulangi No. WA" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-sm mb-2 outline-none dark:text-white">
+             <input type="password" id="forgotPassNew" required placeholder="Password Baru" class="w-full px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-sm mb-2 outline-none dark:text-white">
+             <button type="submit" id="btnResetPass" class="w-full bg-red-600 text-white py-2 rounded-lg font-bold text-xs hover:bg-red-700 transition flex justify-center items-center">
+               <span>Simpan Password Baru</span><div id="loaderResetPass" class="loader w-3 h-3 ml-2 hidden"></div>
+             </button>
+          </form>
+          
+          <button type="button" onclick="window.switchAuthTab('customer')" class="w-full text-center text-xs text-gray-500 hover:text-gray-800 dark:hover:text-white font-medium mt-2">Kembali ke Login</button>
+        </div>
+
+        <!-- FORM ADMIN / STAF -->
+        <form id="formAdmin" class="hidden space-y-4">
           <div>
-            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Username Admin</label>
             <div class="relative">
               <i class="fas fa-user-shield absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="password" id="adminUser" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
+              <input type="text" id="adminUser" required placeholder="Username / No. WA Staf" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none text-sm dark:text-white">
             </div>
           </div>
           <div>
-            <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Password</label>
             <div class="relative">
               <i class="fas fa-lock absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-              <input type="password" id="adminPass" required placeholder="••••••••" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none transition text-gray-800 dark:text-white">
+              <input type="password" id="adminPass" required placeholder="Password Admin / Staf" class="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none text-sm dark:text-white">
             </div>
           </div>
-          <button type="submit" class="w-full bg-slate-900 dark:bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-blue-700 shadow-md transition transform hover:-translate-y-0.5 mt-2">Masuk Panel Admin</button>
+          <button type="submit" id="btnAdminLogin" class="w-full bg-slate-900 dark:bg-red-600 text-white py-3.5 rounded-xl font-bold hover:bg-slate-800 dark:hover:bg-red-700 shadow-md transition flex justify-center items-center mt-2">
+             <span>Masuk Dashboard</span><div id="loaderAdminLogin" class="loader ml-2 hidden"></div>
+          </button>
         </form>
       </div>
     </div>
@@ -134,43 +185,48 @@
        ========================================== -->
   <div id="customerApp" class="hidden min-h-screen flex flex-col relative overflow-x-hidden">
     <!-- Navbar Customer -->
-    <nav class="bg-blue-600 dark:bg-slate-800 text-white shadow-lg sticky top-0 z-40 transition-colors">
+    <nav class="bg-red-600 dark:bg-slate-800 text-white shadow-lg sticky top-0 z-40 transition-colors">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
-          <div class="flex items-center cursor-pointer" onclick="showCustPage('home')">
-            <span class="text-3xl mr-2 drop-shadow-md">🔥</span>
+          <div class="flex items-center cursor-pointer" onclick="window.showCustPage('home')">
+            <img id="navLogo" src="https://placehold.co/100x100/dc2626/white?text=Y" class="w-8 h-8 rounded border border-white/50 mr-2 object-cover bg-white" onerror="this.src='https://placehold.co/100x100/dc2626/white?text=Y'">
             <span class="font-bold text-xl tracking-wide hidden sm:block">YOLA PROMO</span>
           </div>
           
           <div class="hidden md:flex space-x-6 items-center">
-            <a href="#" onclick="showCustPage('home')" class="hover:text-yellow-300 font-medium transition">Promo Hari Ini</a>
-            <a href="#" onclick="showCustPage('favorites')" class="hover:text-yellow-300 font-medium transition"><i class="fas fa-heart"></i> Favorit</a>
-            <a href="#" onclick="showCustPage('dashboard')" class="hover:text-yellow-300 font-medium transition">Pesanan Saya</a>
-            <a href="#" onclick="showCustPage('profile')" class="hover:text-yellow-300 font-medium transition">Profil</a>
+            <a href="#" onclick="window.showCustPage('home')" class="hover:text-yellow-300 font-medium transition text-sm">Promo Hari Ini</a>
             
-            <div class="h-6 w-px bg-blue-400 dark:bg-slate-600 mx-2"></div>
+            <!-- Navbar state for Logged In vs Guest -->
+            <div id="navDesktopLogged" class="hidden flex items-center space-x-6">
+              <a href="#" onclick="window.showCustPage('favorites')" class="hover:text-yellow-300 font-medium transition text-sm"><i class="fas fa-heart"></i> Favorit</a>
+              <a href="#" onclick="window.showCustPage('dashboard')" class="hover:text-yellow-300 font-medium transition text-sm">Pesanan Saya</a>
+              <a href="#" onclick="window.showCustPage('profile')" class="hover:text-yellow-300 font-bold transition text-sm bg-red-700/50 px-3 py-1 rounded-full"><i class="fas fa-user-circle mr-1"></i> <span id="navCustName">Profil</span></a>
+              <button onclick="window.logout()" class="text-red-200 hover:text-white transition ml-1" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
             
-            <!-- Dark Mode Toggle Desktop -->
-            <button onclick="toggleDarkMode()" class="text-yellow-200 hover:text-white transition text-lg" title="Ganti Tema">
+            <div id="navDesktopGuest" class="flex items-center space-x-4">
+               <button onclick="window.openAuthModal()" class="bg-white text-red-600 hover:bg-yellow-300 hover:text-red-800 font-bold px-4 py-1.5 rounded-full transition shadow-sm text-sm"><i class="fas fa-sign-in-alt mr-1"></i> Masuk / Daftar</button>
+            </div>
+
+            <div class="h-6 w-px bg-red-400 dark:bg-slate-600 mx-1"></div>
+            
+            <button onclick="window.toggleDarkMode()" class="text-yellow-200 hover:text-white transition text-lg" title="Ganti Tema">
               <i id="themeIconDesk" class="fas fa-moon"></i>
             </button>
             
-            <button onclick="logout()" class="text-red-200 hover:text-red-400 transition font-bold ml-2" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
-            
-            <button onclick="toggleCart()" class="relative p-2 hover:scale-110 transition ml-2 bg-blue-700 dark:bg-slate-700 rounded-full w-10 h-10 flex items-center justify-center">
+            <button onclick="window.toggleCart()" class="relative p-2 hover:scale-110 transition ml-2 bg-red-700 dark:bg-slate-700 rounded-full w-10 h-10 flex items-center justify-center">
               <i class="fas fa-shopping-cart text-lg"></i>
-              <span id="cartCount" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-blue-600 dark:border-slate-800">0</span>
+              <span id="cartCount" class="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-red-600 dark:border-slate-800">0</span>
             </button>
           </div>
           
           <div class="md:hidden flex items-center space-x-3">
-             <!-- Dark Mode Toggle Mobile -->
-            <button onclick="toggleDarkMode()" class="text-yellow-200 hover:text-white transition text-lg mr-1">
+            <button onclick="window.toggleDarkMode()" class="text-yellow-200 hover:text-white transition text-lg mr-1">
               <i id="themeIconMob" class="fas fa-moon"></i>
             </button>
-            <button onclick="toggleCart()" class="relative p-2 bg-blue-700 dark:bg-slate-700 rounded-full w-9 h-9 flex items-center justify-center">
+            <button onclick="window.toggleCart()" class="relative p-2 bg-red-700 dark:bg-slate-700 rounded-full w-9 h-9 flex items-center justify-center">
               <i class="fas fa-shopping-cart text-sm"></i>
-              <span id="cartCountMobile" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-blue-600 dark:border-slate-800">0</span>
+              <span id="cartCountMobile" class="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full border border-red-600 dark:border-slate-800">0</span>
             </button>
             <button onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" class="p-2 focus:outline-none">
               <i class="fas fa-bars text-xl"></i>
@@ -179,195 +235,213 @@
         </div>
       </div>
       <!-- Mobile Menu -->
-      <div id="mobileMenu" class="hidden md:hidden bg-blue-800 dark:bg-slate-900 px-4 py-4 space-y-3 shadow-inner absolute w-full z-50 border-t border-blue-700 dark:border-slate-800">
-        <div class="flex items-center space-x-3 bg-blue-900 dark:bg-slate-800 p-3 rounded-xl border border-blue-700 dark:border-slate-700 mb-2" onclick="showCustPage('profile'); document.getElementById('mobileMenu').classList.add('hidden')">
-          <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-blue-900 font-bold text-lg"><i class="fas fa-user"></i></div>
+      <div id="mobileMenu" class="hidden md:hidden bg-red-800 dark:bg-slate-900 px-4 py-4 space-y-3 shadow-inner absolute w-full z-50 border-t border-red-700 dark:border-slate-800">
+        <!-- Logged In Mobile Header -->
+        <div id="mobLoggedHeader" class="hidden items-center space-x-3 bg-red-900 dark:bg-slate-800 p-3 rounded-xl border border-red-700 dark:border-slate-700 mb-2" onclick="window.showCustPage('profile'); document.getElementById('mobileMenu').classList.add('hidden')">
+          <div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-red-900 font-bold text-lg"><i class="fas fa-user"></i></div>
           <div>
             <p class="font-bold text-white leading-none mb-1" id="mobCustName">User</p>
-            <p class="text-[10px] text-blue-300 dark:text-gray-400 uppercase font-bold tracking-wider">Edit Profil & Alamat <i class="fas fa-chevron-right ml-1"></i></p>
+            <p class="text-[10px] text-red-300 dark:text-gray-400 uppercase font-bold tracking-wider">Profil & Alamat <i class="fas fa-chevron-right ml-1"></i></p>
           </div>
         </div>
-        <a href="#" onclick="showCustPage('home'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-fire w-6 text-center"></i> Promo Hari Ini</a>
-        <a href="#" onclick="showCustPage('favorites'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-heart w-6 text-center"></i> Diskon Favorit</a>
-        <a href="#" onclick="showCustPage('dashboard'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300"><i class="fas fa-history w-6 text-center"></i> Riwayat Pesanan</a>
-        <hr class="border-blue-600 dark:border-slate-700">
-        <button onclick="logout(); this.parentNode.classList.add('hidden')" class="block w-full text-left text-red-300 font-bold"><i class="fas fa-sign-out-alt w-6 text-center"></i> Keluar Akun</button>
+        <!-- Guest Mobile Header -->
+        <div id="mobGuestHeader" class="bg-red-900 dark:bg-slate-800 p-4 rounded-xl border border-red-700 dark:border-slate-700 mb-2 text-center" onclick="window.openAuthModal(); document.getElementById('mobileMenu').classList.add('hidden')">
+           <p class="text-sm font-bold text-white mb-2">Ingin belanja & borong promo?</p>
+           <button class="bg-white text-red-600 w-full py-2 rounded-lg font-bold text-sm hover:bg-yellow-300">Masuk / Daftar Akun</button>
+        </div>
+
+        <a href="#" onclick="window.showCustPage('home'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300 text-sm py-1"><i class="fas fa-fire w-6 text-center"></i> Promo Hari Ini</a>
+        
+        <div id="mobLoggedLinks" class="hidden space-y-3">
+          <a href="#" onclick="window.showCustPage('favorites'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300 text-sm py-1"><i class="fas fa-heart w-6 text-center"></i> Diskon Favorit</a>
+          <a href="#" onclick="window.showCustPage('dashboard'); this.parentNode.classList.add('hidden')" class="block text-white font-medium hover:text-yellow-300 text-sm py-1"><i class="fas fa-history w-6 text-center"></i> Riwayat Pesanan</a>
+          <hr class="border-red-600 dark:border-slate-700 my-2">
+          <button onclick="window.logout(); this.parentNode.classList.add('hidden')" class="block w-full text-left text-red-300 hover:text-white font-bold text-sm py-1"><i class="fas fa-sign-out-alt w-6 text-center"></i> Keluar Akun</button>
+        </div>
       </div>
     </nav>
 
     <!-- Hal: Katalog Promo Utama -->
     <main id="custHomePage" class="flex-1 w-full max-w-7xl mx-auto px-4 py-6 block">
-      
-      <!-- HERO BANNER (Dikelola Admin) -->
-      <div class="bg-gradient-to-r from-blue-100 to-blue-50 dark:from-slate-800 dark:to-slate-800 rounded-3xl p-6 md:p-10 mb-8 flex flex-col md:flex-row items-center justify-between shadow-sm border border-blue-100 dark:border-slate-700 relative overflow-hidden transition-colors">
+      <!-- HERO BANNER -->
+      <div class="bg-gradient-to-r from-red-100 to-red-50 dark:from-slate-800 dark:to-slate-800 rounded-3xl p-6 md:p-10 mb-8 flex flex-col md:flex-row items-center justify-between shadow-sm border border-red-100 dark:border-slate-700 relative overflow-hidden transition-colors">
         <div class="md:w-1/2 z-10 relative">
-          <span id="heroBadge" class="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block shadow-sm animate-pulse">PROMO SPESIAL</span>
-          <h1 id="heroTitle" class="text-3xl md:text-5xl font-extrabold text-blue-900 dark:text-white mb-4 leading-tight whitespace-pre-line">Belanja Kebutuhan<br>Jadi Lebih Mudah</h1>
-          <p id="heroSubtitle" class="text-blue-700 dark:text-gray-300 mb-6 text-sm md:text-lg">Harga grosir, diskon maksimal. Amankan sekarang!</p>
-          <button onclick="document.getElementById('productsSection').scrollIntoView()" class="bg-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-blue-700 hover:shadow-lg transition mt-2">Sikat Promonya! <i class="fas fa-arrow-down ml-2"></i></button>
+          <span id="heroBadge" class="bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold mb-4 inline-block shadow-sm animate-pulse">PROMO SPESIAL</span>
+          <h1 id="heroTitle" class="text-3xl md:text-5xl font-extrabold text-red-900 dark:text-white mb-4 leading-tight whitespace-pre-line">Belanja Kebutuhan<br>Jadi Lebih Mudah</h1>
+          <p id="heroSubtitle" class="text-red-700 dark:text-gray-300 mb-6 text-sm md:text-lg">Harga grosir, diskon maksimal. Amankan sekarang!</p>
+          <button onclick="document.getElementById('productsSection').scrollIntoView()" class="bg-green-600 text-white px-8 py-3 rounded-full font-bold hover:bg-green-700 hover:shadow-lg transition mt-2 text-sm">Sikat Promonya! <i class="fas fa-arrow-down ml-2"></i></button>
         </div>
-        <div id="heroEmoji" class="text-[7rem] md:text-[8rem] mt-8 md:mt-0 drop-shadow-2xl animate-bounce z-10" style="animation-duration: 3s;">🛍️</div>
-        <div class="absolute -top-10 -right-10 w-64 h-64 bg-blue-200 dark:bg-blue-900 rounded-full mix-blend-multiply filter blur-2xl opacity-50"></div>
+        <div class="mt-8 md:mt-0 z-10 hidden md:block w-48 h-48 lg:w-64 lg:h-64">
+           <img id="heroImage" src="https://placehold.co/400x400/transparent/dc2626?text=🛒" class="w-full h-full object-contain animate-bounce drop-shadow-2xl" style="animation-duration: 3s;" onerror="this.src='https://placehold.co/400x400/transparent/dc2626?text=🛒'">
+        </div>
+        <div class="absolute -top-10 -right-10 w-64 h-64 bg-red-200 dark:bg-red-900 rounded-full mix-blend-multiply filter blur-2xl opacity-50"></div>
       </div>
 
       <div id="productsSection" class="mb-6">
         <div class="flex flex-col md:flex-row md:justify-between md:items-end mb-4 gap-4">
-          <h2 class="text-2xl font-bold text-gray-800 dark:text-white flex items-center shrink-0"><i class="fas fa-bolt text-yellow-500 mr-2"></i> Flash Sale & Promo</h2>
+          <h2 class="text-xl md:text-2xl font-bold text-gray-800 dark:text-white flex items-center shrink-0"><i class="fas fa-bolt text-yellow-500 mr-2"></i> Flash Sale & Promo</h2>
           <div class="relative w-full md:w-64 shrink-0">
             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            <input type="text" id="searchProductInput" onkeyup="searchProducts(this.value)" placeholder="Cari barang diskon..." class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-white rounded-full focus:border-blue-500 outline-none shadow-sm text-sm">
+            <input type="text" id="searchProductInput" placeholder="Cari barang diskon..." class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-800 dark:text-white rounded-full focus:border-red-500 outline-none shadow-sm text-sm">
           </div>
         </div>
         
-        <!-- Filter Kategori Promo Khusus -->
         <div class="flex overflow-x-auto space-x-2 pb-2 mb-4 scrollbar-hide" id="categoryFilters">
-          <button onclick="filterProducts('Semua')" class="category-btn active px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Semua Promo</button>
-          <button onclick="filterProducts('Promo Sensabu')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Promo Sensabu</button>
-          <button onclick="filterProducts('Jusami')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Jusami</button>
-          <button onclick="filterProducts('Promo Gajian')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Promo Gajian</button>
-          <button onclick="filterProducts('Promo Hemat Setiap Hari')" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Hemat Setiap Hari</button>
+          <button data-cat="Semua" class="category-btn active px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Semua Promo</button>
+          <button data-cat="Promo Sensabu" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Promo Sensabu</button>
+          <button data-cat="Jusami" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Jusami</button>
+          <button data-cat="Promo Gajian" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Promo Gajian</button>
+          <button data-cat="Promo Hemat Setiap Hari" class="category-btn px-4 py-1.5 rounded-full border border-gray-300 dark:border-slate-600 text-sm font-medium whitespace-nowrap transition dark:text-gray-300">Hemat Setiap Hari</button>
         </div>
         
-        <div id="productContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5"></div>
+        <div id="productContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5">
+           <div class="col-span-full py-10 flex justify-center"><div class="loader loader-red"></div></div>
+        </div>
       </div>
     </main>
 
     <!-- Hal: Produk Favorit -->
     <main id="custFavoritesPage" class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 hidden">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-heart text-red-500 mr-2"></i> Incaran Saya</h2>
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-heart text-red-600 mr-2"></i> Incaran Saya</h2>
       <div id="favProductContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 md:gap-5"></div>
     </main>
 
     <!-- Hal: Riwayat Pesanan -->
     <main id="custDashboardPage" class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 hidden">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-history text-blue-600 mr-2"></i> Riwayat Pesanan</h2>
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-history text-red-600 mr-2"></i> Riwayat Pesanan</h2>
       <div id="customerOrders" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </main>
 
     <!-- Hal: Profil & Pengaturan -->
     <main id="custProfilePage" class="flex-1 w-full max-w-2xl mx-auto px-4 py-8 hidden">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-user-cog text-blue-600 mr-2"></i> Pengaturan Profil</h2>
+      <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6 border-b dark:border-slate-700 pb-2"><i class="fas fa-user-cog text-red-600 mr-2"></i> Pengaturan Profil</h2>
       <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-sm border border-gray-100 dark:border-slate-700 transition-colors">
-        <form onsubmit="saveProfile(event)" class="space-y-5">
-          <div class="flex items-center space-x-4 mb-6 bg-blue-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-blue-100 dark:border-slate-600">
-            <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold" id="profAvatar">U</div>
+        <form id="formProfile" class="space-y-5">
+          <div class="flex items-center space-x-4 mb-6 bg-red-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-red-100 dark:border-slate-600">
+            <div class="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center text-2xl font-bold" id="profAvatar">U</div>
             <div>
-              <p class="text-xs text-blue-500 dark:text-blue-400 font-bold uppercase tracking-wider">Pemburu Promo</p>
-              <h3 class="font-bold text-xl text-blue-900 dark:text-white" id="profNameDisplay">User</h3>
+              <p class="text-[10px] text-red-500 dark:text-red-400 font-bold uppercase tracking-wider">Pelanggan Yola</p>
+              <h3 class="font-bold text-lg text-red-900 dark:text-white" id="profNameDisplay">User</h3>
             </div>
           </div>
           <div>
-             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
-             <input type="text" id="profName" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none text-gray-800 dark:text-white">
+             <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
+             <input type="text" id="profName" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none text-sm dark:text-white">
           </div>
           <div>
-             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp (Login ID)</label>
-             <input type="tel" id="profPhone" disabled class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-600/50 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-500 dark:text-gray-400 cursor-not-allowed">
+             <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp (Login ID)</label>
+             <input type="tel" id="profPhone" disabled class="w-full px-4 py-3 bg-gray-100 dark:bg-slate-600/50 border border-gray-200 dark:border-slate-700 rounded-xl text-gray-500 dark:text-gray-400 cursor-not-allowed text-sm">
+             <p class="text-[10px] text-gray-400 mt-1">*Nomor WA tidak dapat diubah karena menjadi ID Akun.</p>
           </div>
           <div>
-             <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Alamat Pengiriman Default</label>
-             <textarea id="profAddress" rows="3" placeholder="Masukkan alamat pengiriman..." class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white dark:focus:bg-slate-600 focus:border-blue-500 outline-none resize-none text-gray-800 dark:text-white"></textarea>
+             <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Alamat Pengiriman Default</label>
+             <textarea id="profAddress" rows="3" placeholder="Masukkan alamat lengkap..." class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:bg-white focus:border-red-500 outline-none resize-none text-sm dark:text-white"></textarea>
           </div>
-          <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition">Simpan Perubahan</button>
+          <button type="submit" class="w-full bg-red-600 text-white py-3.5 rounded-xl font-bold hover:bg-red-700 shadow-md transition flex justify-center items-center text-sm">
+             <span>Simpan Perubahan</span><div id="loaderProfile" class="loader ml-2 hidden"></div>
+          </button>
         </form>
       </div>
     </main>
 
-    <!-- TOMBOL BANTUAN CS MENGAMBANG -->
-    <a href="https://wa.me/6289630336404?text=Halo%20Admin%20Toserba%20Yola,%20saya%20butuh%20bantuan..." target="_blank" class="fixed bottom-6 right-6 bg-green-500 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-[0_4px_15px_rgba(34,197,94,0.4)] hover:scale-110 transition-transform z-30 group animate-pulse-soft" title="Hubungi CS">
+    <!-- TOMBOL CS MENGAMBANG -->
+    <button onclick="window.contactCS('Halo Admin Yola Promo, saya butuh bantuan...')" class="fixed bottom-6 right-6 bg-green-600 text-white w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-[0_4px_15px_rgba(22,163,74,0.4)] hover:scale-110 transition-transform z-30 group animate-pulse-soft" title="Hubungi CS">
       <i class="fab fa-whatsapp"></i>
       <span class="absolute right-16 bg-white dark:bg-slate-800 text-gray-800 dark:text-white text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none uppercase tracking-wider border dark:border-slate-700">Tanya CS</span>
-    </a>
+    </button>
 
     <!-- Sidebar Keranjang -->
     <div id="cartSidebar" class="fixed inset-y-0 right-0 w-full md:w-[400px] bg-white dark:bg-slate-800 shadow-2xl flex flex-col border-l dark:border-slate-700 transition-colors">
-      <div class="p-5 bg-blue-600 dark:bg-slate-900 text-white flex justify-between items-center shadow-md z-10">
+      <div class="p-5 bg-red-600 dark:bg-slate-900 text-white flex justify-between items-center shadow-md z-10">
         <h3 class="font-bold text-lg"><i class="fas fa-shopping-basket mr-2"></i> Keranjang Promo</h3>
-        <button onclick="toggleCart()" class="text-white hover:text-red-200 bg-blue-700 dark:bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+        <button onclick="window.toggleCart()" class="text-white hover:text-red-200 bg-red-700 dark:bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
       </div>
       <div id="cartItems" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-slate-900"></div>
       <div class="p-5 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10">
-        <div class="flex justify-between font-bold text-xl mb-4 text-gray-800 dark:text-white">
-          <span>Total:</span><span id="cartTotal" class="text-blue-600 dark:text-blue-400">Rp 0</span>
+        <div class="flex justify-between font-bold text-lg mb-4 text-gray-800 dark:text-white">
+          <span>Total:</span><span id="cartTotal" class="text-red-600 dark:text-red-400">Rp 0</span>
         </div>
-        <button onclick="openCheckout()" class="w-full bg-green-500 text-white py-3.5 rounded-xl font-bold hover:bg-green-600 shadow-lg transition text-lg">Checkout Sekarang</button>
+        <button onclick="window.openCheckout()" class="w-full bg-green-600 text-white py-3.5 rounded-xl font-bold hover:bg-green-700 shadow-lg transition text-sm">Checkout Sekarang</button>
       </div>
     </div>
   </div>
 
 
   <!-- ==========================================
-       2. APLIKASI ADMIN (DASHBOARD)
+       2. APLIKASI ADMIN & STAF
        ========================================== -->
-  <div id="adminApp" class="hidden min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col md:flex-row transition-colors">
+  <div id="adminApp" class="hidden min-h-screen bg-slate-50 dark:bg-slate-900 flex flex-col md:flex-row transition-colors relative">
     <aside class="w-full md:w-64 bg-slate-900 dark:bg-black text-white md:min-h-screen flex flex-col shrink-0 sticky top-0 md:h-screen shadow-xl z-20">
       <div class="p-5 border-b border-slate-800 flex justify-between items-center bg-slate-950 dark:bg-black">
         <div class="flex items-center space-x-3">
-          <div class="w-8 h-8 bg-blue-600 rounded flex items-center justify-center font-bold shadow-md">Y</div>
+          <img id="adminLogo" src="https://placehold.co/100x100/dc2626/white?text=Y" class="w-8 h-8 rounded border border-white/20 object-cover bg-white" onerror="this.src='https://placehold.co/100x100/dc2626/white?text=Y'">
           <div>
-            <h2 class="font-extrabold text-lg tracking-wider text-white leading-none">ADMIN PANEL</h2>
-            <p class="text-[10px] text-blue-400 font-mono mt-1">PROMO EDITION</p>
+            <h2 class="font-extrabold text-sm tracking-wider text-white leading-none">ADMIN PANEL</h2>
+            <p class="text-[9px] text-red-400 font-mono mt-1" id="admRoleBadge">PROMO EDITION</p>
           </div>
         </div>
-        <button class="md:hidden text-slate-400 hover:text-white" onclick="document.getElementById('adminNavLinks').classList.toggle('hidden')"><i class="fas fa-bars text-xl"></i></button>
+        <button class="md:hidden text-slate-400 hover:text-white" onclick="document.getElementById('adminNavLinks').classList.toggle('hidden')"><i class="fas fa-bars"></i></button>
       </div>
-      <nav id="adminNavLinks" class="flex-1 p-4 space-y-2 hidden md:block overflow-y-auto">
-        <p class="text-[10px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-2">Menu Utama</p>
-        <button onclick="showAdminPage('overview')" id="btnAdmOverview" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-600 text-white transition text-left font-medium"><i class="fas fa-home w-5 text-center"></i> <span>Ringkasan</span></button>
-        <button onclick="showAdminPage('orders')" id="btnAdmOrders" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center"></i> <span>Data Pesanan</span></button>
-        <button onclick="showAdminPage('products')" id="btnAdmProducts" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-tags w-5 text-center"></i> <span>Katalog Promo</span></button>
-        <button onclick="showAdminPage('users')" id="btnAdmUsers" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-users w-5 text-center"></i> <span>Pelanggan</span></button>
-        <button onclick="showAdminPage('settings')" id="btnAdmSettings" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-bullhorn w-5 text-center"></i> <span>Pengaturan Promo</span></button>
+      <nav id="adminNavLinks" class="flex-1 p-4 space-y-1.5 hidden md:block overflow-y-auto text-sm">
+        <p class="text-[9px] font-bold text-slate-500 mb-2 uppercase tracking-widest pl-2">Menu Utama</p>
+        <button onclick="window.showAdminPage('overview')" id="btnAdmOverview" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg bg-red-600 text-white transition text-left font-medium"><i class="fas fa-home w-5 text-center"></i> <span>Ringkasan</span></button>
+        <button onclick="window.showAdminPage('orders')" id="btnAdmOrders" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center"></i> <span>Data Pesanan</span></button>
+        <button onclick="window.showAdminPage('products')" id="btnAdmProducts" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-tags w-5 text-center"></i> <span>Katalog Produk</span></button>
         
-        <div class="my-6 border-t border-slate-800 pt-4"></div>
-        <button onclick="toggleDarkMode()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-yellow-300 hover:bg-slate-800 transition text-left font-medium"><i id="themeIconAdm" class="fas fa-moon w-5 text-center"></i> <span>Ganti Tema</span></button>
-        <button onclick="logout()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition text-left font-medium"><i class="fas fa-sign-out-alt w-5 text-center"></i> <span>Keluar</span></button>
+        <p class="text-[9px] font-bold text-slate-500 mt-4 mb-2 uppercase tracking-widest pl-2" id="admNavGroupUser">Manajemen</p>
+        <button onclick="window.showAdminPage('users')" id="btnAdmUsers" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-users w-5 text-center"></i> <span>Pelanggan</span></button>
+        <button onclick="window.showAdminPage('staff')" id="btnAdmStaff" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-user-tie w-5 text-center"></i> <span>Staf Toko</span></button>
+        <button onclick="window.showAdminPage('settings')" id="btnAdmSettings" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-slate-300 hover:bg-slate-800 transition text-left font-medium"><i class="fas fa-cog w-5 text-center"></i> <span>Pengaturan Sistem</span></button>
+        
+        <div class="my-4 border-t border-slate-800 pt-3"></div>
+        <button onclick="window.toggleDarkMode()" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-yellow-300 hover:bg-slate-800 transition text-left font-medium"><i id="themeIconAdm" class="fas fa-moon w-5 text-center"></i> <span>Tema Tampilan</span></button>
+        <button onclick="window.logout()" class="w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-500/10 transition text-left font-medium"><i class="fas fa-sign-out-alt w-5 text-center"></i> <span>Keluar</span></button>
       </nav>
     </aside>
 
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full">
-      <div class="mb-8 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors">
+    <main class="flex-1 p-4 md:p-8 overflow-y-auto w-full relative">
+      <div class="mb-6 bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex justify-between items-center transition-colors">
         <div>
-          <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Panel Administrator 👋</h1>
-          <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Pantau transaksi diskon hari ini.</p>
+          <h1 class="text-xl font-bold text-slate-800 dark:text-white" id="admWelcomeTitle">Panel Admin 👋</h1>
+          <p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Pantau transaksi dan data secara real-time.</p>
         </div>
       </div>
       
       <!-- Halaman Ringkasan -->
       <div id="admOverviewPage" class="block">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center text-xl"><i class="fas fa-wallet"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Total Omset</h3><div id="statRevenue" class="text-xl font-extrabold text-slate-800 dark:text-white">Rp 0</div></div></div>
-          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 flex items-center justify-center text-xl"><i class="fas fa-check-circle"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Pesanan Selesai</h3><div id="statCompleted" class="text-xl font-extrabold text-slate-800 dark:text-white">0</div></div></div>
-          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center text-xl"><i class="fas fa-clock"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Perlu Diproses</h3><div id="statPending" class="text-xl font-extrabold text-slate-800 dark:text-white">0</div></div></div>
-          <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-12 h-12 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-xl"><i class="fas fa-users"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-1">Pelanggan</h3><div id="statUsers" class="text-xl font-extrabold text-slate-800 dark:text-white">0</div></div></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-10 h-10 rounded-full bg-red-50 dark:bg-red-900/30 text-red-600 flex items-center justify-center"><i class="fas fa-wallet"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Total Omset</h3><div id="statRevenue" class="text-lg font-extrabold text-slate-800 dark:text-white">Rp 0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-10 h-10 rounded-full bg-green-50 dark:bg-green-900/30 text-green-600 flex items-center justify-center"><i class="fas fa-check-circle"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Pesanan Selesai</h3><div id="statCompleted" class="text-lg font-extrabold text-slate-800 dark:text-white">0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-10 h-10 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-600 flex items-center justify-center"><i class="fas fa-clock"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Perlu Diproses</h3><div id="statPending" class="text-lg font-extrabold text-slate-800 dark:text-white">0</div></div></div>
+          <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center space-x-4"><div class="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center"><i class="fas fa-users"></i></div><div><h3 class="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase">Pelanggan Aktif</h3><div id="statUsers" class="text-lg font-extrabold text-slate-800 dark:text-white">0</div></div></div>
         </div>
       </div>
 
       <!-- Halaman Pesanan -->
       <div id="admOrdersPage" class="hidden">
-        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
-          <h2 class="text-xl font-bold text-slate-800 dark:text-white">Manajemen Pesanan</h2>
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-3">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white">Data Pesanan</h2>
           <div class="flex space-x-2">
-            <select id="adminFilterOrder" onchange="renderAdminOrders()" class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:border-blue-500 outline-none text-gray-800 dark:text-white">
+            <select id="adminFilterOrder" class="px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:border-red-500 outline-none dark:text-white">
               <option value="Semua">Semua Status</option>
               <option value="Menunggu">Menunggu</option>
               <option value="Diproses">Diproses</option>
               <option value="Selesai">Selesai</option>
               <option value="Batal">Batal</option>
             </select>
-            <input type="text" id="adminSearchOrder" onkeyup="renderAdminOrders()" placeholder="Cari ID/Nama..." class="w-40 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:border-blue-500 outline-none text-gray-800 dark:text-white">
+            <input type="text" id="adminSearchOrder" placeholder="Cari ID/Nama..." class="w-40 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:border-red-500 outline-none dark:text-white">
           </div>
         </div>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[1000px]">
+            <table class="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-xs uppercase tracking-wider">
-                  <th class="p-4 font-semibold w-1/5">ID & Waktu</th>
-                  <th class="p-4 font-semibold w-1/4">Info Pelanggan</th>
-                  <th class="p-4 font-semibold w-1/4">Tagihan & Tipe</th>
-                  <th class="p-4 font-semibold text-center">Status</th>
-                  <th class="p-4 font-semibold text-center">Aksi Manajemen</th>
+                <tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-[10px] uppercase tracking-wider">
+                  <th class="p-3">ID & Waktu</th>
+                  <th class="p-3">Info Pelanggan</th>
+                  <th class="p-3">Tagihan & Tipe</th>
+                  <th class="p-3 text-center">Status</th>
+                  <th class="p-3 text-center">Aksi Manajemen</th>
                 </tr>
               </thead>
               <tbody id="adminFullOrdersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
@@ -376,16 +450,16 @@
         </div>
       </div>
 
-      <!-- Halaman Katalog Produk -->
+      <!-- Halaman Produk -->
       <div id="admProductsPage" class="hidden">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h2 class="text-xl font-bold text-slate-800 dark:text-white">Katalog Item Promo</h2>
-          <button onclick="openProductModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold hover:bg-blue-700 shadow-sm flex items-center"><i class="fas fa-plus mr-2"></i> Tambah Item Promo</button>
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white">Katalog Produk & Stok</h2>
+          <button onclick="window.openProductModal()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-700 text-xs flex items-center shadow-sm"><i class="fas fa-plus mr-1.5"></i> Tambah Produk</button>
         </div>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[700px]">
-              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-xs uppercase tracking-wider"><th class="p-4">Visual</th><th class="p-4">Produk</th><th class="p-4">Kategori Promo</th><th class="p-4">Harga Coret -> Diskon</th><th class="p-4 text-center">Opsi</th></tr></thead>
+            <table class="w-full text-left border-collapse min-w-[800px]">
+              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-[10px] uppercase tracking-wider"><th class="p-3">Gambar</th><th class="p-3">Nama Produk</th><th class="p-3">Kategori</th><th class="p-3 text-center">Stok</th><th class="p-3">Harga</th><th class="p-3 text-center">Opsi</th></tr></thead>
               <tbody id="adminProductsTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
             </table>
           </div>
@@ -394,755 +468,1012 @@
 
       <!-- Halaman Pelanggan -->
       <div id="admUsersPage" class="hidden">
-        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Data Pelanggan</h2>
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-3">
+           <h2 class="text-lg font-bold text-slate-800 dark:text-white">Data Pelanggan</h2>
+           <input type="text" id="adminSearchUser" placeholder="Cari Nama/WA..." class="w-48 px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-xs focus:border-red-500 outline-none dark:text-white">
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse min-w-[600px]">
-              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-xs uppercase tracking-wider"><th class="p-4">Nama Pelanggan</th><th class="p-4">Kontak WhatsApp</th><th class="p-4">Alamat Default</th><th class="p-4">Bergabung</th></tr></thead>
+            <table class="w-full text-left border-collapse min-w-[800px]">
+              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-[10px] uppercase tracking-wider"><th class="p-3">Nama Pelanggan</th><th class="p-3">No WhatsApp</th><th class="p-3">Alamat</th><th class="p-3 text-center">Izin Reset Password</th><th class="p-3 text-center">Opsi Edit/Hapus</th></tr></thead>
               <tbody id="adminUsersTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Halaman Pengaturan Banner -->
-      <div id="admSettingsPage" class="hidden">
-        <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-6">Pengaturan Banner Depan</h2>
-        <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 max-w-2xl">
-          <form onsubmit="saveBanner(event)" class="space-y-4">
-            <div>
-               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Teks Badge (Contoh: PROMO SPESIAL)</label>
-               <input type="text" id="banBadge" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-gray-800 dark:text-white">
-            </div>
-            <div>
-               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Judul Utama</label>
-               <input type="text" id="banTitle" required placeholder="Gunakan \n untuk baris baru" class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-gray-800 dark:text-white">
-            </div>
-            <div>
-               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Sub-judul / Keterangan</label>
-               <input type="text" id="banSubtitle" required class="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-gray-800 dark:text-white">
-            </div>
-            <div>
-               <label class="block text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Emoji Besar</label>
-               <input type="text" id="banEmoji" required class="w-24 px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-center text-2xl text-gray-800 dark:text-white">
-            </div>
-            <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 shadow-md transition mt-4">Simpan Banner</button>
-          </form>
+      <!-- Halaman Staf Toko -->
+      <div id="admStaffPage" class="hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+          <h2 class="text-lg font-bold text-slate-800 dark:text-white">Manajemen Akun Staf Toko</h2>
+          <button onclick="window.openUserModal(null, 'staff')" class="bg-slate-800 dark:bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center shadow-sm hover:bg-slate-700 dark:hover:bg-red-700"><i class="fas fa-user-plus mr-1.5"></i> Buat Akun Staf</button>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[600px]">
+              <thead><tr class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 border-b dark:border-slate-700 text-[10px] uppercase tracking-wider"><th class="p-3">Nama Staf</th><th class="p-3">Username / WA</th><th class="p-3">Dibuat Sejak</th><th class="p-3 text-center">Aksi Manajemen</th></tr></thead>
+              <tbody id="adminStaffTableBody" class="divide-y divide-slate-100 dark:divide-slate-700"></tbody>
+            </table>
+          </div>
         </div>
       </div>
 
+      <!-- Halaman Pengaturan Toko -->
+      <div id="admSettingsPage" class="hidden">
+        <h2 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Pengaturan Sistem Yola</h2>
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 max-w-3xl">
+          <form id="formSettings" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                 <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Teks Badge Banner</label>
+                 <input type="text" id="setBanBadge" required class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-sm dark:text-white">
+              </div>
+              <div>
+                 <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">No. WhatsApp CS Toko</label>
+                 <input type="tel" id="setWaCs" required placeholder="6281234567890" class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-sm dark:text-white">
+              </div>
+            </div>
+            <div>
+               <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Judul Utama Banner</label>
+               <input type="text" id="setBanTitle" required placeholder="Gunakan \n untuk baris baru" class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-sm dark:text-white">
+            </div>
+            <div>
+               <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Sub-judul Banner</label>
+               <input type="text" id="setBanSubtitle" required class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-sm dark:text-white">
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-gray-100 dark:border-slate-700 pt-4 mt-2">
+              <div>
+                 <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Upload Logo Toko</label>
+                 <input type="file" id="setLogoFile" accept="image/*" class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
+                 <input type="hidden" id="setLogoBase64">
+              </div>
+              <div>
+                 <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Upload Gambar Banner (Hero)</label>
+                 <input type="file" id="setHeroFile" accept="image/*" class="w-full px-3 py-2 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
+                 <input type="hidden" id="setHeroBase64">
+              </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 shadow-sm transition mt-4 flex justify-center items-center text-sm">
+               <span>Simpan Semua Pengaturan</span><div id="loaderSettings" class="loader ml-2 hidden"></div>
+            </button>
+          </form>
+        </div>
+      </div>
     </main>
   </div>
 
 
   <!-- ==========================================
-       3. MODALS (POP-UP)
+       3. MODALS (FORM POP-UP)
        ========================================== -->
 
   <!-- Modal Checkout -->
-  <div id="checkoutModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4 z-[999]">
-    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border dark:border-slate-700">
-      <div class="bg-blue-600 dark:bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
-        <h3 class="font-bold text-lg"><i class="fas fa-truck mr-2"></i> Form Pembayaran</h3>
-        <button onclick="closeModal('checkoutModal')" class="bg-blue-700 dark:bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center"><i class="fas fa-times"></i></button>
+  <div id="checkoutModal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] border dark:border-slate-700">
+      <div class="bg-red-600 dark:bg-slate-900 text-white p-4 flex justify-between items-center shrink-0">
+        <h3 class="font-bold text-sm"><i class="fas fa-truck mr-1.5"></i> Form Pembayaran</h3>
+        <button onclick="window.closeModal('checkoutModal')" class="bg-red-700 dark:bg-slate-800 w-7 h-7 rounded-full flex items-center justify-center text-sm"><i class="fas fa-times"></i></button>
       </div>
-      <form id="checkoutForm" onsubmit="processCheckout(event)" class="p-6 space-y-4 overflow-y-auto bg-slate-50 dark:bg-slate-800">
-        <div class="bg-blue-50 dark:bg-slate-700/50 border border-blue-100 dark:border-slate-600 p-3 rounded-xl flex items-start space-x-3 mb-2">
-           <i class="fas fa-info-circle text-blue-500 mt-0.5"></i><p class="text-[11px] text-blue-800 dark:text-gray-300">Data terisi otomatis dari profil. Ubah jika dikirim ke tempat lain.</p>
-        </div>
-        <div class="flex space-x-3 mb-2">
+      <form id="checkoutForm" class="p-5 space-y-4 overflow-y-auto bg-slate-50 dark:bg-slate-800">
+        <div class="flex space-x-3 mb-1">
           <div class="w-1/2">
-            <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Pengiriman</label>
-            <select id="custShipping" class="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:border-blue-500 outline-none font-medium text-sm text-gray-800 dark:text-white">
-              <option value="Kurir Toko">Kirim via Kurir</option>
-              <option value="Ambil di Toko">Ambil di Toko</option>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Pengiriman</label>
+            <select id="custShipping" class="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
+              <option value="Kurir Toko">Kurir Toko</option><option value="Ambil di Toko">Ambil di Toko</option>
             </select>
           </div>
           <div class="w-1/2">
-            <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Pembayaran</label>
-            <select id="custPayment" class="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-xl focus:border-blue-500 outline-none font-medium text-sm text-gray-800 dark:text-white">
-              <option value="COD (Cash)">COD (Bayar Tunai)</option>
-              <option value="Transfer Bank">Transfer Bank</option>
+            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Pembayaran</label>
+            <select id="custPayment" class="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
+              <option value="COD (Cash)">Bayar Tunai (COD)</option><option value="Transfer Bank">Transfer Bank</option>
             </select>
           </div>
         </div>
-        <div>
-          <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nama Penerima</label>
-          <input type="text" id="custName" required class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none font-medium text-gray-800 dark:text-white">
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Nomor WhatsApp Aktif</label>
-          <input type="tel" id="custPhone" required class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none font-medium text-gray-800 dark:text-white">
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">Alamat Tujuan</label>
-          <textarea id="custAddress" required rows="2" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none resize-none text-sm text-gray-800 dark:text-white"></textarea>
-        </div>
-        <button type="submit" id="btnSubmitOrder" class="w-full bg-green-500 text-white py-4 rounded-xl font-bold hover:bg-green-600 shadow-md flex justify-center items-center space-x-2 mt-2">
-          <span>Kirim Pesanan Sekarang</span><div id="submitLoader" class="loader hidden"></div>
+        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nama Penerima</label><input type="text" id="custName" required class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white"></div>
+        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">No WhatsApp Aktif</label><input type="tel" id="custPhone" required class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white"></div>
+        <div><label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Alamat Tujuan</label><textarea id="custAddress" required rows="2" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none resize-none text-xs dark:text-white"></textarea></div>
+        <button type="submit" id="btnSubmitOrder" class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 shadow flex justify-center items-center text-sm">
+          <span>Kirim Pesanan Sekarang</span><div id="submitLoader" class="loader ml-2 hidden"></div>
         </button>
       </form>
     </div>
   </div>
 
-  <!-- Modal Struk/Invoice (Customer) -->
-  <div id="invoiceModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4 z-[999]">
-    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col relative border-t-8 border-blue-600 dark:border-blue-500">
-      <button onclick="closeModal('invoiceModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-times text-xl"></i></button>
-      <div class="p-6 pt-8 text-center border-b border-dashed border-gray-300 dark:border-slate-600">
-        <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-2 text-xl"><i class="fas fa-receipt"></i></div>
-        <h2 class="font-bold text-xl text-gray-800 dark:text-white">TOSERBA YOLA</h2>
-        <p class="text-xs text-gray-500 dark:text-gray-400" id="invDate">Tanggal</p>
+  <!-- Modal Struk/Invoice -->
+  <div id="invoiceModal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-xl overflow-hidden flex flex-col relative border-t-8 border-red-600">
+      <button onclick="window.closeModal('invoiceModal')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 dark:hover:text-white"><i class="fas fa-times"></i></button>
+      <div class="p-5 pt-8 text-center border-b border-dashed border-gray-200 dark:border-slate-600">
+        <img id="invLogo" src="https://placehold.co/100x100/dc2626/white?text=Y" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border dark:border-slate-700" onerror="this.src='https://placehold.co/100x100/dc2626/white?text=Y'">
+        <h2 class="font-bold text-lg text-gray-800 dark:text-white">TOSERBA YOLA</h2>
+        <p class="text-[10px] text-gray-500" id="invDate">Tanggal</p>
       </div>
-      <div class="p-6 bg-gray-50 dark:bg-slate-700/30 text-sm">
-        <div class="flex justify-between mb-2"><span class="text-gray-500 dark:text-gray-400">Order ID:</span><strong id="invId" class="text-blue-600 dark:text-blue-400">ORD-123</strong></div>
-        <div class="flex justify-between mb-2"><span class="text-gray-500 dark:text-gray-400">Status:</span><strong id="invStatus" class="dark:text-white">Selesai</strong></div>
-        <div class="flex justify-between mb-4"><span class="text-gray-500 dark:text-gray-400">Metode:</span><strong id="invMethod" class="text-gray-800 dark:text-gray-200 text-right">COD</strong></div>
+      <div class="p-5 bg-gray-50 dark:bg-slate-700/30 text-xs">
+        <div class="flex justify-between mb-2"><span class="text-gray-500">Order ID:</span><strong id="invId" class="text-red-600 dark:text-red-400">ORD</strong></div>
+        <div class="flex justify-between mb-2"><span class="text-gray-500">Status:</span><strong id="invStatus" class="dark:text-white">Selesai</strong></div>
+        <div class="flex justify-between mb-4"><span class="text-gray-500">Metode:</span><strong id="invMethod" class="text-gray-800 dark:text-gray-200 text-right">COD</strong></div>
         <div class="border-t border-b border-gray-200 dark:border-slate-600 py-3 mb-4 space-y-2" id="invItems"></div>
-        <div class="flex justify-between text-base"><span class="font-bold text-gray-700 dark:text-gray-300">Total Pembayaran:</span><strong id="invTotal" class="text-blue-700 dark:text-blue-400 text-lg">Rp 0</strong></div>
+        <div class="flex justify-between text-sm"><span class="font-bold text-gray-700 dark:text-gray-300">Total Tagihan:</span><strong id="invTotal" class="text-red-700 dark:text-red-400">Rp 0</strong></div>
       </div>
-      <div class="p-4 bg-white dark:bg-slate-800 text-center text-xs text-gray-400 dark:text-gray-500 border-t dark:border-slate-700">Terima kasih telah memborong promo Yola!</div>
+      <div class="p-3 bg-white dark:bg-slate-800 text-center text-[10px] text-gray-400 border-t dark:border-slate-700">Terima kasih telah belanja promo!</div>
     </div>
   </div>
 
-  <!-- Modal Form Produk (Admin Add/Edit) -->
-  <div id="productFormModal" class="modal-overlay fixed inset-0 flex items-center justify-center px-4 z-[999]">
-    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border dark:border-slate-700">
-      <div class="bg-slate-900 dark:bg-black text-white p-5 flex justify-between items-center">
-        <h3 class="font-bold text-lg" id="prodModalTitle"><i class="fas fa-box-open mr-2"></i> Form Promo Produk</h3>
-        <button onclick="closeModal('productFormModal')" class="text-slate-400 bg-slate-800 dark:bg-slate-900 w-8 h-8 rounded-full"><i class="fas fa-times"></i></button>
+  <!-- Modal Admin Form Produk -->
+  <div id="productFormModal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-xl overflow-hidden border dark:border-slate-700">
+      <div class="bg-slate-900 dark:bg-black text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-sm" id="prodModalTitle"><i class="fas fa-box-open mr-1.5"></i> Form Produk Promo</h3>
+        <button onclick="window.closeModal('productFormModal')" class="text-slate-400 bg-slate-800 w-7 h-7 rounded-full text-xs"><i class="fas fa-times"></i></button>
       </div>
-      <form id="productForm" onsubmit="saveProduct(event)" class="p-6 space-y-4 bg-slate-50 dark:bg-slate-800">
+      <form id="productForm" class="p-5 space-y-3 bg-slate-50 dark:bg-slate-800">
         <input type="hidden" id="prodIdForm">
-        <div class="flex space-x-4">
-          <div class="w-1/3">
-            <label class="block text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-1">Emoji</label>
-            <input type="text" id="prodEmoji" required placeholder="🍎" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none text-center text-xl shadow-sm dark:text-white">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Upload Gambar Produk</label>
+          <input type="file" id="prodImgFile" accept="image/*" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
+          <input type="hidden" id="prodImgBase64">
+        </div>
+        <div class="flex space-x-3">
+          <div class="w-1/2">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nama Produk</label>
+            <input type="text" id="prodName" required class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
           </div>
-          <div class="w-2/3">
-            <label class="block text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-1">Kategori Promo</label>
-            <select id="prodCategory" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm font-medium dark:text-white">
-              <option value="Promo Sensabu">Promo Sensabu</option>
-              <option value="Jusami">Jusami</option>
-              <option value="Promo Gajian">Promo Gajian</option>
-              <option value="Promo Hemat Setiap Hari">Promo Hemat Setiap Hari</option>
+          <div class="w-1/2">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kategori Promo</label>
+            <select id="prodCategory" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-[11px] font-medium dark:text-white">
+              <option value="Promo Sensabu">Sensabu</option><option value="Jusami">Jusami</option>
+              <option value="Promo Gajian">Gajian</option><option value="Promo Hemat Setiap Hari">Hemat Harian</option>
             </select>
           </div>
         </div>
         <div>
-          <label class="block text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nama Produk Promo</label>
-          <input type="text" id="prodName" required class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-xl focus:border-blue-500 outline-none shadow-sm text-sm dark:text-white">
+          <label class="block text-[10px] font-bold text-red-500 uppercase mb-1">Stok Tersedia</label>
+          <input type="number" id="prodStock" required min="0" placeholder="50" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-red-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
         </div>
-        <div class="flex space-x-4">
+        <div class="flex space-x-3">
           <div class="w-1/2">
-            <label class="block text-[10px] font-bold text-red-500 dark:text-red-400 uppercase tracking-wider mb-1">Harga Asli (Dicoret)</label>
-            <input type="number" id="prodOrigPrice" required min="100" placeholder="15000" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-red-200 dark:border-red-900 rounded-xl focus:border-red-500 outline-none shadow-sm text-sm dark:text-white">
+            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Harga Asli (Coret)</label>
+            <input type="number" id="prodOrigPrice" required min="100" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:border-red-500 outline-none text-xs dark:text-white">
           </div>
           <div class="w-1/2">
-            <label class="block text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-wider mb-1">Harga Promo (Jual)</label>
-            <input type="number" id="prodPrice" required min="100" placeholder="10000" class="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-green-200 dark:border-green-900 rounded-xl focus:border-green-500 outline-none shadow-sm text-sm dark:text-white font-bold">
+            <label class="block text-[10px] font-bold text-green-600 uppercase mb-1">Harga Diskon (Jual)</label>
+            <input type="number" id="prodPrice" required min="100" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-green-200 dark:border-slate-600 rounded-lg focus:border-green-500 outline-none text-xs font-bold dark:text-white">
           </div>
         </div>
-        <button type="submit" class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 mt-4 shadow-md transition text-sm">Simpan Data Promo</button>
+        <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-xl font-bold hover:bg-red-700 mt-2 flex justify-center items-center text-sm shadow">
+          <span>Simpan Data Produk</span><div id="loaderProd" class="loader ml-2 hidden"></div>
+        </button>
       </form>
     </div>
   </div>
 
-  <!-- Custom Dialog -->
-  <div id="customDialog" class="modal-overlay fixed inset-0 flex items-center justify-center px-4" style="z-index: 10000;">
+  <!-- Modal Edit User/Staff -->
+  <div id="userFormModal" class="modal-overlay fixed inset-0 flex items-center justify-center p-4">
+    <div class="modal-content bg-white dark:bg-slate-800 w-full max-w-sm rounded-2xl shadow-xl overflow-hidden border dark:border-slate-700">
+      <div class="bg-red-600 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-sm" id="userModalTitle"><i class="fas fa-user-edit mr-1.5"></i> Edit Akun</h3>
+        <button onclick="window.closeModal('userFormModal')" class="text-white hover:text-gray-200 text-sm"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="formEditUser" class="p-5 space-y-3 bg-slate-50 dark:bg-slate-800">
+        <input type="hidden" id="editUserRole">
+        <input type="hidden" id="editUserIsNew">
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nama Lengkap</label>
+          <input type="text" id="editUserName" required class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg outline-none text-xs dark:text-white">
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Nomor WA / Username ID</label>
+          <input type="text" id="editUserPhone" required class="w-full px-3 py-2 bg-gray-100 dark:bg-slate-600/50 border border-gray-200 dark:border-slate-700 rounded-lg outline-none text-xs text-gray-500" placeholder="Diisi saat buat baru">
+          <p class="text-[9px] text-gray-400 mt-0.5" id="editUserPhoneHint">*ID/Nomor tidak bisa diganti jika sudah tersimpan.</p>
+        </div>
+        <div>
+          <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Password</label>
+          <input type="text" id="editUserPass" required class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg outline-none text-xs dark:text-white">
+        </div>
+        <div id="divEditAddress">
+          <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Alamat (Optional)</label>
+          <textarea id="editUserAddress" rows="2" class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg outline-none resize-none text-xs dark:text-white"></textarea>
+        </div>
+        <button type="submit" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 mt-2 flex justify-center items-center text-sm shadow">
+          <span>Simpan Data Akun</span><div id="loaderUserEdit" class="loader w-3 h-3 ml-2 hidden"></div>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Dialog Confirm -->
+  <div id="customDialog" class="modal-overlay fixed inset-0 flex items-center justify-center px-4">
     <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 md:p-8 max-w-sm w-full shadow-2xl text-center transform scale-95 transition-transform duration-200 border dark:border-slate-700" id="dialogBox">
       <div id="dialogIcon" class="text-5xl mb-4">❓</div>
-      <h3 id="dialogTitle" class="text-xl font-extrabold text-gray-800 dark:text-white mb-2">Konfirmasi</h3>
+      <h3 id="dialogTitle" class="text-lg font-extrabold text-gray-800 dark:text-white mb-2">Konfirmasi</h3>
       <p id="dialogMessage" class="text-gray-500 dark:text-gray-400 mb-6 text-sm">Apakah Anda yakin?</p>
       <div class="flex space-x-3 justify-center">
-        <button id="dialogBtnCancel" class="flex-1 px-4 py-3 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold hover:bg-gray-200 dark:hover:bg-slate-600 transition hidden">Batal</button>
-        <button id="dialogBtnConfirm" class="flex-1 px-4 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-md transition">Tutup</button>
+        <button id="dialogBtnCancel" class="flex-1 px-4 py-2.5 rounded-xl bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-bold hover:bg-gray-200 text-sm hidden">Batal</button>
+        <button id="dialogBtnConfirm" class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 shadow flex justify-center items-center text-sm">
+           <span>Tutup</span><div id="loaderDialog" class="loader w-3 h-3 ml-2 hidden"></div>
+        </button>
       </div>
     </div>
   </div>
 
-
   <!-- ==========================================
-       4. LOGIKA JAVASCRIPT UTAMA
+       4. LOGIKA JAVASCRIPT (FIREBASE CLOUD & GUEST MODE)
        ========================================== -->
-  <script>
-    const GOOGLE_SHEETS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz_XXXXXXXXX_YYYYYYY/exec'; 
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, doc, setDoc, getDoc, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+    // Formatters
     const formatRp = (angka) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-    
-    // Format nomor HP
     const formatWaNumber = (phone) => {
       let p = phone.toString().replace(/[^0-9]/g, '');
       if(p.startsWith('0')) p = '62' + p.substring(1);
       return p;
     };
-    
-    // --- DARK MODE LOGIC ---
-    let isDarkMode = localStorage.getItem('yola_theme') === 'dark';
-    function applyTheme() {
-      if (isDarkMode) document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
-      ['themeIconDesk', 'themeIconMob', 'themeIconAdm'].forEach(id => {
-        let el = document.getElementById(id);
-        if(el) el.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+
+    // Firebase Setup
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'yola-app-v4';
+
+    // Global App State
+    let state = {
+      products: [], orders: [], users: [],
+      settings: { 
+        badge: 'PROMO SPESIAL', title: 'Belanja Kebutuhan\nJadi Lebih Mudah', subtitle: 'Harga grosir, diskon maksimal. Amankan sekarang!', 
+        heroImg: 'https://placehold.co/400x400/transparent/dc2626?text=🛒', logoUrl: 'https://placehold.co/150x150/dc2626/white?text=YOLA', waCs: '6281234567890' 
+      },
+      currentUserInfo: null, // null = Guest, object = Logged in (customer, admin, staff)
+      cart: [], currentCategory: 'Semua', searchQuery: '',
+      unsubscribeListeners: []
+    };
+
+    // --- UTILITIES ---
+    window.showToast = (message, type = 'success') => {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let icon = type === 'success' ? '<i class="fas fa-check-circle text-green-500 text-xl"></i>' : (type === 'error' ? '<i class="fas fa-times-circle text-red-500 text-xl"></i>' : '<i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `${icon} <div><p class="text-xs font-bold dark:text-white">${type==='success'?'Berhasil!':(type==='error'?'Gagal!':'Perhatian')}</p><p class="text-[10px] text-gray-500 mt-0.5">${message}</p></div>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3000);
+    };
+
+    window.confirmCustomDialog = (title, msg, cb) => {
+      const d = document.getElementById('customDialog'); document.getElementById('dialogTitle').innerHTML = title; document.getElementById('dialogMessage').innerHTML = msg; document.getElementById('dialogIcon').innerHTML = '<i class="fas fa-question-circle text-red-600"></i>';
+      const c = document.getElementById('dialogBtnCancel'), o = document.getElementById('dialogBtnConfirm'); c.classList.remove('hidden');
+      o.querySelector('span').innerText = 'Ya, Lanjutkan';
+      c.onclick = () => { d.classList.remove('active'); setTimeout(() => d.classList.add('hidden'), 300); };
+      o.onclick = async () => { 
+        document.getElementById('loaderDialog').classList.remove('hidden');
+        await cb(); 
+        document.getElementById('loaderDialog').classList.add('hidden');
+        d.classList.remove('active'); setTimeout(() => d.classList.add('hidden'), 300); 
+      };
+      d.classList.remove('hidden'); setTimeout(() => d.classList.add('active'), 10);
+    };
+
+    window.openModal = (id) => document.getElementById(id).classList.add('active');
+    window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+    window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); };
+
+    // COMPRESS IMAGE TO BASE64 (Safe for Firestore)
+    const compressImage = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 600; const MAX_HEIGHT = 600;
+            let width = img.width; let height = img.height;
+            if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+            else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+            canvas.width = width; canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.6)); // 60% quality
+          };
+          img.onerror = (e) => reject(e);
+        };
+        reader.onerror = (e) => reject(e);
       });
-    }
-    function toggleDarkMode() {
-      isDarkMode = !isDarkMode;
-      localStorage.setItem('yola_theme', isDarkMode ? 'dark' : 'light');
-      applyTheme();
-    }
-    applyTheme(); // Panggil di awal
+    };
 
-    // --- DEFAULT DATA PROMO ---
-    const defaultProducts = [
-      { id: 1, name: 'Beras Premium 5kg', originalPrice: 75000, price: 65000, img: '🌾', category: 'Promo Sensabu' },
-      { id: 2, name: 'Minyak Goreng 2L', originalPrice: 38000, price: 34000, img: '🛢️', category: 'Jusami' },
-      { id: 3, name: 'Gula Pasir 1kg', originalPrice: 18000, price: 15000, img: '🍚', category: 'Promo Hemat Setiap Hari' },
-      { id: 4, name: 'Susu UHT 1L', originalPrice: 22000, price: 18000, img: '🥛', category: 'Promo Sensabu' },
-      { id: 5, name: 'Telur Ayam 1kg', originalPrice: 30000, price: 27000, img: '🥚', category: 'Promo Gajian' },
-      { id: 6, name: 'Sabun Mandi Cair', originalPrice: 28000, price: 22000, img: '🧼', category: 'Jusami' },
-      { id: 7, name: 'Mie Instan (5 Pcs)', originalPrice: 17500, price: 15000, img: '🍜', category: 'Promo Hemat Setiap Hari' },
-      { id: 8, name: 'Kopi Kapal Api', originalPrice: 15000, price: 12500, img: '☕', category: 'Promo Gajian' }
-    ];
-
-    let products = JSON.parse(localStorage.getItem('yola_products_v2'));
-    if(!products) {
-      products = defaultProducts;
-      localStorage.setItem('yola_products_v2', JSON.stringify(products));
+    // --- DARK MODE ---
+    let isDarkMode = localStorage.getItem('yola_theme') === 'dark';
+    window.applyTheme = () => {
+      if (isDarkMode) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark');
+      ['themeIconDesk', 'themeIconMob', 'themeIconAdm'].forEach(id => { let el = document.getElementById(id); if(el) el.className = isDarkMode ? 'fas fa-sun' : 'fas fa-moon'; });
     }
-    
-    const defaultBanner = { badge: 'PROMO SPESIAL', title: 'Belanja Kebutuhan\nJadi Lebih Mudah', subtitle: 'Harga grosir, diskon maksimal. Amankan sekarang!', emoji: '🛍️' };
-    let bannerData = JSON.parse(localStorage.getItem('yola_banner')) || defaultBanner;
+    window.toggleDarkMode = () => { isDarkMode = !isDarkMode; localStorage.setItem('yola_theme', isDarkMode ? 'dark' : 'light'); window.applyTheme(); }
+    window.applyTheme();
 
-    function applyBanner() {
-      document.getElementById('heroBadge').innerText = bannerData.badge;
-      document.getElementById('heroTitle').innerText = bannerData.title;
-      document.getElementById('heroSubtitle').innerText = bannerData.subtitle;
-      document.getElementById('heroEmoji').innerText = bannerData.emoji;
-      
-      // Isi form admin jika ada
-      if(document.getElementById('banBadge')) {
-        document.getElementById('banBadge').value = bannerData.badge;
-        document.getElementById('banTitle').value = bannerData.title.replace(/\n/g, '\\n');
-        document.getElementById('banSubtitle').value = bannerData.subtitle;
-        document.getElementById('banEmoji').value = bannerData.emoji;
+    // --- FIREBASE INIT ---
+    const initApp = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
+        else await signInAnonymously(auth);
+      } catch(e) { console.error("Auth error"); }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const localSession = localStorage.getItem('yola_session_v4');
+        if (localSession) state.currentUserInfo = JSON.parse(localSession);
+        setupDataListeners();
       }
-    }
-    
-    let cart = [], currentCategory = 'Semua', searchQuery = '', currentUser = null;
+    });
 
-    // --- SISTEM AUTENTIKASI ---
-    function switchAuthTab(type) {
-      const clsActiveCust = "flex-1 py-4 font-bold text-sm text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 bg-blue-50/30 dark:bg-blue-900/20 transition";
-      const clsInactive = "flex-1 py-4 font-bold text-sm text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:bg-gray-50 dark:hover:bg-slate-700 transition";
-      const clsActiveAdm = "flex-1 py-4 font-bold text-sm text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-slate-500 bg-slate-50/30 dark:bg-slate-700/50 transition";
+    const setupDataListeners = () => {
+      const paths = ['products', 'orders', 'users', 'settings'].map(col => collection(db, 'artifacts', appId, 'public', 'data', col));
       
-      if (type === 'customer') {
-        document.getElementById('tabCustBtn').className = clsActiveCust;
-        document.getElementById('tabAdminBtn').className = clsInactive;
-        document.getElementById('formCustomer').classList.replace('hidden', 'block');
-        document.getElementById('formAdmin').classList.replace('block', 'hidden');
+      // Products
+      state.unsubscribeListeners.push(onSnapshot(paths[0], (snapshot) => {
+        state.products = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if(state.products.length === 0) seedDefaultData();
+        renderCustomerProducts();
+        if(state.currentUserInfo?.role === 'admin' || state.currentUserInfo?.role === 'staff') renderAdminProductsTable();
+      }));
+
+      // Settings
+      state.unsubscribeListeners.push(onSnapshot(paths[3], (snapshot) => {
+        let setDoc = snapshot.docs.find(d => d.id === 'banner');
+        if (setDoc) { state.settings = { ...state.settings, ...setDoc.data() }; applySettingsUI(); }
+      }));
+
+      // Orders
+      state.unsubscribeListeners.push(onSnapshot(paths[1], (snapshot) => {
+        state.orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => b.timestamp - a.timestamp);
+        if(state.currentUserInfo?.role === 'customer' && !document.getElementById('custDashboardPage').classList.contains('hidden')) renderCustomerDashboard();
+        else if(state.currentUserInfo?.role === 'admin' || state.currentUserInfo?.role === 'staff') { renderAdminDashboard(); renderAdminOrders(); }
+      }));
+
+      // Users
+      state.unsubscribeListeners.push(onSnapshot(paths[2], (snapshot) => {
+        state.users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        // Sync current user if logged in
+        if(state.currentUserInfo) {
+          const dbUser = state.users.find(u => u.phone === state.currentUserInfo.phone);
+          if(dbUser) {
+            state.currentUserInfo = { ...state.currentUserInfo, ...dbUser };
+            localStorage.setItem('yola_session_v4', JSON.stringify(state.currentUserInfo));
+            if(state.currentUserInfo.role === 'customer' && !document.getElementById('custFavoritesPage').classList.contains('hidden')) renderFavorites();
+          } else if (state.currentUserInfo.phone !== 'admin') {
+            window.logout(true); // User was deleted by admin
+          }
+        }
+        
+        if(state.currentUserInfo?.role === 'admin') { renderAdminDashboard(); renderAdminUsersTable(); renderAdminStaffTable(); }
+        
+        setTimeout(() => { document.getElementById('appLoader').style.opacity = '0'; setTimeout(() => document.getElementById('appLoader').style.display = 'none', 500); bootRouting(); }, 1000);
+      }));
+    };
+
+    const seedDefaultData = async () => {
+      const def = [
+        { name: 'Beras Premium 5kg', originalPrice: 75000, price: 65000, img: 'https://placehold.co/400x400/f8fafc/64748b?text=Beras+5kg', category: 'Promo Sensabu', stock: 50 },
+        { name: 'Minyak Goreng 2L', originalPrice: 38000, price: 34000, img: 'https://placehold.co/400x400/f8fafc/64748b?text=Minyak+2L', category: 'Jusami', stock: 100 },
+        { name: 'Gula Pasir 1kg', originalPrice: 18000, price: 15000, img: 'https://placehold.co/400x400/f8fafc/64748b?text=Gula+1kg', category: 'Promo Hemat Setiap Hari', stock: 200 }
+      ];
+      for (const p of def) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', Date.now().toString()+Math.floor(Math.random()*1000)), p);
+    };
+
+    // --- APP ROUTING & UI SYNC ---
+    const applySettingsUI = () => {
+      document.getElementById('heroBadge').innerText = state.settings.badge;
+      document.getElementById('heroTitle').innerText = state.settings.title;
+      document.getElementById('heroSubtitle').innerText = state.settings.subtitle;
+      document.getElementById('heroImage').src = state.settings.heroImg;
+      document.getElementById('navLogo').src = state.settings.logoUrl;
+      document.getElementById('adminLogo').src = state.settings.logoUrl;
+      document.getElementById('authLogo').src = state.settings.logoUrl;
+      if(document.getElementById('invLogo')) document.getElementById('invLogo').src = state.settings.logoUrl;
+      
+      // Admin Settings Form Hidden Inputs
+      if(document.getElementById('setBanBadge')) {
+        document.getElementById('setBanBadge').value = state.settings.badge;
+        document.getElementById('setBanTitle').value = state.settings.title.replace(/\n/g, '\\n');
+        document.getElementById('setBanSubtitle').value = state.settings.subtitle;
+        document.getElementById('setWaCs').value = state.settings.waCs;
+        document.getElementById('setLogoBase64').value = state.settings.logoUrl;
+        document.getElementById('setHeroBase64').value = state.settings.heroImg;
+      }
+    };
+
+    const bootRouting = () => {
+      applySettingsUI();
+      if (state.currentUserInfo && (state.currentUserInfo.role === 'admin' || state.currentUserInfo.role === 'staff')) {
+        // ADMIN / STAFF MODE
+        document.getElementById('customerApp').classList.add('hidden');
+        document.getElementById('adminApp').classList.replace('hidden', 'flex');
+        document.getElementById('admWelcomeTitle').innerText = `Halo, ${state.currentUserInfo.name} 👋`;
+        document.getElementById('admRoleBadge').innerText = state.currentUserInfo.role === 'admin' ? 'ROOT ADMIN' : 'STAF TOKO';
+        
+        // Hide some menu for Staff
+        if(state.currentUserInfo.role === 'staff') {
+           document.getElementById('admNavGroupUser').classList.add('hidden');
+           document.getElementById('btnAdmUsers').classList.add('hidden');
+           document.getElementById('btnAdmStaff').classList.add('hidden');
+           document.getElementById('btnAdmSettings').classList.add('hidden');
+        } else {
+           document.getElementById('admNavGroupUser').classList.remove('hidden');
+           document.getElementById('btnAdmUsers').classList.remove('hidden');
+           document.getElementById('btnAdmStaff').classList.remove('hidden');
+           document.getElementById('btnAdmSettings').classList.remove('hidden');
+        }
+        window.showAdminPage('overview');
       } else {
-        document.getElementById('tabAdminBtn').className = clsActiveAdm;
-        document.getElementById('tabCustBtn').className = clsInactive;
-        document.getElementById('formAdmin').classList.replace('hidden', 'block');
-        document.getElementById('formCustomer').classList.replace('block', 'hidden');
+        // CUSTOMER / GUEST MODE
+        document.getElementById('adminApp').classList.add('hidden');
+        document.getElementById('adminApp').classList.remove('flex');
+        document.getElementById('customerApp').classList.remove('hidden');
+        
+        if (state.currentUserInfo) {
+          // Logged In Customer
+          document.getElementById('navDesktopGuest').classList.add('hidden');
+          document.getElementById('navDesktopLogged').classList.remove('hidden');
+          document.getElementById('mobGuestHeader').classList.add('hidden');
+          document.getElementById('mobLoggedHeader').classList.remove('hidden');
+          document.getElementById('mobLoggedHeader').classList.add('flex');
+          document.getElementById('mobLoggedLinks').classList.remove('hidden');
+          
+          document.getElementById('navCustName').innerText = state.currentUserInfo.name.split(' ')[0];
+          document.getElementById('mobCustName').innerText = state.currentUserInfo.name;
+        } else {
+          // Guest
+          document.getElementById('navDesktopLogged').classList.add('hidden');
+          document.getElementById('navDesktopGuest').classList.remove('hidden');
+          document.getElementById('mobLoggedHeader').classList.add('hidden');
+          document.getElementById('mobLoggedHeader').classList.remove('flex');
+          document.getElementById('mobGuestHeader').classList.remove('hidden');
+          document.getElementById('mobLoggedLinks').classList.add('hidden');
+        }
+        
+        updateCartUI(); window.showCustPage('home');
       }
-    }
+    };
 
-    function handleCustomerLogin(e) {
+    // --- AUTH MODAL LOGIC ---
+    window.openAuthModal = () => window.openModal('authAppModal');
+    window.closeAuthModal = () => window.closeModal('authAppModal');
+
+    window.switchAuthTab = (target) => {
+      document.querySelectorAll('.auth-tab-btn').forEach(b => {
+        if(b.dataset.target === target || (target === 'forgot' && b.dataset.target === 'customer')) {
+          b.className = "auth-tab-btn flex-1 py-3 font-bold text-xs text-red-600 border-b-2 border-red-600 bg-red-50/30 dark:bg-red-900/20 dark:text-red-400 dark:border-red-400";
+        } else {
+          b.className = "auth-tab-btn flex-1 py-3 font-bold text-xs text-gray-500 border-b-2 border-transparent hover:bg-gray-50 dark:hover:bg-slate-700 dark:text-gray-400";
+        }
+      });
+      ['formCustomer', 'formAdmin', 'formForgot'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      
+      if(target === 'customer') document.getElementById('formCustomer').classList.remove('hidden');
+      if(target === 'admin') document.getElementById('formAdmin').classList.remove('hidden');
+      if(target === 'forgot') document.getElementById('formForgot').classList.remove('hidden');
+    };
+
+    document.getElementById('formCustomer').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const btn = document.getElementById('btnCustLogin'); const loader = document.getElementById('loaderCustLogin');
       const name = document.getElementById('regName').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
       const pass = document.getElementById('regPass').value.trim();
       
-      if(name.length < 3 || phone.length < 10 || pass.length < 4) {
-        return showCustomDialog("Peringatan", "Data tidak lengkap! Nama, Nomor WA, dan Password (min. 4 digit) wajib diisi.", "warning");
-      }
+      if(name.length < 3 || phone.length < 10 || pass.length < 4) return window.showToast("Data tidak valid!", "warning");
 
-      let users = JSON.parse(localStorage.getItem('yola_users') || '[]');
-      let user = users.find(u => u.phone === phone);
-      
-      if (!user) {
-        user = { name, phone, pass, address: '', favorites: [], role: 'customer', joined: new Date().toLocaleDateString('id-ID') };
-        users.push(user);
-        showCustomDialog("Pendaftaran Berhasil", `Selamat bergabung, <b>${user.name}</b>! Akun berhasil dibuat.`, "success");
-      } else {
-        if (user.pass !== pass) return showCustomDialog("Akses Ditolak", "Password yang Anda masukkan salah!", "error");
-        user.name = name; 
-        if(!user.favorites) user.favorites = [];
-        if(!user.address) user.address = '';
-        showCustomDialog("Berhasil Masuk", `Selamat datang kembali, <b>${user.name}</b>! Siap berburu promo?`, "success");
-      }
-      
-      localStorage.setItem('yola_users', JSON.stringify(users));
-      localStorage.setItem('yola_session', JSON.stringify(user));
-      bootSystem();
-    }
-
-    function handleAdminLogin(e) {
-      e.preventDefault();
-      const user = document.getElementById('adminUser').value;
-      const pass = document.getElementById('adminPass').value;
-      if (user === 'admin' && pass === '@Yola123') {
-        localStorage.setItem('yola_session', JSON.stringify({ name: 'Admin', phone: 'SYSTEM', role: 'admin' }));
-        bootSystem();
-      } else {
-        showCustomDialog("Akses Ditolak", "Username atau Password Admin salah!", "error");
-      }
-    }
-
-    function logout() {
-      confirmCustomDialog("Keluar", "Yakin ingin keluar dari akun?", () => {
-        localStorage.removeItem('yola_session'); bootSystem();
-      });
-    }
-
-    function bootSystem() {
-      applyBanner();
-      const session = localStorage.getItem('yola_session');
-      if (session) {
-        currentUser = JSON.parse(session);
-        document.getElementById('authApp').classList.add('hidden');
-        if (currentUser.role === 'admin') {
-          document.getElementById('customerApp').classList.add('hidden');
-          document.getElementById('adminApp').classList.replace('hidden', 'flex');
-          showAdminPage('overview');
+      btn.disabled = true; loader.classList.remove('hidden');
+      try {
+        let userDoc = state.users.find(u => u.phone === phone);
+        if (!userDoc) {
+          const newUser = { name, phone, pass, address: '', favorites: [], role: 'customer', joined: new Date().toLocaleDateString('id-ID'), allowReset: false };
+          await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', phone), newUser);
+          state.currentUserInfo = newUser;
+          window.showToast(`Selamat bergabung, ${name}!`, "success");
         } else {
-          document.getElementById('adminApp').classList.add('hidden');
-          document.getElementById('adminApp').classList.remove('flex');
-          document.getElementById('customerApp').classList.remove('hidden');
-          
-          document.getElementById('navCustName').innerText = currentUser.name.split(' ')[0];
-          document.getElementById('mobCustName').innerText = currentUser.name;
-          
-          let users = JSON.parse(localStorage.getItem('yola_users') || '[]');
-          let dbUser = users.find(u => u.phone === currentUser.phone);
-          if(dbUser) currentUser = dbUser;
-
-          renderCustomerProducts(); updateCartUI(); showCustPage('home');
+          if (userDoc.role !== 'customer') throw new Error("Akses ditolak");
+          if (userDoc.pass !== pass) return window.showToast("Password yang dimasukkan salah!", "error");
+          state.currentUserInfo = userDoc;
+          window.showToast(`Selamat datang kembali, ${name}!`, "success");
         }
+        localStorage.setItem('yola_session_v4', JSON.stringify(state.currentUserInfo));
+        document.getElementById('formCustomer').reset(); // Clear form values
+        window.closeAuthModal(); bootRouting();
+      } catch (err) { window.showToast("Akun bukan untuk pelanggan.", "error"); } 
+      finally { btn.disabled = false; loader.classList.add('hidden'); }
+    });
+
+    document.getElementById('formAdmin').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const user = document.getElementById('adminUser').value; const pass = document.getElementById('adminPass').value;
+      
+      if (user === 'admin' && pass === '@Yola123') {
+        state.currentUserInfo = { name: 'Admin Utama', phone: 'admin', role: 'admin' };
+        localStorage.setItem('yola_session_v4', JSON.stringify(state.currentUserInfo));
+        document.getElementById('formAdmin').reset();
+        window.closeAuthModal(); bootRouting(); window.showToast("Berhasil masuk ke Panel Admin", "success");
       } else {
-        document.getElementById('authApp').classList.remove('hidden');
-        document.getElementById('customerApp').classList.add('hidden');
-        document.getElementById('adminApp').classList.replace('flex', 'hidden');
-        document.getElementById('formCustomer').reset(); document.getElementById('formAdmin').reset();
+        // Check Staff
+        let staffDoc = state.users.find(u => u.phone === user && u.role === 'staff');
+        if(staffDoc && staffDoc.pass === pass) {
+          state.currentUserInfo = staffDoc;
+          localStorage.setItem('yola_session_v4', JSON.stringify(state.currentUserInfo));
+          document.getElementById('formAdmin').reset();
+          window.closeAuthModal(); bootRouting(); window.showToast("Berhasil masuk sebagai Staf", "success");
+        } else {
+          window.showToast("Akses Ditolak! Kredensial salah.", "error");
+        }
       }
-    }
+    });
 
-    // --- FUNGSI PELANGGAN (STOREFRONT) ---
-    function filterProducts(cat) { currentCategory = cat; document.querySelectorAll('.category-btn').forEach(b => b.classList.toggle('active', b.innerText.includes(cat) || (cat==='Semua' && b.innerText==='Semua Promo'))); renderCustomerProducts(); }
-    function searchProducts(val) { searchQuery = val.toLowerCase(); renderCustomerProducts(); }
+    // LUPA PASSWORD LOGIC
+    window.requestResetWA = () => {
+      const p = document.getElementById('forgotPhoneReq').value;
+      if(!p) return window.showToast("Masukkan No WA dulu!", "warning");
+      const msg = `Halo CS Yola Promo, saya ingin meminta izin untuk mengubah password akun saya dengan nomor: *${p}*. Mohon dibantu konfirmasi.`;
+      const waNumber = formatWaNumber(state.settings.waCs);
+      window.location.href = `https://wa.me/${waNumber}?text=${encodeURIComponent(msg)}`;
+    };
 
-    function toggleFavorite(id, btnIcon) {
-      if(!currentUser || currentUser.role === 'admin') return;
-      let users = JSON.parse(localStorage.getItem('yola_users') || '[]');
-      let userIndex = users.findIndex(u => u.phone === currentUser.phone);
+    document.getElementById('formResetSubmit').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btnResetPass'); const loader = document.getElementById('loaderResetPass');
+      const phone = document.getElementById('forgotPhoneConfirm').value; const newPass = document.getElementById('forgotPassNew').value;
       
-      if(userIndex !== -1) {
-        let favs = users[userIndex].favorites || [];
-        const index = favs.indexOf(id);
-        if(index === -1) { favs.push(id); btnIcon.classList.add('fas', 'heart-active'); btnIcon.classList.remove('far'); } 
-        else { favs.splice(index, 1); btnIcon.classList.add('far'); btnIcon.classList.remove('fas', 'heart-active'); }
-        
-        users[userIndex].favorites = favs;
-        localStorage.setItem('yola_users', JSON.stringify(users));
-        currentUser.favorites = favs; 
-        if(document.getElementById('custFavoritesPage').classList.contains('hidden') === false) renderFavorites();
-      }
-    }
+      let u = state.users.find(x => x.phone === phone);
+      if(!u) return window.showToast("Nomor WA tidak terdaftar.", "error");
+      if(!u.allowReset) return window.showToast("CS belum memberikan Izin Reset. Hubungi CS terlebih dahulu.", "warning");
+      if(newPass.length < 4) return window.showToast("Password minimal 4 karakter.", "warning");
 
-    function renderProductCard(p, isFavOnly = false) {
-      const isFav = currentUser && currentUser.favorites && currentUser.favorites.includes(p.id);
+      btn.disabled = true; loader.classList.remove('hidden');
+      try {
+        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', phone), { pass: newPass, allowReset: false });
+        window.showToast("Password berhasil diubah! Silakan login.", "success");
+        document.getElementById('formForgot').reset();
+        window.switchAuthTab('customer');
+      } catch(e) { window.showToast("Gagal mengubah password.", "error"); }
+      finally { btn.disabled = false; loader.classList.add('hidden'); }
+    });
+
+    window.logout = (silent = false) => {
+      if(silent) { localStorage.removeItem('yola_session_v4'); state.currentUserInfo = null; bootRouting(); return; }
+      window.confirmCustomDialog("Keluar", "Yakin ingin keluar dari akun?", () => {
+        localStorage.removeItem('yola_session_v4'); state.currentUserInfo = null; state.cart = []; bootRouting();
+      });
+    };
+
+    // --- CUSTOMER LOGIC ---
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        state.currentCategory = e.target.getAttribute('data-cat');
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active');
+        renderCustomerProducts();
+      });
+    });
+    document.getElementById('searchProductInput').addEventListener('keyup', (e) => { state.searchQuery = e.target.value.toLowerCase(); renderCustomerProducts(); });
+
+    window.toggleFavorite = async (id, btnIcon) => {
+      if(!state.currentUserInfo) return window.openAuthModal();
+      let favs = state.currentUserInfo.favorites || []; const index = favs.indexOf(id);
+      if(index === -1) { favs.push(id); btnIcon.classList.add('fas', 'heart-active'); btnIcon.classList.remove('far'); window.showToast("Ditambahkan ke Favorit", "success"); } 
+      else { favs.splice(index, 1); btnIcon.classList.add('far'); btnIcon.classList.remove('fas', 'heart-active'); }
+      state.currentUserInfo.favorites = favs;
+      await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', state.currentUserInfo.phone), { favorites: favs });
+      if(!document.getElementById('custFavoritesPage').classList.contains('hidden')) renderFavorites();
+    };
+
+    const renderProductCard = (p, isFavOnly = false) => {
+      const isFav = state.currentUserInfo?.favorites?.includes(p.id);
       if(isFavOnly && !isFav) return '';
-      
-      const origPrice = p.originalPrice || p.price + 5000; // Fallback jika undefined
-      const discount = Math.round(((origPrice - p.price) / origPrice) * 100);
+      const origPrice = p.originalPrice || p.price + 5000; const discount = Math.round(((origPrice - p.price) / origPrice) * 100);
+      const isOutOfStock = p.stock !== undefined && p.stock <= 0;
       
       return `
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 hover:shadow-xl transition relative flex flex-col h-full overflow-hidden">
-          <div class="absolute top-0 left-0 bg-red-500 text-white text-[9px] font-bold px-2 py-1 rounded-br-lg z-10">HEMAT ${discount}%</div>
-          <button onclick="toggleFavorite(${p.id}, this.querySelector('i'))" class="absolute top-3 right-3 text-gray-300 dark:text-gray-500 hover:text-red-500 z-10 transition focus:outline-none">
-            <i class="${isFav ? 'fas heart-active' : 'far'} fa-heart text-xl transition-transform"></i>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-3 md:p-4 hover:shadow-xl transition relative flex flex-col h-full overflow-hidden ${isOutOfStock ? 'opacity-70 grayscale-[30%]' : ''}">
+          <div class="absolute top-0 left-0 bg-red-600 text-white text-[9px] font-bold px-2 py-1 rounded-br-lg z-10">HEMAT ${discount}%</div>
+          <button onclick="window.toggleFavorite('${p.id}', this.querySelector('i'))" class="absolute top-3 right-3 text-gray-300 dark:text-gray-500 hover:text-red-500 z-10 transition focus:outline-none">
+            <i class="${isFav ? 'fas heart-active' : 'far'} fa-heart text-lg md:text-xl transition-transform"></i>
           </button>
           
-          <div class="text-5xl text-center mb-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-600 py-5 rounded-xl shadow-inner mt-2">${p.img}</div>
-          <span class="text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider mb-1 block">${p.category}</span>
-          <h3 class="font-bold text-gray-800 dark:text-white line-clamp-2 leading-tight flex-1 text-sm">${p.name}</h3>
+          <div class="h-28 md:h-36 w-full mb-3 mt-2 rounded-xl overflow-hidden bg-gray-50 dark:bg-slate-700/50 flex items-center justify-center p-2 border border-gray-100 dark:border-slate-600">
+             <img src="${p.img}" class="max-h-full max-w-full object-contain mix-blend-multiply dark:mix-blend-normal" alt="${p.name}" onerror="this.src='https://placehold.co/400x400/transparent/dc2626?text=Tanpa+Gambar'">
+          </div>
+          <span class="text-[9px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider mb-1 block">${p.category}</span>
+          <h3 class="font-bold text-gray-800 dark:text-white line-clamp-2 leading-tight flex-1 text-xs md:text-sm">${p.name}</h3>
           
           <div class="mt-2 mb-3">
-             <div class="text-xs text-gray-400 line-through">${formatRp(origPrice)}</div>
-             <div class="text-red-600 dark:text-red-400 font-extrabold text-base sm:text-lg">${formatRp(p.price)}</div>
+             <div class="text-[10px] text-gray-400 line-through">${formatRp(origPrice)}</div>
+             <div class="flex justify-between items-end">
+               <div class="text-red-600 dark:text-red-400 font-extrabold text-sm md:text-base">${formatRp(p.price)}</div>
+               <div class="text-[9px] md:text-[10px] ${isOutOfStock ? 'text-red-500 font-bold' : 'text-gray-500 dark:text-gray-400'}">${isOutOfStock ? 'Habis' : 'Sisa: '+p.stock}</div>
+             </div>
           </div>
           
-          <button onclick="addToCart(${p.id}, this)" class="w-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold py-2 rounded-xl border border-blue-100 dark:border-blue-800/50 hover:bg-blue-600 dark:hover:bg-blue-600 hover:text-white transition text-sm">
-            <i class="fas fa-cart-plus mr-1"></i> Beli
+          <button onclick="window.addToCart('${p.id}', this)" ${isOutOfStock ? 'disabled' : ''} class="w-full ${isOutOfStock ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-slate-700 dark:text-gray-500' : 'bg-green-600 text-white hover:bg-green-700 shadow-sm'} font-bold py-2 rounded-lg transition text-xs md:text-sm flex justify-center items-center">
+            ${isOutOfStock ? 'Stok Habis' : '<i class="fas fa-cart-plus mr-1"></i> Beli'}
           </button>
         </div>`;
-    }
+    };
 
-    function renderCustomerProducts() {
+    const renderCustomerProducts = () => {
       const container = document.getElementById('productContainer');
-      let filtered = products.filter(p => (currentCategory === 'Semua' || p.category === currentCategory) && p.name.toLowerCase().includes(searchQuery));
-      container.innerHTML = filtered.length ? filtered.map(p => renderProductCard(p)).join('') : '<div class="col-span-full text-center py-10 text-gray-400">Barang promo tidak ditemukan.</div>';
-    }
+      let filtered = state.products.filter(p => (state.currentCategory === 'Semua' || p.category === state.currentCategory) && p.name.toLowerCase().includes(state.searchQuery));
+      container.innerHTML = filtered.length ? filtered.map(p => renderProductCard(p)).join('') : '<div class="col-span-full text-center py-10 text-gray-400 text-sm">Barang promo tidak ditemukan.</div>';
+    };
 
-    function renderFavorites() {
+    const renderFavorites = () => {
       const container = document.getElementById('favProductContainer');
-      if(!currentUser.favorites || currentUser.favorites.length === 0) {
-        container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 dark:text-slate-500"><i class="far fa-heart text-5xl mb-3 block text-gray-200 dark:text-slate-600"></i>Belum ada produk favorit.</div>';
-        return;
-      }
-      container.innerHTML = products.map(p => renderProductCard(p, true)).join('');
-    }
+      if(!state.currentUserInfo?.favorites || state.currentUserInfo.favorites.length === 0) return container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-400 dark:text-slate-500"><i class="far fa-heart text-5xl mb-3 block text-gray-200 dark:text-slate-600"></i>Belum ada produk favorit.</div>';
+      container.innerHTML = state.products.map(p => renderProductCard(p, true)).join('');
+    };
 
-    function addToCart(id, btn) {
-      const product = products.find(p => p.id === id);
-      const item = cart.find(i => i.id === id);
-      if (item) item.qty++; else cart.push({ ...product, qty: 1 });
-      updateCartUI();
+    window.addToCart = (id, btn) => {
+      if(!state.currentUserInfo) return window.openAuthModal();
+      const product = state.products.find(p => p.id === id); const item = state.cart.find(i => i.id === id);
+      if(product.stock <= 0) return window.showToast("Stok sudah habis!", "error");
+      if(item && item.qty >= product.stock) return window.showToast("Maksimal stok tercapai", "warning");
+
+      if (item) item.qty++; else state.cart.push({ ...product, qty: 1 });
+      updateCartUI(); window.showToast("Masuk Keranjang!", "success");
       
-      const ori = btn.innerHTML;
-      btn.innerHTML = '<i class="fas fa-check"></i> OK';
-      btn.classList.replace('bg-blue-50', 'bg-green-500'); btn.classList.replace('text-blue-700', 'text-white');
-      btn.classList.replace('dark:bg-blue-900/30', 'dark:bg-green-500'); btn.classList.replace('dark:text-blue-400', 'dark:text-white');
-      setTimeout(() => { 
-        btn.innerHTML = ori; 
-        btn.classList.replace('bg-green-500', 'bg-blue-50'); btn.classList.replace('text-white', 'text-blue-700');
-        btn.classList.replace('dark:bg-green-500', 'dark:bg-blue-900/30'); btn.classList.replace('dark:text-white', 'dark:text-blue-400');
-      }, 800);
-    }
+      const ori = btn.innerHTML; btn.innerHTML = '<i class="fas fa-check"></i> OK';
+      btn.classList.replace('bg-green-600', 'bg-red-600');
+      setTimeout(() => { btn.innerHTML = ori; btn.className = btn.className.replace('bg-red-600', 'bg-green-600'); }, 800);
+    };
 
-    function updateCartUI() {
-      const qty = cart.reduce((s, i) => s + i.qty, 0);
+    const updateCartUI = () => {
+      const qty = state.cart.reduce((s, i) => s + i.qty, 0);
       document.getElementById('cartCount').innerText = qty; document.getElementById('cartCountMobile').innerText = qty;
       const cItems = document.getElementById('cartItems');
       
-      if (!cart.length) { cItems.innerHTML = `<div class="text-center text-gray-400 dark:text-slate-500 mt-10"><i class="fas fa-shopping-basket text-5xl mb-3 text-gray-200 dark:text-slate-600"></i><p class="text-sm">Keranjang kosong</p></div>`; } 
+      if (!state.cart.length) { cItems.innerHTML = `<div class="text-center text-gray-400 dark:text-slate-500 mt-10"><i class="fas fa-shopping-basket text-5xl mb-3 text-gray-200 dark:text-slate-600"></i><p class="text-sm">Keranjang kosong</p></div>`; } 
       else {
-        cItems.innerHTML = cart.map((i, idx) => `
+        cItems.innerHTML = state.cart.map((i, idx) => `
           <div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700">
-            <div class="flex items-center space-x-3"><div class="text-2xl bg-gray-50 dark:bg-slate-700 p-2 rounded-lg border border-gray-100 dark:border-slate-600">${i.img}</div>
-            <div class="max-w-[130px]"><h4 class="font-bold text-sm text-gray-800 dark:text-white line-clamp-1">${i.name}</h4><div class="text-red-500 text-xs font-semibold">${formatRp(i.price)}</div></div></div>
-            <div class="flex items-center space-x-1 bg-gray-50 dark:bg-slate-700 rounded-lg p-1 border dark:border-slate-600"><button onclick="cart[${idx}].qty--; if(cart[${idx}].qty<=0) cart.splice(${idx},1); updateCartUI();" class="w-6 h-6 bg-white dark:bg-slate-600 rounded font-bold shadow-sm text-gray-600 dark:text-gray-200">-</button><span class="text-xs font-bold w-5 text-center dark:text-white">${i.qty}</span><button onclick="cart[${idx}].qty++; updateCartUI();" class="w-6 h-6 bg-white dark:bg-slate-600 rounded font-bold shadow-sm text-gray-600 dark:text-gray-200">+</button></div>
+            <div class="flex items-center space-x-3">
+               <img src="${i.img}" class="w-12 h-12 rounded-lg object-contain bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 p-1" onerror="this.src='https://placehold.co/100?text=Gambar'">
+               <div class="max-w-[130px]"><h4 class="font-bold text-xs text-gray-800 dark:text-white line-clamp-1">${i.name}</h4><div class="text-red-600 text-xs font-semibold">${formatRp(i.price)}</div></div>
+            </div>
+            <div class="flex items-center space-x-1 bg-gray-50 dark:bg-slate-700 rounded-lg p-1 border dark:border-slate-600">
+              <button onclick="window.updateCartQty(${idx}, -1)" class="w-6 h-6 bg-white dark:bg-slate-600 rounded font-bold shadow-sm text-gray-600 dark:text-gray-200">-</button>
+              <span class="text-[10px] font-bold w-5 text-center dark:text-white">${i.qty}</span>
+              <button onclick="window.updateCartQty(${idx}, 1)" class="w-6 h-6 bg-white dark:bg-slate-600 rounded font-bold shadow-sm text-gray-600 dark:text-gray-200">+</button>
+            </div>
           </div>`).join('');
       }
-      document.getElementById('cartTotal').innerText = formatRp(cart.reduce((s, i) => s + (i.price * i.qty), 0));
-    }
-    function toggleCart() { document.getElementById('cartSidebar').classList.toggle('open'); }
+      document.getElementById('cartTotal').innerText = formatRp(state.cart.reduce((s, i) => s + (i.price * i.qty), 0));
+    };
 
-    function openCheckout() {
-      if (!cart.length) return showCustomDialog("Keranjang Kosong", "Pilih produk promo terlebih dahulu.", "warning");
-      document.getElementById('custName').value = currentUser.name;
-      document.getElementById('custPhone').value = currentUser.phone;
-      document.getElementById('custAddress').value = currentUser.address || '';
-      toggleCart(); openModal('checkoutModal');
-    }
+    window.updateCartQty = (idx, delta) => {
+      const item = state.cart[idx]; const prod = state.products.find(p => p.id === item.id);
+      if(delta > 0 && item.qty >= prod.stock) return window.showToast("Maksimal stok tercapai", "warning");
+      item.qty += delta; if(item.qty <= 0) state.cart.splice(idx, 1);
+      updateCartUI();
+    };
 
-    async function processCheckout(e) {
+    window.toggleCart = () => { if(!state.currentUserInfo) return window.openAuthModal(); document.getElementById('cartSidebar').classList.toggle('open'); };
+
+    window.openCheckout = () => {
+      if (!state.cart.length) return window.showToast("Pilih produk promo terlebih dahulu.", "warning");
+      document.getElementById('custName').value = state.currentUserInfo.name; document.getElementById('custPhone').value = state.currentUserInfo.phone; document.getElementById('custAddress').value = state.currentUserInfo.address || '';
+      window.toggleCart(); window.openModal('checkoutModal');
+    };
+
+    document.getElementById('checkoutForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const btn = document.getElementById('btnSubmitOrder');
-      const loader = document.getElementById('submitLoader');
+      const btn = document.getElementById('btnSubmitOrder'); const loader = document.getElementById('submitLoader');
       const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
       
-      const shipMethod = document.getElementById('custShipping').value;
-      const payMethod = document.getElementById('custPayment').value;
-      
       const payload = {
-        orderId, date: new Date().toLocaleString('id-ID'),
+        orderId, timestamp: Date.now(), date: new Date().toLocaleString('id-ID'),
         name: document.getElementById('custName').value, phone: document.getElementById('custPhone').value,
-        address: document.getElementById('custAddress').value,
-        items: cart.map(i => `${i.name} (${i.qty})`).join(', '),
-        total: cart.reduce((s, i) => s + (i.price * i.qty), 0),
-        status: 'Menunggu', ownerPhone: currentUser.phone, fullItems: [...cart],
-        shipping: shipMethod, payment: payMethod
+        address: document.getElementById('custAddress').value, items: state.cart.map(i => `${i.name} (${i.qty})`).join(', '),
+        total: state.cart.reduce((s, i) => s + (i.price * i.qty), 0),
+        status: 'Menunggu', ownerPhone: state.currentUserInfo.phone, fullItems: [...state.cart],
+        shipping: document.getElementById('custShipping').value, payment: document.getElementById('custPayment').value
       };
 
       btn.disabled = true; loader.classList.remove('hidden');
-      
       try {
-        if(!GOOGLE_SHEETS_WEB_APP_URL.includes('XXXXXXXXX')) {
-          let fd = new FormData(); Object.keys(payload).forEach(k => fd.append(k, payload[k]));
-          await fetch(GOOGLE_SHEETS_WEB_APP_URL, { method: 'POST', body: fd, mode: 'no-cors' });
-        } else { await new Promise(r => setTimeout(r, 1000)); }
-
-        let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]');
-        orders.unshift(payload); localStorage.setItem('yola_orders', JSON.stringify(orders));
-        cart = []; updateCartUI(); closeModal('checkoutModal');
-        
-        showCustomDialog("Pesanan Berhasil!", `ID Pesanan: <b>${orderId}</b><br>Gunakan metode <b>${payMethod}</b> untuk melunasi.`, "success", () => showCustPage('dashboard'));
-      } catch (err) { showCustomDialog("Gagal", "Koneksi server bermasalah.", "error"); } 
+        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', orderId), payload);
+        for(let item of state.cart) {
+          const dbProd = state.products.find(p => p.id === item.id);
+          if(dbProd && dbProd.stock) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', item.id), { stock: Math.max(0, dbProd.stock - item.qty) });
+        }
+        state.cart = []; updateCartUI(); window.closeModal('checkoutModal');
+        window.showCustomDialog("Pesanan Berhasil!", `ID Pesanan: <b>${orderId}</b><br>Pesanan sedang diproses.`, "success", () => window.showCustPage('dashboard'));
+      } catch (err) { window.showToast("Gagal menyimpan pesanan.", "error"); } 
       finally { btn.disabled = false; loader.classList.add('hidden'); }
-    }
+    });
 
-    function setupProfilePage() {
-      document.getElementById('profAvatar').innerText = currentUser.name.charAt(0).toUpperCase();
-      document.getElementById('profNameDisplay').innerText = currentUser.name;
-      document.getElementById('profName').value = currentUser.name;
-      document.getElementById('profPhone').value = currentUser.phone;
-      document.getElementById('profAddress').value = currentUser.address || '';
-    }
+    const setupProfilePage = () => {
+      document.getElementById('profAvatar').innerText = state.currentUserInfo.name.charAt(0).toUpperCase();
+      document.getElementById('profNameDisplay').innerText = state.currentUserInfo.name;
+      document.getElementById('profName').value = state.currentUserInfo.name; document.getElementById('profPhone').value = state.currentUserInfo.phone; document.getElementById('profAddress').value = state.currentUserInfo.address || '';
+    };
     
-    function saveProfile(e) {
-      e.preventDefault();
-      const newName = document.getElementById('profName').value;
-      const newAddr = document.getElementById('profAddress').value;
-      
-      let users = JSON.parse(localStorage.getItem('yola_users') || '[]');
-      let uIdx = users.findIndex(u => u.phone === currentUser.phone);
-      if(uIdx !== -1) {
-        users[uIdx].name = newName; users[uIdx].address = newAddr;
-        localStorage.setItem('yola_users', JSON.stringify(users));
-        currentUser = users[uIdx];
-        localStorage.setItem('yola_session', JSON.stringify(currentUser));
-        setupProfilePage();
-        document.getElementById('navCustName').innerText = newName.split(' ')[0];
-        showCustomDialog("Tersimpan!", "Data profil berhasil diperbarui.", "success");
-      }
-    }
+    document.getElementById('formProfile').addEventListener('submit', async (e) => {
+      e.preventDefault(); const loader = document.getElementById('loaderProfile'); loader.classList.remove('hidden');
+      try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', state.currentUserInfo.phone), { name: document.getElementById('profName').value, address: document.getElementById('profAddress').value }); window.showToast("Profil berhasil diperbarui.", "success"); } 
+      catch(err) { window.showToast("Gagal menyimpan profil.", "error"); } finally { loader.classList.add('hidden'); }
+    });
 
-    function renderCustomerDashboard() {
-      let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]').filter(o => o.ownerPhone === currentUser.phone);
+    const renderCustomerDashboard = () => {
+      let userOrders = state.orders.filter(o => o.ownerPhone === state.currentUserInfo.phone);
       const container = document.getElementById('customerOrders');
-      if(!orders.length) return container.innerHTML = '<div class="col-span-full text-center py-16"><i class="fas fa-receipt text-6xl text-gray-200 dark:text-slate-600 mb-4 block"></i><p class="text-gray-500 dark:text-gray-400 font-medium">Belum ada pesanan.</p></div>';
-
-      container.innerHTML = orders.map(o => `
-        <div class="border border-gray-100 dark:border-slate-700 rounded-2xl p-5 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition cursor-pointer" onclick="showInvoice('${o.orderId}')">
-          <div class="flex justify-between items-start border-b border-gray-50 dark:border-slate-700 pb-3 mb-3">
-            <div><div class="font-extrabold text-blue-800 dark:text-blue-400">${o.orderId}</div><div class="text-[10px] text-gray-400 mt-0.5">${o.date}</div></div>
+      if(!userOrders.length) return container.innerHTML = '<div class="col-span-full text-center py-16"><i class="fas fa-receipt text-6xl text-gray-200 dark:text-slate-600 mb-4 block"></i><p class="text-gray-500 dark:text-gray-400 text-sm font-medium">Belum ada pesanan.</p></div>';
+      container.innerHTML = userOrders.map(o => `
+        <div class="border border-gray-100 dark:border-slate-700 rounded-2xl p-4 bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition cursor-pointer" onclick="window.showInvoice('${o.orderId}')">
+          <div class="flex justify-between items-start border-b border-gray-50 dark:border-slate-700 pb-2 mb-2">
+            <div><div class="font-extrabold text-red-800 dark:text-red-400 text-sm">${o.orderId}</div><div class="text-[9px] text-gray-400 mt-0.5">${o.date}</div></div>
             <span class="px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider border ${o.status==='Menunggu'?'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 border-orange-200 dark:border-orange-800':(o.status==='Diproses'?'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800':(o.status==='Selesai'?'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800':'bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800'))}">${o.status}</span>
           </div>
-          <div class="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">${o.items}</div>
-          <div class="flex justify-between items-end border-t border-gray-50 dark:border-slate-700 pt-3 text-sm"><span class="text-xs dark:text-gray-400">Total:</span><b class="text-gray-900 dark:text-white">${formatRp(o.total)}</b></div>
+          <div class="text-[10px] text-gray-500 dark:text-gray-400 mb-2 line-clamp-2">${o.items}</div>
+          <div class="flex justify-between items-end border-t border-gray-50 dark:border-slate-700 pt-2"><span class="text-[10px] dark:text-gray-400">Total:</span><b class="text-gray-900 dark:text-white text-sm">${formatRp(o.total)}</b></div>
         </div>`).join('');
-    }
+    };
 
-    function showInvoice(orderId) {
-      let order = JSON.parse(localStorage.getItem('yola_orders') || '[]').find(o => o.orderId === orderId);
-      if(!order) return;
-      document.getElementById('invDate').innerText = order.date;
-      document.getElementById('invId').innerText = order.orderId;
-      document.getElementById('invStatus').innerText = order.status;
-      
-      let payShipText = `${order.payment || 'Tunai'} • ${order.shipping || 'Reguler'}`;
-      document.getElementById('invMethod').innerText = payShipText;
-      
-      let htmlItems = order.fullItems && order.fullItems.length > 0 ? 
-        order.fullItems.map(i => `<div class="flex justify-between text-xs"><span class="text-gray-600 dark:text-gray-300">${i.name} <span class="text-gray-400">x${i.qty}</span></span><span class="font-medium dark:text-white">Rp${(i.price*i.qty).toLocaleString('id-ID')}</span></div>`).join('') : 
-        `<div class="text-xs text-gray-600 dark:text-gray-400 italic">${order.items}</div>`;
-      
-      document.getElementById('invItems').innerHTML = htmlItems;
-      document.getElementById('invTotal').innerText = formatRp(order.total);
-      openModal('invoiceModal');
-    }
+    window.showInvoice = (orderId) => {
+      let order = state.orders.find(o => o.orderId === orderId); if(!order) return;
+      document.getElementById('invDate').innerText = order.date; document.getElementById('invId').innerText = order.orderId; document.getElementById('invStatus').innerText = order.status; document.getElementById('invMethod').innerText = `${order.payment || 'Tunai'} • ${order.shipping || 'Reguler'}`;
+      document.getElementById('invItems').innerHTML = order.fullItems ? order.fullItems.map(i => `<div class="flex justify-between text-[10px]"><span class="text-gray-600 dark:text-gray-300">${i.name} <span class="text-gray-400">x${i.qty}</span></span><span class="font-medium dark:text-white">Rp${(i.price*i.qty).toLocaleString('id-ID')}</span></div>`).join('') : '';
+      document.getElementById('invTotal').innerText = formatRp(order.total); window.openModal('invoiceModal');
+    };
 
-    // --- FUNGSI ADMIN ---
-    function renderAdminDashboard() {
-      let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]');
-      document.getElementById('statRevenue').innerText = formatRp(orders.filter(o => o.status === 'Selesai').reduce((s, o) => s + o.total, 0));
-      document.getElementById('statCompleted').innerText = orders.filter(o => o.status === 'Selesai').length;
-      document.getElementById('statPending').innerText = orders.filter(o => o.status === 'Menunggu').length;
-      document.getElementById('statUsers').innerText = JSON.parse(localStorage.getItem('yola_users') || '[]').filter(u=>u.role!=='admin').length;
-    }
+    // --- ADMIN & STAFF LOGIC ---
+    const renderAdminDashboard = () => {
+      document.getElementById('statRevenue').innerText = formatRp(state.orders.filter(o => o.status === 'Selesai').reduce((s, o) => s + o.total, 0));
+      document.getElementById('statCompleted').innerText = state.orders.filter(o => o.status === 'Selesai').length;
+      document.getElementById('statPending').innerText = state.orders.filter(o => o.status === 'Menunggu').length;
+      document.getElementById('statUsers').innerText = state.users.filter(u=>u.role==='customer').length;
+    };
 
-    function renderAdminOrders() {
-      let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]');
-      const filter = document.getElementById('adminFilterOrder').value;
-      const search = document.getElementById('adminSearchOrder').value.toLowerCase();
+    const renderAdminOrders = () => {
+      const filter = document.getElementById('adminFilterOrder').value; const search = document.getElementById('adminSearchOrder').value.toLowerCase();
+      let filtered = state.orders.filter(o => (filter === 'Semua' || o.status === filter) && (o.orderId.toLowerCase().includes(search) || o.name.toLowerCase().includes(search)));
       
-      let filtered = orders.filter(o => (filter === 'Semua' || o.status === filter) && (o.orderId.toLowerCase().includes(search) || o.name.toLowerCase().includes(search)));
-      const tbody = document.getElementById('adminFullOrdersTableBody');
-      
-      tbody.innerHTML = filtered.length ? filtered.map(o => {
-        let waMsg = encodeURIComponent(`Halo ${o.name},\nKami dari Yola Promo ingin mengkonfirmasi pesanan Anda dengan ID *${o.orderId}*.\n\nDetail:\n${o.items}\nPengiriman: ${o.shipping||'-'}\nPembayaran: ${o.payment||'-'}\nTotal Tagihan: *${formatRp(o.total)}*\n\nTerima kasih.`);
+      document.getElementById('adminFullOrdersTableBody').innerHTML = filtered.length ? filtered.map(o => {
+        let waMsg = encodeURIComponent(`Halo ${o.name},\nKami dari Yola Promo ingin mengkonfirmasi pesanan Anda dengan ID *${o.orderId}*.\n\nDetail:\n${o.items}\nTotal Tagihan: *${formatRp(o.total)}*\n\nTerima kasih.`);
         let waLink = `https://wa.me/${formatWaNumber(o.phone)}?text=${waMsg}`;
-        
         return `
-        <tr class="hover:bg-blue-50/20 dark:hover:bg-slate-700/50 bg-white dark:bg-slate-800 transition-colors">
-          <td class="p-4"><div class="font-extrabold text-blue-700 dark:text-blue-400 text-sm">${o.orderId}</div><div class="text-[10px] text-slate-400 mt-1">${o.date}</div></td>
-          <td class="p-4"><div class="font-bold text-slate-800 dark:text-white text-xs">${o.name}</div><div class="text-[10px] text-slate-500 dark:text-slate-400 font-mono"><i class="fab fa-whatsapp text-green-500"></i> ${o.phone}</div><div class="text-[10px] text-slate-400 line-clamp-1" title="${o.address}">${o.address}</div></td>
-          <td class="p-4">
-             <div class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1 mb-1">${o.items}</div>
-             <div class="font-bold text-slate-900 dark:text-white text-sm">${formatRp(o.total)}</div>
-             <div class="text-[9px] text-blue-500 mt-1">${o.shipping||'-'} • ${o.payment||'-'}</div>
-          </td>
-          <td class="p-4 text-center"><span class="px-2 py-1 text-[9px] font-bold uppercase rounded border ${o.status==='Menunggu'?'bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800':(o.status==='Diproses'?'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800':(o.status==='Selesai'?'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800':'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'))}">${o.status}</span></td>
-          <td class="p-4 text-center flex flex-wrap justify-center gap-1.5">
-            <a href="${waLink}" target="_blank" class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 px-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-green-500 hover:text-white transition flex items-center" title="Chat Pembeli"><i class="fab fa-whatsapp text-sm mr-1"></i> WA</a>
-            ${o.status === 'Menunggu' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Diproses')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Proses</button><button onclick="updateOrderStatus('${o.orderId}', 'Batal')" class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-3 py-1.5 rounded-lg text-[10px] font-bold">Tolak</button>` : ''}
-            ${o.status === 'Diproses' ? `<button onclick="updateOrderStatus('${o.orderId}', 'Selesai')" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold shadow-sm">Selesai</button>` : ''}
-            ${o.status === 'Batal' ? `<button onclick="deleteOrder('${o.orderId}')" class="text-red-500 hover:text-red-700 text-xs px-2" title="Hapus Data"><i class="fas fa-trash"></i></button>` : ''}
+        <tr class="hover:bg-red-50/20 dark:hover:bg-slate-700/50 bg-white dark:bg-slate-800 transition-colors">
+          <td class="p-3"><div class="font-extrabold text-red-700 dark:text-red-400 text-xs">${o.orderId}</div><div class="text-[9px] text-slate-400 mt-0.5">${o.date}</div></td>
+          <td class="p-3"><div class="font-bold text-slate-800 dark:text-white text-[11px]">${o.name}</div><div class="text-[9px] text-slate-500 font-mono mt-0.5"><i class="fab fa-whatsapp text-green-500"></i> ${o.phone}</div></td>
+          <td class="p-3"><div class="text-[9px] text-slate-500 line-clamp-1 mb-1" title="${o.items}">${o.items}</div><div class="font-bold text-slate-900 dark:text-white text-xs">${formatRp(o.total)}</div></td>
+          <td class="p-3 text-center"><span class="px-2 py-1 text-[8px] font-bold uppercase rounded border ${o.status==='Menunggu'?'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800':(o.status==='Diproses'?'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800':(o.status==='Selesai'?'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800':'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'))}">${o.status}</span></td>
+          <td class="p-3 text-center flex flex-wrap justify-center gap-1.5">
+            <a href="${waLink}" target="_blank" class="bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800 px-2 py-1 rounded text-[9px] font-bold hover:bg-green-500 hover:text-white transition flex items-center" title="Chat WA"><i class="fab fa-whatsapp mr-1"></i> WA</a>
+            ${o.status === 'Menunggu' ? `<button onclick="window.updateOrderStatus('${o.orderId}', 'Diproses')" class="bg-blue-600 text-white px-2 py-1 rounded text-[9px] font-bold">Proses</button>` : ''}
+            ${o.status === 'Diproses' ? `<button onclick="window.updateOrderStatus('${o.orderId}', 'Selesai')" class="bg-green-600 text-white px-2 py-1 rounded text-[9px] font-bold">Selesai</button>` : ''}
+            ${o.status === 'Batal' && state.currentUserInfo.role === 'admin' ? `<button onclick="window.deleteOrder('${o.orderId}')" class="text-red-500 hover:text-red-700 text-[10px] px-1" title="Hapus"><i class="fas fa-trash"></i></button>` : ''}
           </td>
         </tr>`;
-      }).join('') : '<tr><td colspan="5" class="p-10 text-center text-slate-400">Data pesanan tidak ditemukan.</td></tr>';
-    }
+      }).join('') : '<tr><td colspan="5" class="p-8 text-center text-slate-400 text-xs">Data pesanan tidak ditemukan.</td></tr>';
+    };
 
-    function updateOrderStatus(id, st) {
-      confirmCustomDialog("Konfirmasi", `Ubah status ${id} menjadi <b>${st}</b>?`, () => {
-        let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]');
-        let idx = orders.findIndex(o => o.orderId === id);
-        if (idx !== -1) { orders[idx].status = st; localStorage.setItem('yola_orders', JSON.stringify(orders)); renderAdminOrders(); renderAdminDashboard(); }
-      });
-    }
+    document.getElementById('adminFilterOrder').addEventListener('change', renderAdminOrders);
+    document.getElementById('adminSearchOrder').addEventListener('keyup', renderAdminOrders);
 
-    function deleteOrder(id) {
-      confirmCustomDialog("Hapus Pesanan", "Hapus permanen pesanan ini dari database?", () => {
-        let orders = JSON.parse(localStorage.getItem('yola_orders') || '[]').filter(o => o.orderId !== id);
-        localStorage.setItem('yola_orders', JSON.stringify(orders)); renderAdminOrders();
-      });
-    }
+    window.updateOrderStatus = (id, st) => window.confirmCustomDialog("Konfirmasi", `Ubah status menjadi <b>${st}</b>?`, async () => { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', id), { status: st }); window.showToast(`Status diperbarui`, "success"); });
+    window.deleteOrder = (id) => window.confirmCustomDialog("Hapus Pesanan", "Hapus permanen pesanan ini?", async () => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'orders', id)); window.showToast(`Pesanan dihapus`, "success"); });
 
-    function openProductModal(id = null) {
-      document.getElementById('productForm').reset();
-      document.getElementById('prodIdForm').value = '';
-      document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-box-open mr-2"></i> Tambah Promo';
-      
+    window.openProductModal = (id = null) => {
+      document.getElementById('productForm').reset(); document.getElementById('prodIdForm').value = ''; document.getElementById('prodImgBase64').value = ''; 
+      document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-box-open mr-1.5"></i> Tambah Produk';
       if(id !== null) {
-        const p = products.find(x => x.id === id);
+        const p = state.products.find(x => x.id === id);
         if(p) {
-          document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-edit mr-2"></i> Edit Promo';
-          document.getElementById('prodIdForm').value = p.id;
-          document.getElementById('prodEmoji').value = p.img;
+          document.getElementById('prodModalTitle').innerHTML = '<i class="fas fa-edit mr-1.5"></i> Edit Produk';
+          document.getElementById('prodIdForm').value = p.id; 
+          document.getElementById('prodImgBase64').value = p.img || ''; // store existing base64/url
           document.getElementById('prodCategory').value = p.category;
-          document.getElementById('prodName').value = p.name;
-          document.getElementById('prodOrigPrice').value = p.originalPrice || (p.price + 5000);
-          document.getElementById('prodPrice').value = p.price;
+          document.getElementById('prodName').value = p.name; document.getElementById('prodStock').value = p.stock || 0;
+          document.getElementById('prodOrigPrice').value = p.originalPrice || (p.price + 5000); document.getElementById('prodPrice').value = p.price;
         }
       }
-      openModal('productFormModal');
-    }
+      window.openModal('productFormModal');
+    };
 
-    function saveProduct(e) {
-      e.preventDefault();
-      const idForm = document.getElementById('prodIdForm').value;
-      const data = {
-        name: document.getElementById('prodName').value,
-        originalPrice: parseInt(document.getElementById('prodOrigPrice').value),
-        price: parseInt(document.getElementById('prodPrice').value),
-        img: document.getElementById('prodEmoji').value,
-        category: document.getElementById('prodCategory').value
-      };
+    document.getElementById('productForm').addEventListener('submit', async (e) => {
+      e.preventDefault(); const loader = document.getElementById('loaderProd'); loader.classList.remove('hidden');
+      const fileInput = document.getElementById('prodImgFile');
+      let imgData = document.getElementById('prodImgBase64').value; // Get existing first
       
-      if(data.price >= data.originalPrice) {
-        return showCustomDialog("Gagal", "Harga Promo harus lebih murah dari Harga Asli (Coret)!", "warning");
-      }
-      
-      if(idForm) {
-        const idx = products.findIndex(p => p.id == idForm);
-        if(idx !== -1) products[idx] = { ...products[idx], ...data };
-      } else {
-        data.id = products.length ? Math.max(...products.map(p=>p.id)) + 1 : 1;
-        products.push(data);
-      }
-      
-      localStorage.setItem('yola_products_v2', JSON.stringify(products));
-      closeModal('productFormModal'); renderAdminProductsTable(); renderCustomerProducts();
-      showCustomDialog("Sukses", "Data promo berhasil diperbarui.", "success");
-    }
+      try {
+        if(fileInput.files.length > 0) {
+           imgData = await compressImage(fileInput.files[0]); // Compress newly uploaded image
+        } else if (!imgData) {
+           throw new Error("Pilih gambar produk terlebih dahulu!");
+        }
 
-    function renderAdminProductsTable() {
-      const tbody = document.getElementById('adminProductsTableBody');
-      tbody.innerHTML = products.length ? products.map(p => {
-        const origPrice = p.originalPrice || p.price + 5000;
+        const data = { 
+           name: document.getElementById('prodName').value, 
+           originalPrice: parseInt(document.getElementById('prodOrigPrice').value), 
+           price: parseInt(document.getElementById('prodPrice').value), 
+           stock: parseInt(document.getElementById('prodStock').value), 
+           img: imgData, 
+           category: document.getElementById('prodCategory').value 
+        };
+
+        if(data.price >= data.originalPrice) { throw new Error("Harga Jual harus lebih murah dari harga asli!"); }
+        
+        const finalId = document.getElementById('prodIdForm').value || (Date.now().toString() + Math.floor(Math.random()*100));
+        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', finalId), data);
+        window.closeModal('productFormModal'); window.showToast("Data promo disimpan.", "success");
+      } catch(e) { window.showToast(e.message || "Gagal menyimpan data.", "error"); } finally { loader.classList.add('hidden'); }
+    });
+
+    const renderAdminProductsTable = () => {
+      document.getElementById('adminProductsTableBody').innerHTML = state.products.length ? state.products.map(p => {
         return `
         <tr class="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 transition-colors">
-          <td class="p-4 text-center text-2xl">${p.img}</td>
-          <td class="p-4 font-bold text-slate-800 dark:text-white text-sm">${p.name}</td>
-          <td class="p-4 text-[10px] font-bold uppercase text-blue-500">${p.category}</td>
-          <td class="p-4">
-             <div class="text-xs text-red-500 line-through">${formatRp(origPrice)}</div>
-             <div class="font-bold text-green-600 dark:text-green-400 text-sm">${formatRp(p.price)}</div>
-          </td>
-          <td class="p-4 text-center flex justify-center space-x-2">
-          <button onclick="openProductModal(${p.id})" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 p-2 rounded transition"><i class="fas fa-edit"></i></button>
-          <button onclick="deleteProduct(${p.id})" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-2 rounded transition"><i class="fas fa-trash-alt"></i></button>
+          <td class="p-3"><img src="${p.img}" class="w-10 h-10 rounded object-contain bg-gray-50 dark:bg-slate-700 border dark:border-slate-600" onerror="this.src='https://placehold.co/100?text=IMG'"></td>
+          <td class="p-3 font-bold text-slate-800 dark:text-white text-[11px]">${p.name}</td>
+          <td class="p-3 text-[9px] font-bold uppercase text-red-500">${p.category}</td>
+          <td class="p-3 text-center"><span class="${p.stock <= 5 ? 'text-red-500 bg-red-50 dark:bg-red-900/30' : 'text-green-600 bg-green-50 dark:bg-green-900/30'} px-2 py-1 rounded font-bold text-[10px]">${p.stock || 0}</span></td>
+          <td class="p-3"><div class="text-[9px] text-red-500 line-through">${formatRp(p.originalPrice || p.price + 5000)}</div><div class="font-bold text-green-600 dark:text-green-400 text-xs">${formatRp(p.price)}</div></td>
+          <td class="p-3 text-center flex justify-center space-x-1">
+          <button onclick="window.openProductModal('${p.id}')" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 p-1.5 rounded transition" title="Edit"><i class="fas fa-edit"></i></button>
+          <button onclick="window.deleteProduct('${p.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-1.5 rounded transition" title="Hapus"><i class="fas fa-trash-alt"></i></button>
         </td></tr>`
-      }).join('') : '<tr><td colspan="5" class="p-10 text-center text-slate-400">Belum ada promo.</td></tr>';
-    }
+      }).join('') : '<tr><td colspan="6" class="p-8 text-center text-slate-400 text-xs">Belum ada promo.</td></tr>';
+    };
 
-    function deleteProduct(id) {
-      confirmCustomDialog("Hapus Item", "Yakin hapus promo produk ini?", () => {
-        products = products.filter(p => p.id !== id); localStorage.setItem('yola_products_v2', JSON.stringify(products));
-        renderAdminProductsTable(); renderCustomerProducts();
-      });
-    }
+    window.deleteProduct = (id) => window.confirmCustomDialog("Hapus Item", "Yakin hapus promo produk ini?", async () => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); window.showToast("Produk dihapus", "success"); });
 
-    function renderAdminUsersTable() {
-      let users = JSON.parse(localStorage.getItem('yola_users') || '[]').filter(u=>u.role!=='admin');
-      document.getElementById('adminUsersTableBody').innerHTML = users.length ? users.map(u => `
+    // --- MANAJEMEN AKUN (USER & STAFF) ---
+    const renderAdminUsersTable = () => {
+      const search = document.getElementById('adminSearchUser').value.toLowerCase();
+      let fUsers = state.users.filter(u => u.role === 'customer' && (u.name.toLowerCase().includes(search) || u.phone.includes(search)));
+      
+      document.getElementById('adminUsersTableBody').innerHTML = fUsers.length ? fUsers.map(u => `
         <tr class="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 transition-colors">
-          <td class="p-4 font-bold text-sm dark:text-white"><i class="fas fa-user-circle text-blue-400 mr-2"></i>${u.name}</td>
-          <td class="p-4 font-mono text-xs text-slate-600 dark:text-slate-300">
-            <div class="flex items-center">
-              <span>${u.phone}</span>
-              <a href="https://wa.me/${formatWaNumber(u.phone)}?text=Halo%20kak%20${encodeURIComponent(u.name)}," target="_blank" class="ml-3 text-green-500 hover:text-green-700 transition" title="Chat Pembeli"><i class="fab fa-whatsapp text-lg"></i></a>
-            </div>
+          <td class="p-3 font-bold text-[11px] dark:text-white"><i class="fas fa-user-circle text-red-400 mr-1.5"></i>${u.name}</td>
+          <td class="p-3 font-mono text-[10px] text-slate-600 dark:text-slate-300"><div class="flex items-center"><span>${u.phone}</span><a href="https://wa.me/${formatWaNumber(u.phone)}" target="_blank" class="ml-2 text-green-500 hover:text-green-700 transition" title="Chat WA"><i class="fab fa-whatsapp"></i></a></div></td>
+          <td class="p-3 text-[9px] text-slate-500 dark:text-slate-400 line-clamp-1" title="${u.address}">${u.address || '-'}</td>
+          <td class="p-3 text-center">
+             <button onclick="window.toggleUserReset('${u.phone}', ${u.allowReset})" class="px-2 py-1 rounded text-[9px] font-bold ${u.allowReset ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400' : 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400'} hover:opacity-80 transition">${u.allowReset ? 'Batalkan Izin' : 'Buka Akses Reset'}</button>
           </td>
-          <td class="p-4 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2" title="${u.address}">${u.address || '-'}</td>
-          <td class="p-4 text-[10px] dark:text-slate-400">${u.joined}</td>
-        </tr>`).join('') : '<tr><td colspan="4" class="p-6 text-center text-slate-400">Kosong</td></tr>';
-    }
+          <td class="p-3 text-center space-x-1">
+             <button onclick="window.openUserModal('${u.phone}', 'customer')" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 p-1.5 rounded transition"><i class="fas fa-edit"></i></button>
+             <button onclick="window.deleteUser('${u.phone}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-1.5 rounded transition"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>`).join('') : '<tr><td colspan="5" class="p-6 text-center text-slate-400 text-xs">Kosong.</td></tr>';
+    };
+    
+    document.getElementById('adminSearchUser').addEventListener('keyup', renderAdminUsersTable);
 
-    function saveBanner(e) {
-      e.preventDefault();
-      bannerData = {
-        badge: document.getElementById('banBadge').value,
-        title: document.getElementById('banTitle').value.replace(/\\n/g, '\n'),
-        subtitle: document.getElementById('banSubtitle').value,
-        emoji: document.getElementById('banEmoji').value
-      };
-      localStorage.setItem('yola_banner', JSON.stringify(bannerData));
-      applyBanner();
-      showCustomDialog("Sukses", "Banner depan berhasil diperbarui!", "success");
-    }
+    const renderAdminStaffTable = () => {
+      let fStaff = state.users.filter(u => u.role === 'staff');
+      document.getElementById('adminStaffTableBody').innerHTML = fStaff.length ? fStaff.map(u => `
+        <tr class="bg-white dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700 transition-colors">
+          <td class="p-3 font-bold text-[11px] dark:text-white"><i class="fas fa-user-tie text-slate-500 mr-1.5"></i>${u.name}</td>
+          <td class="p-3 font-mono text-[10px] text-slate-600 dark:text-slate-300">${u.phone}</td>
+          <td class="p-3 text-[9px] text-slate-500 dark:text-slate-400">${u.joined || '-'}</td>
+          <td class="p-3 text-center space-x-1">
+             <button onclick="window.openUserModal('${u.phone}', 'staff')" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 p-1.5 rounded transition"><i class="fas fa-edit"></i></button>
+             <button onclick="window.deleteUser('${u.phone}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-slate-700 p-1.5 rounded transition"><i class="fas fa-trash-alt"></i></button>
+          </td>
+        </tr>`).join('') : '<tr><td colspan="4" class="p-6 text-center text-slate-400 text-xs">Belum ada akun Staf.</td></tr>';
+    };
+
+    window.toggleUserReset = async (phone, currentVal) => {
+      try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', phone), { allowReset: !currentVal }); window.showToast(`Akses reset diperbarui`, "success"); } 
+      catch(e) { window.showToast("Gagal memperbarui izin", "error"); }
+    };
+
+    window.openUserModal = (phone = null, role = 'customer') => {
+      document.getElementById('formEditUser').reset();
+      document.getElementById('editUserRole').value = role;
+      document.getElementById('editUserIsNew').value = phone === null ? 'true' : 'false';
+      
+      const phoneInput = document.getElementById('editUserPhone');
+      const hint = document.getElementById('editUserPhoneHint');
+      const divAddr = document.getElementById('divEditAddress');
+      
+      document.getElementById('userModalTitle').innerHTML = phone === null ? `<i class="fas fa-user-plus mr-1.5"></i> Buat Akun ${role==='staff'?'Staf':'Pelanggan'}` : `<i class="fas fa-user-edit mr-1.5"></i> Edit Akun ${role==='staff'?'Staf':'Pelanggan'}`;
+      
+      if(role === 'staff') divAddr.classList.add('hidden'); else divAddr.classList.remove('hidden');
+
+      if(phone !== null) {
+        phoneInput.value = phone; phoneInput.disabled = true; hint.classList.remove('hidden');
+        let u = state.users.find(x => x.phone === phone);
+        if(u) { document.getElementById('editUserName').value = u.name; document.getElementById('editUserPass').value = u.pass; document.getElementById('editUserAddress').value = u.address || ''; }
+      } else {
+        phoneInput.disabled = false; hint.classList.add('hidden');
+      }
+      window.openModal('userFormModal');
+    };
+
+    document.getElementById('formEditUser').addEventListener('submit', async (e) => {
+      e.preventDefault(); const loader = document.getElementById('loaderUserEdit'); loader.classList.remove('hidden');
+      const isNew = document.getElementById('editUserIsNew').value === 'true';
+      const role = document.getElementById('editUserRole').value;
+      const phone = document.getElementById('editUserPhone').value.trim();
+      
+      const data = { name: document.getElementById('editUserName').value, phone: phone, pass: document.getElementById('editUserPass').value, role: role };
+      if(role === 'customer') { data.address = document.getElementById('editUserAddress').value; data.favorites = []; data.allowReset = false; data.joined = new Date().toLocaleDateString('id-ID'); } 
+      else { data.joined = new Date().toLocaleDateString('id-ID'); }
+
+      try {
+        if(isNew) {
+           if(state.users.find(u => u.phone === phone)) return window.showToast("ID / No. WA sudah terdaftar!", "warning");
+           await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', phone), data);
+        } else {
+           await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', phone), { name: data.name, pass: data.pass, address: data.address || '' });
+        }
+        window.closeModal('userFormModal'); window.showToast("Data akun disimpan.", "success");
+      } catch(e) { window.showToast("Gagal menyimpan akun.", "error"); } finally { loader.classList.add('hidden'); }
+    });
+
+    window.deleteUser = (phone) => {
+      window.confirmCustomDialog("Hapus Akun", `Yakin ingin menghapus akun permanen?`, async () => {
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', phone));
+        window.showToast("Akun berhasil dihapus", "success");
+      });
+    };
+
+    document.getElementById('formSettings').addEventListener('submit', async (e) => {
+      e.preventDefault(); const loader = document.getElementById('loaderSettings'); loader.classList.remove('hidden');
+      
+      const fileLogo = document.getElementById('setLogoFile');
+      const fileHero = document.getElementById('setHeroFile');
+      let finalLogoUrl = document.getElementById('setLogoBase64').value;
+      let finalHeroUrl = document.getElementById('setHeroBase64').value;
+
+      try {
+        if(fileLogo.files.length > 0) finalLogoUrl = await compressImage(fileLogo.files[0]);
+        if(fileHero.files.length > 0) finalHeroUrl = await compressImage(fileHero.files[0]);
+
+        const data = { 
+          badge: document.getElementById('setBanBadge').value, 
+          title: document.getElementById('setBanTitle').value.replace(/\\n/g, '\n'), 
+          subtitle: document.getElementById('setBanSubtitle').value, 
+          logoUrl: finalLogoUrl, 
+          heroImg: finalHeroUrl, 
+          waCs: document.getElementById('setWaCs').value 
+        };
+
+        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'banner'), data); 
+        document.getElementById('formSettings').reset();
+        window.showToast("Pengaturan tersimpan!", "success"); 
+      } catch(err) { window.showToast(err.message || "Gagal menyimpan", "error"); } 
+      finally { loader.classList.add('hidden'); }
+    });
 
     // --- NAVIGATION HELPERS ---
-    function showCustPage(page) {
+    window.showCustPage = (page) => {
       ['custHomePage','custFavoritesPage','custDashboardPage','custProfilePage'].forEach(id => document.getElementById(id).classList.add('hidden'));
       if(page === 'home') document.getElementById('custHomePage').classList.remove('hidden');
-      if(page === 'favorites') { renderFavorites(); document.getElementById('custFavoritesPage').classList.remove('hidden'); }
-      if(page === 'dashboard') { renderCustomerDashboard(); document.getElementById('custDashboardPage').classList.remove('hidden'); }
-      if(page === 'profile') { setupProfilePage(); document.getElementById('custProfilePage').classList.remove('hidden'); }
-    }
+      if(page === 'favorites') { if(!state.currentUserInfo) return window.openAuthModal(); renderFavorites(); document.getElementById('custFavoritesPage').classList.remove('hidden'); }
+      if(page === 'dashboard') { if(!state.currentUserInfo) return window.openAuthModal(); renderCustomerDashboard(); document.getElementById('custDashboardPage').classList.remove('hidden'); }
+      if(page === 'profile') { if(!state.currentUserInfo) return window.openAuthModal(); setupProfilePage(); document.getElementById('custProfilePage').classList.remove('hidden'); }
+    };
 
-    function showAdminPage(page) {
-      ['btnAdmOverview','btnAdmOrders','btnAdmProducts','btnAdmUsers', 'btnAdmSettings'].forEach(id => { const btn = document.getElementById(id); btn.classList.remove('bg-blue-600', 'text-white'); btn.classList.add('text-slate-300', 'hover:bg-slate-800'); });
-      ['admOverviewPage','admOrdersPage','admProductsPage','admUsersPage', 'admSettingsPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    window.showAdminPage = (page) => {
+      ['btnAdmOverview','btnAdmOrders','btnAdmProducts','btnAdmUsers','btnAdmStaff','btnAdmSettings'].forEach(id => { const btn = document.getElementById(id); if(btn) { btn.classList.remove('bg-red-600', 'text-white'); btn.classList.add('text-slate-300', 'hover:bg-slate-800'); } });
+      ['admOverviewPage','admOrdersPage','admProductsPage','admUsersPage','admStaffPage','admSettingsPage'].forEach(id => document.getElementById(id).classList.add('hidden'));
 
-      if(page === 'overview') { renderAdminDashboard(); document.getElementById('admOverviewPage').classList.remove('hidden'); document.getElementById('btnAdmOverview').classList.add('bg-blue-600', 'text-white'); }
-      if(page === 'orders') { renderAdminOrders(); document.getElementById('admOrdersPage').classList.remove('hidden'); document.getElementById('btnAdmOrders').classList.add('bg-blue-600', 'text-white'); }
-      if(page === 'products') { renderAdminProductsTable(); document.getElementById('admProductsPage').classList.remove('hidden'); document.getElementById('btnAdmProducts').classList.add('bg-blue-600', 'text-white'); }
-      if(page === 'users') { renderAdminUsersTable(); document.getElementById('admUsersPage').classList.remove('hidden'); document.getElementById('btnAdmUsers').classList.add('bg-blue-600', 'text-white'); }
-      if(page === 'settings') { document.getElementById('admSettingsPage').classList.remove('hidden'); document.getElementById('btnAdmSettings').classList.add('bg-blue-600', 'text-white'); applyBanner(); }
+      if(page === 'overview') { renderAdminDashboard(); document.getElementById('admOverviewPage').classList.remove('hidden'); document.getElementById('btnAdmOverview').classList.add('bg-red-600', 'text-white'); }
+      if(page === 'orders') { renderAdminOrders(); document.getElementById('admOrdersPage').classList.remove('hidden'); document.getElementById('btnAdmOrders').classList.add('bg-red-600', 'text-white'); }
+      if(page === 'products') { renderAdminProductsTable(); document.getElementById('admProductsPage').classList.remove('hidden'); document.getElementById('btnAdmProducts').classList.add('bg-red-600', 'text-white'); }
+      if(page === 'users') { renderAdminUsersTable(); document.getElementById('admUsersPage').classList.remove('hidden'); document.getElementById('btnAdmUsers').classList.add('bg-red-600', 'text-white'); }
+      if(page === 'staff') { renderAdminStaffTable(); document.getElementById('admStaffPage').classList.remove('hidden'); document.getElementById('btnAdmStaff').classList.add('bg-red-600', 'text-white'); }
+      if(page === 'settings') { document.getElementById('admSettingsPage').classList.remove('hidden'); document.getElementById('btnAdmSettings').classList.add('bg-red-600', 'text-white'); applySettingsUI(); }
       
       document.getElementById('adminNavLinks').classList.add('hidden'); document.getElementById('adminNavLinks').classList.replace('block', 'md:block');
-    }
+    };
 
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
-
-    function showCustomDialog(title, msg, type="info", cb = null) {
-      const d = document.getElementById('customDialog'); document.getElementById('dialogTitle').innerHTML = title; document.getElementById('dialogMessage').innerHTML = msg; document.getElementById('dialogBtnCancel').classList.add('hidden');
-      const icons = { 'success': '<i class="fas fa-check-circle text-green-500"></i>', 'warning': '<i class="fas fa-exclamation-triangle text-orange-500"></i>', 'error': '<i class="fas fa-times-circle text-red-500"></i>', 'info': '<i class="fas fa-info-circle text-blue-500"></i>' };
-      document.getElementById('dialogIcon').innerHTML = icons[type] || icons['info'];
-      document.getElementById('dialogBtnConfirm').onclick = () => { d.classList.remove('active'); if(cb) setTimeout(cb, 300); };
-      d.classList.remove('hidden'); setTimeout(() => d.classList.add('active'), 10);
-    }
-
-    function confirmCustomDialog(title, msg, cb) {
-      const d = document.getElementById('customDialog'); document.getElementById('dialogTitle').innerHTML = title; document.getElementById('dialogMessage').innerHTML = msg; document.getElementById('dialogIcon').innerHTML = '<i class="fas fa-question-circle text-blue-500"></i>';
-      const c = document.getElementById('dialogBtnCancel'), o = document.getElementById('dialogBtnConfirm'); c.classList.remove('hidden');
-      c.onclick = () => { d.classList.remove('active'); setTimeout(() => d.classList.add('hidden'), 300); };
-      o.onclick = () => { d.classList.remove('active'); setTimeout(() => d.classList.add('hidden'), 300); cb(); };
-      d.classList.remove('hidden'); setTimeout(() => d.classList.add('active'), 10);
-    }
-
-    window.onclick = e => { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('active'); };
-
-    // --- MULAI APLIKASI ---
-    bootSystem();
+    initApp();
   </script>
 </body>
 </html>
