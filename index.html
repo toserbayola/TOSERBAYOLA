@@ -2313,10 +2313,10 @@
     <div id="home" class="page active">
       <div class="carousel-container" id="carousel">
         <div class="carousel-slides" id="carouselSlides">
-          <div class="carousel-slide"><img src="" alt="Sensabu" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Sensabu</h3><p>Senin-Rabu diskon 30%</p></div></div>
-          <div class="carousel-slide"><img src="" alt="Jusami" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Jusami</h3><p>Jumat-Minggu diskon 25%</p></div></div>
-          <div class="carousel-slide"><img src="" alt="Gajian" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Gajian</h3><p>25 Feb - 5 Mar diskon 40%</p></div></div>
-          <div class="carousel-slide"><img src="" alt="Hemat" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Hemat</h3><p>Setiap hari diskon 20%</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Sensabu" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Sensabu</h3><p>Senin-Rabu</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Jusami" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Jusami</h3><p>Jumat-Minggu</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Gajian" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Gajian</h3><p>25 Feb - 5 Mar</p></div></div>
+          <div class="carousel-slide"><img src="" alt="Hemat" onerror="this.style.display='none'"><div class="slide-caption"><h3>Promo Hemat</h3><p>Setiap hari</p></div></div>
         </div>
         <button class="carousel-btn carousel-prev" onclick="prevSlide()">❮</button>
         <button class="carousel-btn carousel-next" onclick="nextSlide()">❯</button>
@@ -2358,7 +2358,7 @@
         <input type="range" id="hargaMax" min="0" max="100000" value="100000" step="1000">
         <div class="harga-range">
           <span>Rp <span id="hargaMinVal">0</span></span>
-          <span>Rp <span id="hargaMaxVal">100000</span></span>
+          <span>Rp <span id="hargaMaxVal">100000</span></span>C
         </div>
       </div>
       <div class="kategori-grid" id="kategoriProduk"></div>
@@ -2540,8 +2540,8 @@
         </div>
         
         <div class="modal-buttons">
-          <button type="button" class="modal-btn btn-cancel" onclick="closeModal('checkoutModal')">Batal</button>
-          <button type="button" class="modal-btn btn-submit" onclick="submitOrder()">
+          <button class="modal-btn btn-cancel" onclick="closeModal('checkoutModal')">Batal</button>
+          <button class="modal-btn btn-submit" onclick="submitOrder()">
             <i class="fab fa-whatsapp"></i> Kirim via WA
           </button>
         </div>
@@ -3710,7 +3710,15 @@
     });
 
     window.submitOrder = function() {
-      // ── 1. AMBIL DATA FORM ──────────────────────────────
+      // ═══════════════════════════════════════════════════════
+      // TRICK ANTI-POPUP-BLOCKER (desktop Chrome/Firefox/Edge):
+      // Buka tab kosong di baris PERTAMA saat masih dalam
+      // konteks klik user, lalu isi URL-nya setelah proses.
+      // Browser tidak akan memblokir karena tab dibuka sinkron.
+      // ═══════════════════════════════════════════════════════
+      const waTab = window.open('about:blank', '_blank');
+
+      // ── 1. AMBIL DATA FORM ─────────────────────────────────
       const name     = document.getElementById('customerName').value.trim();
       const phone    = document.getElementById('customerPhone').value.trim();
       const delivery = document.querySelector('input[name="delivery"]:checked').value;
@@ -3718,67 +3726,65 @@
       const address  = document.getElementById('customerAddress').value.trim();
       const notes    = document.getElementById('customerNotes').value.trim();
 
-      // ── 2. VALIDASI ─────────────────────────────────────
+      // ── 2. VALIDASI — tutup tab jika gagal ─────────────────
       if (!name) {
+        if (waTab) waTab.close();
         showToast('Nama harus diisi', 'error');
         document.getElementById('customerName').focus();
         return;
       }
       if (!phone) {
+        if (waTab) waTab.close();
         showToast('Nomor WhatsApp harus diisi', 'error');
         document.getElementById('customerPhone').focus();
         return;
       }
       if (delivery === 'delivery' && !address) {
+        if (waTab) waTab.close();
         showToast('Alamat harus diisi untuk pengiriman', 'error');
         document.getElementById('customerAddress').focus();
         return;
       }
 
-      // ── 3. HITUNG TOTAL & BUAT PESAN ────────────────────
-      const total   = cart.reduce((sum, i) => sum + (i.harga * i.quantity), 0);
-      const metode  = delivery === 'pickup' ? 'Ambil di Toko' : 'Antar ke Rumah';
+      // ── 3. HITUNG TOTAL & BUAT PESAN WA ───────────────────
+      const total  = cart.reduce((sum, i) => sum + (i.harga * i.quantity), 0);
+      const metode = delivery === 'pickup' ? 'Ambil di Toko' : 'Antar ke Rumah';
 
-      let message = `*TOSERBA YOLA - PESANAN BARU*\n\n`;
-      message += `👤 *Nama:* ${name}\n`;
-      message += `📱 *No. WhatsApp:* ${phone}\n`;
-      message += `📍 *Metode:* ${metode}\n`;
-      message += `💳 *Pembayaran:* ${payment}\n`;
-      if (delivery === 'delivery') message += `🏠 *Alamat:* ${address}\n`;
-      if (notes) message += `📝 *Catatan:* ${notes}\n`;
-      message += `\n*🛒 DETAIL PRODUK*\n`;
-      message += `═══════════════\n`;
-      cart.forEach(item => {
-        const subtotal = item.harga * item.quantity;
-        message += `• ${item.nama}\n  ${item.quantity} x Rp ${item.harga.toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}\n`;
+      let message = '*TOSERBA YOLA - PESANAN BARU*\n\n';
+      message += '\uD83D\uDC64 *Nama:* ' + name + '\n';
+      message += '\uD83D\uDCF1 *No. WhatsApp:* ' + phone + '\n';
+      message += '\uD83D\uDCCD *Metode:* ' + metode + '\n';
+      message += '\uD83D\uDCB3 *Pembayaran:* ' + payment + '\n';
+      if (delivery === 'delivery') message += '\uD83C\uDFE0 *Alamat:* ' + address + '\n';
+      if (notes) message += '\uD83D\uDCDD *Catatan:* ' + notes + '\n';
+      message += '\n*\uD83D\uDED2 DETAIL PRODUK*\n';
+      message += '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n';
+      cart.forEach(function(item) {
+        var subtotal = item.harga * item.quantity;
+        message += '\u2022 ' + item.nama + '\n  ' + item.quantity + ' x Rp ' + item.harga.toLocaleString('id-ID') + ' = Rp ' + subtotal.toLocaleString('id-ID') + '\n';
       });
-      message += `═══════════════\n`;
-      message += `*💰 TOTAL: Rp ${total.toLocaleString('id-ID')}*\n\n`;
-      message += `Terima kasih telah berbelanja di TOSERBA YOLA 🙏`;
+      message += '\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\n';
+      message += '*\uD83D\uDCB0 TOTAL: Rp ' + total.toLocaleString('id-ID') + '*\n\n';
+      message += 'Terima kasih telah berbelanja di TOSERBA YOLA \uD83D\uDE4F';
 
-      const waUrl = `https://wa.me/6282130998503?text=${encodeURIComponent(message)}`;
+      const waUrl = 'https://wa.me/6282130998503?text=' + encodeURIComponent(message);
 
-      // ── 4. BUKA WHATSAPP LANGSUNG (sebelum proses lain!) ─
-      // Cara paling andal: gunakan location.href untuk mobile,
-      // fallback anchor click agar tidak diblokir popup blocker
-      try {
-        const waWin = window.open(waUrl, '_blank');
-        if (!waWin || waWin.closed || typeof waWin.closed === 'undefined') {
-          // Jika popup diblokir, arahkan di tab yang sama lewat link
-          const a = document.createElement('a');
-          a.href = waUrl;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => document.body.removeChild(a), 500);
-        }
-      } catch(e) {
-        window.location.href = waUrl;
+      // ── 4. ARAHKAN TAB KE WHATSAPP ────────────────────────
+      if (waTab && !waTab.closed) {
+        waTab.location.href = waUrl;
+      } else {
+        // Fallback: anchor click
+        var a = document.createElement('a');
+        a.href = waUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() { document.body.removeChild(a); }, 500);
       }
 
-      // ── 5. SIMPAN ORDER (setelah WA dibuka) ─────────────
-      const order = {
+      // ── 5. SIMPAN ORDER ────────────────────────────────────
+      var order = {
         id: 'ORD' + Date.now(),
         waktu: new Date().toLocaleString('id-ID'),
         nama: name,
@@ -3786,13 +3792,12 @@
         alamat: delivery === 'delivery' ? address : null,
         metode: metode,
         pembayaran: payment,
-        items: cart.map(i => ({ id: i.id, nama: i.nama, harga: i.harga, quantity: i.quantity })),
+        items: cart.map(function(i) { return { id: i.id, nama: i.nama, harga: i.harga, quantity: i.quantity }; }),
         total: total,
         status: 'pending',
         notes: notes,
         timeline: [{ status: 'pending', waktu: new Date().toLocaleString(), keterangan: 'Pesanan dibuat' }]
       };
-
       orders.push(order);
       localStorage.setItem('orders', JSON.stringify(orders));
 
@@ -3801,14 +3806,14 @@
         currentCustomer.totalSpent  = (currentCustomer.totalSpent  || 0) + total;
         currentCustomer.poin        = (currentCustomer.poin        || 0) + Math.floor(total / 1000);
         localStorage.setItem('currentCustomer', JSON.stringify(currentCustomer));
-        const custIndex = customers.findIndex(c => c.telepon === phone);
+        var custIndex = customers.findIndex(function(c) { return c.telepon === phone; });
         if (custIndex >= 0) {
           customers[custIndex] = currentCustomer;
           localStorage.setItem('customers', JSON.stringify(customers));
         }
       }
 
-      // ── 6. BERSIHKAN & TUTUP ─────────────────────────────
+      // ── 6. BERSIHKAN UI ────────────────────────────────────
       cart = [];
       saveCart();
       updateCartUI();
@@ -3820,7 +3825,7 @@
       showToast('Pesanan berhasil dikirim! Cek WhatsApp Anda', 'success');
 
       if (currentCustomer) {
-        setTimeout(() => showPage('my-orders'), 1500);
+        setTimeout(function() { showPage('my-orders'); }, 1500);
       }
     };
 
